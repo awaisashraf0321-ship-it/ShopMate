@@ -127,6 +127,7 @@ const Design = ({
             size="sm"
             fullWidth={false}
             onPress={() => setShowPhotoModal(true)}
+            style={styles.changePhoto}
           />
         </View>
 

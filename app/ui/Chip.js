@@ -16,13 +16,13 @@ export function Chip({ label, selected = false, onPress }) {
         {
           borderRadius: radius.pill,
           paddingHorizontal: spacing.lg,
-          backgroundColor: selected ? colors.textPrimary : colors.surface,
-          borderColor: selected ? colors.textPrimary : colors.border,
+          backgroundColor: selected ? colors.primary : colors.surface,
+          borderColor: selected ? colors.primary : colors.border,
           opacity: pressed ? 0.85 : 1,
         },
       ]}
     >
-      <AppText variant="label" color={selected ? 'textInverse' : 'textPrimary'}>
+      <AppText variant="label" color={selected ? 'onPrimary' : 'textPrimary'}>
         {label}
       </AppText>
     </Pressable>

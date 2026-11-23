@@ -71,12 +71,15 @@ const PeriodFilterModal = ({
                 onPress={() => handleSelect(item)}
               >
                 {isSelected ? (
-                  <LinearGradient
-                    colors={theme.colors.gradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.optionSelected}
-                  >
+                  // Gradient as a background layer: padding on LinearGradient
+                  // itself renders inset and clipped the row.
+                  <View style={styles.optionSelected}>
+                    <LinearGradient
+                      colors={theme.colors.gradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.optionFill}
+                    />
                     <View style={styles.optionIconSelected}>
                       <Icon
                         name={item.icon}
@@ -98,7 +101,7 @@ const PeriodFilterModal = ({
                         color={theme.colors.primary}
                       />
                     </View>
-                  </LinearGradient>
+                  </View>
                 ) : (
                   <View style={styles.optionUnselected}>
                     <View style={styles.optionIconUnselected}>
@@ -186,7 +189,17 @@ const styles = StyleSheet.create({
     marginBottom: sizeHelper.calHp(14),
   },
 
+  optionFill: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: sizeHelper.calHp(24),
+  },
+
   optionSelected: {
+    overflow: 'hidden',
     minHeight: sizeHelper.calHp(100),
     flexDirection: 'row',
     alignItems: 'center',

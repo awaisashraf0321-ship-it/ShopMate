@@ -29,31 +29,40 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}
             >
               <Text style={styles.title}>Update Photo</Text>
-              <TouchableOpacity onPress={onDelete}>
+              <TouchableOpacity
+                onPress={onDelete}
+                accessibilityRole="button"
+                accessibilityLabel="Remove photo"
+                hitSlop={10}
+              >
                 <Icon
                   name="delete-outline"
-                  size={sizeHelper.calHp(65)}
-                  color="black"
+                  size={theme.sizes.icon.lg}
+                  color={theme.colors.danger}
                 />
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.option} onPress={onCamera}>
-              <Icon
-                name="camera-alt"
-                size={sizeHelper.calHp(65)}
-                color={theme.colors.textPrimary}
-              />
+              <View style={styles.optionIcon}>
+                <Icon
+                  name="camera-alt"
+                  size={theme.sizes.icon.md}
+                  color={theme.colors.primary}
+                />
+              </View>
 
               <Text style={styles.optionText}>Camera</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.option} onPress={onGallery}>
-              <Icon
-                name="photo-library"
-                size={sizeHelper.calHp(65)}
-                color={theme.colors.textPrimary}
-              />
+              <View style={styles.optionIcon}>
+                <Icon
+                  name="photo-library"
+                  size={theme.sizes.icon.md}
+                  color={theme.colors.primary}
+                />
+              </View>
 
               <Text style={styles.optionText}>Gallery</Text>
             </TouchableOpacity>
@@ -71,14 +80,28 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
 export default PhotoModal;
 
 const styles = StyleSheet.create({
+  // Soft emerald tile, same as the other sheets' option icons
+  optionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   overlay: {
     flex: 1,
     backgroundColor: theme.colors.overlay,
     justifyContent: 'flex-end',
   },
 
+  // White behind the home-indicator inset so the sheet reaches the bottom edge
   safeArea: {
     width: '100%',
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: sizeHelper.calHp(70),
+    borderTopRightRadius: sizeHelper.calHp(70),
+    overflow: 'hidden',
   },
 
   modalBox: {

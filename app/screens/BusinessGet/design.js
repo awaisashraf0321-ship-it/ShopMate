@@ -75,7 +75,7 @@ const Design = ({
       />
       <LeadgerHeader
         title={'Business Expense'}
-        subTitle="Manage your Business expenses"
+        subTitle="Manage your business expenses"
         btn={false}
         navigation={navigation}
         plus={true}
@@ -91,7 +91,7 @@ const Design = ({
         <PaymentSummaryCard
           totalAmount={myDashboard.TotalExpense}
           totalTransactions={myDashboard.PaymentCount}
-          paymentText="Total Buisness Expense"
+          paymentText="Total business expenses"
           paymentPercentage="Business"
           selectedPeriod={selectedPeriod}
           setSelectedPeriod={setSelectedPeriod}
@@ -124,7 +124,7 @@ const Design = ({
         {groupedPayments.length === 0 && !Loading1 ? (
           <EmptyState
             title="No Business Expense Available"
-            message="You haven't added any Business payments yet. Tap the plus icon above to create one."
+            message="You haven't added any business expenses yet. Tap the plus icon above to create one."
           />
         ) : (
           groupedPayments.map(group => (

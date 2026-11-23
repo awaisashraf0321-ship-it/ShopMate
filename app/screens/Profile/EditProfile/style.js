@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.sm,
   },
+  changePhoto: { alignSelf: 'center' },
   save: { marginTop: spacing.xl },
 });
 

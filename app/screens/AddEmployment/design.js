@@ -11,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   Platform,
   Keyboard,
-  SafeAreaView,
 } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -100,7 +99,7 @@ const CustomerScreen = ({
   };
 
   return (
-    <SafeAreaView style={customerStyles.safeArea}>
+    <View style={customerStyles.safeArea}>
       <DropdownStylishBtn
         navigation={navigation}
         showDropdown={false}
@@ -130,11 +129,7 @@ const CustomerScreen = ({
                 style={customerStyles.scrollView}
                 contentContainerStyle={[
                   customerStyles.scrollContent,
-                  {
-                    paddingBottom: onFocus
-                      ? sizeHelper.calHp(1600)
-                      : sizeHelper.calHp(1200),
-                  },
+                  { paddingBottom: theme.spacing.xl },
                 ]}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
@@ -174,7 +169,7 @@ const CustomerScreen = ({
                 {/* Phone number */}
                 <View style={customerStyles.fieldContainer}>
                   <Text style={customerStyles.fieldLabel}>
-                    Phone number
+                    Phone number{' '}
                     <Text style={customerStyles.requiredText}>*</Text>
                   </Text>
 
@@ -425,36 +420,36 @@ const CustomerScreen = ({
                     </View>
                   )}
                 </View>
-                <View style={customerStyles.bottomBar}>
-                  <TouchableOpacity
-                    style={[
-                      customerStyles.saveButton,
-                      loading && customerStyles.saveButtonDisabled,
-                    ]}
-                    activeOpacity={0.85}
-                    disabled={loading}
-                    onPress={handleSubmit}
-                  >
-                    <>
-                      <Icon
-                        name="check"
-                        size={21}
-                        color={theme.colors.onPrimary}
-                      />
-                      <Text style={customerStyles.saveButtonText}>
-                        Save customer
-                      </Text>
-                    </>
-                  </TouchableOpacity>
-                </View>
               </ScrollView>
 
-              {/* Fixed bottom save button */}
+              {/* Save button pinned below the form */}
+              <View style={customerStyles.bottomBar}>
+                <TouchableOpacity
+                  style={[
+                    customerStyles.saveButton,
+                    loading && customerStyles.saveButtonDisabled,
+                  ]}
+                  activeOpacity={0.85}
+                  disabled={loading}
+                  onPress={handleSubmit}
+                >
+                  <>
+                    <Icon
+                      name="check"
+                      size={21}
+                      color={theme.colors.onPrimary}
+                    />
+                    <Text style={customerStyles.saveButtonText}>
+                      Save customer
+                    </Text>
+                  </>
+                </TouchableOpacity>
+              </View>
             </>
           )}
         </Formik>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

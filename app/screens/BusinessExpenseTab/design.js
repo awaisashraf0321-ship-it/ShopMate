@@ -102,7 +102,7 @@ const Design = ({
           totalAmount={outgoingdashboard.TotalOutgoing}
           totalTransactions={outgoingdashboard.OutgoingCount}
           methods={methods}
-          paymentText="Total outcoming"
+          paymentText="Total sent"
           paymentType="Outgoing"
           paymentPercentage="Outgoing"
           formatAmount={formatAmount}
@@ -135,7 +135,7 @@ const Design = ({
         {payment.length === 0 && !loading ? (
           <EmptyState
             title="No Outgoing Payments Available"
-            message="You haven't added any outcoming payments yet. Tap the plus icon above to create one."
+            message="You haven't recorded any outgoing payments yet. Tap the plus icon above to create one."
           />
         ) : (
           groupedPayments.map(group => (

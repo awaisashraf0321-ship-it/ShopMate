@@ -103,7 +103,7 @@ const Design = ({
           totalAmount={Ingoingdashboard.TotalIncoming}
           totalTransactions={Ingoingdashboard.IncomingCount}
           methods={methods}
-          paymentText="Total InComing"
+          paymentText="Total received"
           paymentType="Ingoing"
           paymentPercentage="Ingoing"
           formatAmount={formatAmount}
@@ -137,7 +137,7 @@ const Design = ({
         {payment.length === 0 && !loading ? (
           <EmptyState
             title="No Incoming Payments Available"
-            message="You haven't added any Incoming payments yet. Tap the plus icon above to create one."
+            message="You haven't recorded any received payments yet. Tap the plus icon above to create one."
           />
         ) : (
           groupedPayments.map((group, index) => (

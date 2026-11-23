@@ -145,14 +145,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   addressTypeSelected: {
-    backgroundColor: colors.textPrimary,
-    borderColor: colors.textPrimary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   addressTypeText: { ...typography.label, color: colors.textPrimary },
-  addressTypeTextSelected: { color: colors.textInverse },
+  addressTypeTextSelected: { color: colors.onPrimary },
   addressField: { marginBottom: spacing.md },
 
-  bottomBar: { paddingVertical: spacing.lg },
+  // Pinned save bar, same as the other forms
+  bottomBar: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
   // Same look as ui/Button (primary, md)
   saveButton: {
     width: '100%',
