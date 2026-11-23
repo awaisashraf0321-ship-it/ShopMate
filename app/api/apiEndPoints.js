@@ -16,7 +16,6 @@ export const API_END_POINTS = {
   CUSTOMER_DELETE: '/api/Customer/delete/{id}',
   POST_EXPENSES: '/api/Expenses/post',
   LOOKUP_EXPENSE_CATEGORIES: '/api/Lookup/ExpenseCategories/Module/{moduleId}',
-  POST_EXPENSES: '/api/Expenses/post',
   GET_EXPENSES_ALL: '/api/Expenses/All',
   DELETE_EXPENSES: '/api/Expenses/delete/{id}',
   EXPENSES_GET_BY_ID: '/api/Expenses/getById/{id}',
