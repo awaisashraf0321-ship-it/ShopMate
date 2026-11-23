@@ -2,8 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
-import colors1 from '../theme/myColors';
+import { theme } from '../theme';
 
 const BudgetAmountInput = ({
   expenseAmount,
@@ -19,7 +18,7 @@ const BudgetAmountInput = ({
         style={[styles.inputWrapper, compact && styles.compactInputWrapper]}
       >
         <Text style={[styles.currency, compact && styles.compactCurrency]}>
-          Rs.
+          Rs
         </Text>
 
         <TextInput
@@ -27,7 +26,7 @@ const BudgetAmountInput = ({
           value={expenseAmount}
           onChangeText={Changed}
           placeholder={compact ? 'Amount' : 'Enter Your Expense Amount'}
-          placeholderTextColor={compact ? '#000000c5' : '#999999'}
+          placeholderTextColor={theme.colors.textMuted}
           keyboardType="numeric"
           onFocus={onFocus}
         />
@@ -47,7 +46,7 @@ const styles = StyleSheet.create({
     fontSize: sizeHelper.calHp(28),
     fontWeight: '600',
     marginTop: sizeHelper.calHp(20),
-    color: colors.textColor,
+    color: theme.colors.textSecondary,
     marginBottom: sizeHelper.calHp(12),
   },
 
@@ -55,9 +54,9 @@ const styles = StyleSheet.create({
     minHeight: sizeHelper.calHp(120),
     borderWidth: 1,
     width: '95%',
-    borderColor: colors.borderColor,
+    borderColor: theme.colors.border,
     borderRadius: sizeHelper.calHp(35),
-    backgroundColor: colors.white,
+    backgroundColor: theme.colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: sizeHelper.calWp(25),
@@ -65,14 +64,14 @@ const styles = StyleSheet.create({
 
   currency: {
     fontSize: sizeHelper.calHp(30),
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
     marginRight: sizeHelper.calWp(10),
   },
 
   input: {
     flex: 1,
     fontSize: sizeHelper.calHp(30),
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
     paddingVertical: sizeHelper.calHp(20),
   },
 
@@ -84,26 +83,25 @@ const styles = StyleSheet.create({
 
   compactInputWrapper: {
     width: '100%',
-    minHeight: sizeHelper.calHp(85),
+    minHeight: 52,
     borderWidth: 1,
-    borderColor: colors1.border,
-    borderRadius: sizeHelper.calHp(14),
-    backgroundColor: colors1.white,
-    paddingHorizontal: sizeHelper.calWp(10),
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.md,
   },
 
   compactCurrency: {
-    fontSize: sizeHelper.calHp(27),
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    marginRight: sizeHelper.calWp(5),
+    ...theme.typography.bodyStrong,
+    color: theme.colors.textSecondary,
+    marginRight: theme.spacing.xs,
   },
 
   compactInput: {
-    fontSize: sizeHelper.calHp(27),
-    color: colors1.black,
-    fontWeight: '700',
-    fontFamily: 'PlusJakartaSans-Regular',
-    paddingVertical: sizeHelper.calHp(8),
+    flex: 1,
+    ...theme.typography.body,
+    lineHeight: undefined,
+    color: theme.colors.textPrimary,
+    paddingVertical: theme.spacing.sm,
   },
 });

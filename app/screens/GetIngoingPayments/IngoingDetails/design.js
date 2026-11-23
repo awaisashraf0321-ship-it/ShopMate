@@ -6,7 +6,6 @@ import React from 'react';
 import Loader from '../../../components/Loader';
 import { ScrollView } from 'react-native';
 import ConfirmModal from '../../../components/ConfirmModal';
-import colors from '../../../theme/colors';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
 const Design = ({
   navigation,
@@ -28,12 +27,10 @@ const Design = ({
         <DropdownStylishBtn
           navigation={navigation}
           Margin={false}
-          showDropdown={true}
+          showDropdown={false}
           showBack={true}
           showPlus={false}
           back={() => navigation.goBack()}
-
-          // onPress={() => navigation.navigate('InComing')}
         />
         <LeadgerHeader
           title={'Payment Details'}
@@ -60,7 +57,7 @@ const Design = ({
               reciptNo={getPayments1.ReceiptNo}
               module={getPayments1.Module}
               Description={getPayments1.Description}
-              paymentMode={getPayments1.paymentMode}
+              paymentMode={getPayments1.Paymentmode ?? getPayments1.paymentMode}
               reciptDate={getPayments1.ReceiptDate}
               navigation={navigation}
               formatDate={formatDate}
@@ -74,14 +71,12 @@ const Design = ({
           <ConfirmModal
             visible={deleteModal1}
             icon="delete"
-            style={{ backgroundColor: colors.lightDot }}
-            iconColor={colors.redColor}
+            tone="danger"
             title="Are You Sure?"
             deleteText="Delete"
             subTitle1="This payment will be permanently deleted."
             subTitle2="Do you want to continue?"
             onClose={() => SetDeleteModal1(false)}
-            btnStyle={{ backgroundColor: colors.redColor }}
             onOk={() => {
               handleDelete(selectedPaymentId1);
               SetDeleteModal1(false);

@@ -10,6 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import sizeHelper from '../helpers/sizeHelper';
+import { theme } from '../theme';
 
 const PeriodFilterModal = ({
   visible,
@@ -41,7 +42,7 @@ const PeriodFilterModal = ({
               <Icon
                 name="calendar-month"
                 size={sizeHelper.calHp(34)}
-                color="#8996B5"
+                color={theme.colors.textMuted}
               />
               <Text style={styles.headerTitle}>Select Period</Text>
             </View>
@@ -51,7 +52,11 @@ const PeriodFilterModal = ({
               activeOpacity={0.7}
               onPress={() => setVisible(false)}
             >
-              <Icon name="close" size={sizeHelper.calHp(32)} color="#8490AD" />
+              <Icon
+                name="close"
+                size={sizeHelper.calHp(32)}
+                color={theme.colors.textMuted}
+              />
             </TouchableOpacity>
           </View>
 
@@ -67,7 +72,7 @@ const PeriodFilterModal = ({
               >
                 {isSelected ? (
                   <LinearGradient
-                    colors={['#9148F8', '#C348E8']}
+                    colors={theme.colors.gradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.optionSelected}
@@ -76,7 +81,7 @@ const PeriodFilterModal = ({
                       <Icon
                         name={item.icon}
                         size={sizeHelper.calHp(40)}
-                        color="#FFFFFF"
+                        color={theme.colors.onPrimary}
                       />
                     </View>
 
@@ -90,7 +95,7 @@ const PeriodFilterModal = ({
                       <Icon
                         name="check"
                         size={sizeHelper.calHp(26)}
-                        color="#9C48ED"
+                        color={theme.colors.primary}
                       />
                     </View>
                   </LinearGradient>
@@ -100,7 +105,7 @@ const PeriodFilterModal = ({
                       <Icon
                         name={item.icon}
                         size={sizeHelper.calHp(40)}
-                        color="#843CF2"
+                        color={theme.colors.primary}
                       />
                     </View>
 
@@ -125,7 +130,7 @@ export default PeriodFilterModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(16, 20, 40, 0.45)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: sizeHelper.calWp(30),
@@ -133,12 +138,12 @@ const styles = StyleSheet.create({
 
   dropdownMenu: {
     width: '80%',
-    backgroundColor: '#FFFEFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: sizeHelper.calHp(32),
     paddingHorizontal: sizeHelper.calWp(24),
     paddingVertical: sizeHelper.calHp(24),
     elevation: 12,
-    shadowColor: '#000000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
       height: sizeHelper.calHp(8),
@@ -162,9 +167,9 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontFamily: 'PlusJakartaSans-Bold',
+    fontFamily: theme.fontFamily.bold,
     fontSize: sizeHelper.calHp(30),
-    color: '#252B43',
+    color: theme.colors.textPrimary,
     fontWeight: '700',
   },
 
@@ -172,7 +177,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(52),
     height: sizeHelper.calHp(52),
     borderRadius: sizeHelper.calHp(18),
-    backgroundColor: '#F1F2F8',
+    backgroundColor: theme.colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -197,16 +202,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: sizeHelper.calWp(18),
     paddingVertical: sizeHelper.calHp(14),
     borderRadius: sizeHelper.calHp(24),
-    backgroundColor: '#F8F7FC',
+    backgroundColor: theme.colors.surfaceMuted,
     borderWidth: 1,
-    borderColor: '#ECE8F6',
+    borderColor: theme.colors.border,
   },
 
   optionIconSelected: {
     width: sizeHelper.calWp(62),
     height: sizeHelper.calHp(62),
     borderRadius: sizeHelper.calHp(20),
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: theme.colors.onPrimarySurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -215,7 +220,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(62),
     height: sizeHelper.calHp(62),
     borderRadius: sizeHelper.calHp(20),
-    backgroundColor: '#EEE5FF',
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -226,16 +231,16 @@ const styles = StyleSheet.create({
   },
 
   selectedOptionTitle: {
-    fontFamily: 'PlusJakartaSans-Bold',
+    fontFamily: theme.fontFamily.bold,
     fontSize: sizeHelper.calHp(28),
-    color: '#FFFFFF',
+    color: theme.colors.onPrimary,
     fontWeight: '700',
   },
 
   optionTitle: {
-    fontFamily: 'PlusJakartaSans-SemiBold',
+    fontFamily: theme.fontFamily.semiBold,
     fontSize: sizeHelper.calHp(28),
-    color: '#292D43',
+    color: theme.colors.textPrimary,
     fontWeight: '600',
   },
 
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(38),
     height: sizeHelper.calHp(38),
     borderRadius: sizeHelper.calHp(19),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -253,6 +258,6 @@ const styles = StyleSheet.create({
     height: sizeHelper.calHp(30),
     borderRadius: sizeHelper.calHp(15),
     borderWidth: 2,
-    borderColor: '#C9BEDD',
+    borderColor: theme.colors.border,
   },
 });

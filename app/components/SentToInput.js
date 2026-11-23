@@ -13,9 +13,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../theme/colors';
 import sizeHelper from '../helpers/sizeHelper';
 import SearchBar from '../components/SearchBar';
+import { theme } from '../theme';
 
 const SentToInput = ({
   search,
@@ -77,8 +77,8 @@ const SentToInput = ({
         >
           <Icon
             name="person-outline"
-            size={sizeHelper.calHp(38)}
-            color={colors.textSecondary}
+            size={theme.sizes.icon.md}
+            color={theme.colors.textSecondary}
             style={styles.personIcon}
           />
 
@@ -91,8 +91,8 @@ const SentToInput = ({
 
           <Icon
             name="keyboard-arrow-down"
-            size={sizeHelper.calHp(42)}
-            color={colors.textSecondary}
+            size={theme.sizes.icon.lg}
+            color={theme.colors.textSecondary}
           />
         </TouchableOpacity>
       </View>
@@ -123,7 +123,7 @@ const SentToInput = ({
                     <Icon
                       name="close"
                       size={sizeHelper.calHp(48)}
-                      color="#333"
+                      color={theme.colors.textPrimary}
                     />
                   </TouchableOpacity>
                 </View>
@@ -142,7 +142,7 @@ const SentToInput = ({
                         setSearch={setSearch}
                         placeholder="Search by name"
                         style1={{
-                          backgroundColor: '#e8f0fe9d',
+                          backgroundColor: theme.colors.surfaceMuted,
                           width: '100%',
                           marginHorizontal: sizeHelper.calWp(0),
                         }}
@@ -157,7 +157,7 @@ const SentToInput = ({
                             style={styles.iconPlus}
                             name="add"
                             size={sizeHelper.calHp(40)}
-                            color={colors.primary}
+                            color={theme.colors.primary}
                           />
 
                           <Text style={styles.CusText}>Add new Customer</Text>
@@ -238,7 +238,7 @@ const SentToInput = ({
                               <Icon
                                 name="check"
                                 size={sizeHelper.calHp(30)}
-                                color={colors.white}
+                                color={theme.colors.onPrimary}
                               />
                             </View>
                           )}
@@ -260,29 +260,19 @@ export default SentToInput;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: sizeHelper.calHp(15),
+    marginTop: theme.spacing.md,
   },
 
   cardCon: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginHorizontal: theme.spacing.lg,
   },
 
+  // Same look as ui/Card
   card: {
-    backgroundColor: colors.cardBackground,
-    borderRadius: sizeHelper.calHp(35),
-    marginHorizontal: sizeHelper.calWp(29),
-    width: '94%',
-    paddingVertical: sizeHelper.calHp(28),
-    elevation: 3,
-    shadowColor: colors.textPrimary,
-    shadowOffset: {
-      width: 0,
-      height: sizeHelper.calHp(4),
-    },
-    shadowOpacity: 0.07,
-    shadowRadius: sizeHelper.calHp(12),
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
+    ...theme.shadows.sm,
   },
 
   header: {
@@ -291,68 +281,64 @@ const styles = StyleSheet.create({
   },
 
   iconCircle: {
-    width: sizeHelper.calWp(78),
-    height: sizeHelper.calHp(78),
-    borderRadius: sizeHelper.calHp(50),
-    backgroundColor: colors.primaryGradientStart,
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   titleContainer: {
-    marginLeft: sizeHelper.calWp(22),
+    marginLeft: theme.spacing.md,
     flex: 1,
   },
 
   label: {
-    fontSize: sizeHelper.calHp(30),
-    marginHorizontal: sizeHelper.calWp(40),
-    fontFamily: 'PlusJakartaSans-Regular',
-    fontWeight: '700',
-    color: colors.textPrimary,
+    ...theme.typography.label,
+    color: theme.colors.textPrimary,
+    marginHorizontal: theme.spacing.lg,
   },
 
+  // Same look as ui/TextField
   inputWrapper: {
-    marginTop: sizeHelper.calHp(22),
-    minHeight: sizeHelper.calHp(125),
-    borderRadius: sizeHelper.calHp(25),
-    backgroundColor: colors.white,
-    width: '94%',
+    marginTop: theme.spacing.sm,
+    minHeight: 52,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
+    width: '100%',
     borderWidth: 1,
-    borderColor: colors.borderColor,
-    paddingHorizontal: sizeHelper.calWp(22),
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
   },
 
   personIcon: {
-    marginRight: sizeHelper.calWp(20),
-    marginLeft: sizeHelper.calWp(10),
+    marginRight: theme.spacing.sm,
   },
 
   inputText: {
     flex: 1,
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '400',
-    fontFamily: 'PlusJakartaSans-Regular',
-    color: colors.textPrimary,
+    ...theme.typography.body,
+    lineHeight: undefined,
+    color: theme.colors.textPrimary,
   },
 
   placeholder: {
-    color: colors.textSecondary,
-    fontWeight: '400',
+    color: theme.colors.textMuted,
   },
 
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'flex-end',
     width: '100%',
   },
 
   dropdown: {
     width: '100%',
-    backgroundColor: colors.white,
+    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: sizeHelper.calHp(46),
     borderTopRightRadius: sizeHelper.calHp(46),
     maxHeight: '75%',
@@ -372,16 +358,16 @@ const styles = StyleSheet.create({
 
   modalTitle: {
     fontSize: sizeHelper.calHp(43),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
     fontWeight: '700',
     marginLeft: sizeHelper.calWp(5),
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
   },
 
   iconBorder: {
     height: sizeHelper.calHp(90),
     width: sizeHelper.calHp(90),
-    backgroundColor: '#E8F0FE',
+    backgroundColor: theme.colors.surfaceMuted,
     borderRadius: sizeHelper.calHp(30),
     justifyContent: 'center',
     alignItems: 'center',
@@ -398,18 +384,18 @@ const styles = StyleSheet.create({
   optionText: {
     flex: 1,
     fontSize: sizeHelper.calHp(35),
-    color: colors.dark,
+    color: theme.colors.textPrimary,
     fontWeight: 'bold',
     marginLeft: sizeHelper.calWp(40),
     marginRight: sizeHelper.calWp(20),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
   },
 
   emptyText: {
     textAlign: 'center',
     paddingVertical: sizeHelper.calHp(50),
-    color: colors.textSecondary,
-    fontFamily: 'PlusJakartaSans-Regular',
+    color: theme.colors.textSecondary,
+    fontFamily: theme.fontFamily.regular,
   },
 
   addCusCon: {
@@ -426,12 +412,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: sizeHelper.calWp(20),
     borderStyle: 'dotted',
-    borderColor: colors.primary,
+    borderColor: theme.colors.primary,
   },
 
   CusText: {
-    color: colors.primary,
-    fontFamily: 'PlusJakartaSans-Regular',
+    color: theme.colors.primary,
+    fontFamily: theme.fontFamily.regular,
     fontWeight: 'bold',
   },
 
@@ -444,10 +430,10 @@ const styles = StyleSheet.create({
   },
 
   cusLenText: {
-    color: '#808080',
+    color: theme.colors.textMuted,
     fontWeight: 'bold',
     marginBottom: sizeHelper.calHp(20),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
     fontSize: sizeHelper.calHp(30),
   },
 
@@ -461,11 +447,11 @@ const styles = StyleSheet.create({
 
   initials: {
     fontSize: sizeHelper.calHp(30),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
   },
 
   selected: {
-    backgroundColor: '#DCEAFF',
+    backgroundColor: theme.colors.primarySoft,
     borderRadius: sizeHelper.calHp(40),
     height: sizeHelper.calHp(160),
   },
@@ -478,7 +464,7 @@ const styles = StyleSheet.create({
     height: sizeHelper.calHp(70),
     marginRight: sizeHelper.calWp(26),
     width: sizeHelper.calWp(70),
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: sizeHelper.calHp(49),
@@ -488,7 +474,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
     marginTop: sizeHelper.calHp(20),
     height: sizeHelper.calHp(140),
     borderRadius: sizeHelper.calHp(40),
@@ -496,7 +482,7 @@ const styles = StyleSheet.create({
   },
 
   selectedText: {
-    color: colors.white,
+    color: theme.colors.onPrimary,
     fontWeight: 'bold',
   },
 });

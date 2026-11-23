@@ -1,134 +1,83 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-} from 'react-native';
+import { StyleSheet, Pressable, View } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useModule } from './ModuleContext';
-import colors from '../theme/colors';
-import sizeHelper from '../helpers/sizeHelper';
+import { theme } from '../theme';
+import { AppText } from '../ui';
+
+const { colors, spacing, radius, sizes, shadows } = theme;
+
+const ACTIONS = {
+  self: {
+    label: 'Add Self Expenses',
+    icon: 'account-balance-wallet',
+    screen: 'SelfExpense',
+  },
+  business: {
+    label: 'Business Expense',
+    icon: 'business-center',
+    screen: 'BusinessExpense',
+  },
+  loan: { label: 'Outgoing Payments', icon: 'payments', screen: 'Loan' },
+  incoming: {
+    label: 'Incoming Payments',
+    icon: 'call-received',
+    screen: 'InComing',
+  },
+  monthly: {
+    label: 'Monthly Budget',
+    icon: 'calendar-month',
+    screen: 'Monthly',
+  },
+  customer: { label: 'Add Customer', icon: 'person', screen: 'AddCustomer' },
+};
+
+// Which four shortcuts each module shows, in order.
+const BY_MODULE = {
+  'Self Expense': ['self', 'loan', 'incoming', 'monthly'],
+  'Business Expense': ['business', 'loan', 'incoming', 'customer'],
+};
+
+/** Four shortcut tiles under the balance card; set depends on the module. */
 const QuickActions = ({ navigation }) => {
   const { selectedModule } = useModule();
-
-  const Actions = [
-    {
-      key: 'self',
-      label: ' Add Self Expenses',
-      icon: 'account-balance-wallet',
-      color: colors.categoryTravel,
-      lightColor: colors.primary,
-      screen: 'SelfExpense',
-    },
-    {
-      key: 'business',
-      label: 'Business Expense',
-      icon: 'business-center',
-      color: colors.dot,
-      lightColor: colors.primary,
-      screen: 'BusinessExpense',
-    },
-    {
-      key: 'loan',
-      label: 'Outgoing Payments',
-      icon: 'payments',
-      color: colors.primaryGradientStart,
-      lightColor: colors.primary,
-      screen: 'Loan',
-    },
-    {
-      key: 'Ingoing',
-      label: 'Incoming Payments',
-      icon: 'call-received',
-      color: colors.primaryGradientStart,
-      lightColor: colors.primary,
-      screen: 'InComing',
-    },
-    {
-      key: 'Monthly',
-      label: 'Montly Budget',
-      icon: 'calendar-month',
-      color: colors.primaryGradientStart,
-      lightColor: colors.primary,
-      screen: 'Monthly',
-    },
-    {
-      key: 'customer',
-      label: 'Add Customer',
-      icon: 'person',
-      color: colors.primaryGradientStart,
-      lightColor: colors.primary,
-      screen: 'AddCustomer',
-    },
-  ];
-
-  let actions = [];
-
-  for (let i = 0; i < Actions.length; i++) {
-    const item = Actions[i];
-
-    if (selectedModule === 'Self Expense') {
-      if (
-        item.key === 'self' ||
-        item.key === 'loan' ||
-        item.key === 'Ingoing' ||
-        item.key === 'Monthly'
-      ) {
-        actions.push(item);
-      }
-    } else {
-      if (
-        item.key === 'business' ||
-        item.key === 'loan' ||
-        item.key === 'Ingoing' ||
-        item.key === 'customer'
-      ) {
-        actions.push(item);
-      }
-    }
-  }
-  const renderAction = ({ item }) => (
-    <View style={styles.con}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate(item.screen)}
-        activeOpacity={0.8}
-        style={styles.wrapper}
-      >
-        {/* Light Circle */}
-        <View style={[styles.iconOuter, { backgroundColor: item.lightColor }]}>
-          {/* Colored Circle */}
-          <View style={[styles.iconCircle]}>
-            <Icon
-              name={item.icon}
-              size={sizeHelper.calHp(45)}
-              color={colors.white}
-            />
-          </View>
-        </View>
-
-        <Text style={styles.label} numberOfLines={2}>
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const keys = BY_MODULE[selectedModule] ?? BY_MODULE['Business Expense'];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quick Actions</Text>
-      <FlatList
-        data={actions}
-        renderItem={renderAction}
-        keyExtractor={item => item.key}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => (
-          <View style={{ width: sizeHelper.calHp(14) }} />
-        )}
-      />
+      <AppText variant="title" style={styles.title}>
+        Quick Actions
+      </AppText>
+      <View style={styles.row}>
+        {keys.map(key => {
+          const action = ACTIONS[key];
+          return (
+            <Pressable
+              key={key}
+              onPress={() => navigation.navigate(action.screen)}
+              style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
+              accessibilityRole="button"
+              accessibilityLabel={action.label}
+            >
+              <View style={styles.icon}>
+                <Icon
+                  name={action.icon}
+                  size={sizes.icon.lg}
+                  color={colors.primary}
+                />
+              </View>
+              <AppText
+                variant="caption"
+                align="center"
+                numberOfLines={2}
+                style={styles.label}
+              >
+                {action.label}
+              </AppText>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 };
@@ -137,78 +86,37 @@ export default QuickActions;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: sizeHelper.calHp(24),
+    marginTop: spacing.xl,
+    marginHorizontal: spacing.lg,
   },
-
   title: {
-    fontSize: sizeHelper.calHp(32),
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginTop: sizeHelper.calHp(5),
-    marginLeft: sizeHelper.calHp(35),
-    marginBottom: sizeHelper.calHp(18),
+    marginBottom: spacing.md,
   },
-
-  listContent: {
-    paddingBottom: sizeHelper.calHp(5),
-    marginHorizontal: sizeHelper.calHp(23),
-    justifyContent: 'center',
-    // paddingRight: sizeHelper.calWp(55),
+  row: {
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
-
-  wrapper: {
-    width: sizeHelper.calWp(242),
-    height: sizeHelper.calHp(265),
-    backgroundColor: colors.white,
-    borderRadius: sizeHelper.calHp(28),
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 5,
-    borderWidth: 1,
-    borderColor: colors.border,
-    // elevation: 2,
-  },
-
-  iconOuter: {
-    width: sizeHelper.calHp(90),
-    height: sizeHelper.calHp(90),
-    borderRadius: sizeHelper.calHp(31),
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    marginBottom: sizeHelper.calHp(12),
-  },
-
-  iconCircle: {
-    width: sizeHelper.calHp(56),
-    height: sizeHelper.calHp(56),
-    borderRadius: sizeHelper.calHp(28),
-
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  label: {
-    fontSize: sizeHelper.calHp(22),
-    fontWeight: '600',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    lineHeight: sizeHelper.calHp(22),
-    width: sizeHelper.calWp(130),
-  },
-  con: {
-    justifyContent: 'space-between',
+  tile: {
     flex: 1,
+    minHeight: 112,
     alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    ...shadows.sm,
+  },
+  pressed: { opacity: 0.8 },
+  icon: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  label: {
+    fontFamily: theme.fontFamily.semiBold,
   },
 });

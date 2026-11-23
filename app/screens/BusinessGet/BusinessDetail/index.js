@@ -1,46 +1,21 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import { screenFill } from '../../../theme';
+import { View } from 'react-native';
+import React, { useState } from 'react';
 import Design from '../BusinessDetail/design';
-import { SelfGetById } from '../../../api/ExpenseApi';
 import { useMutation } from '@tanstack/react-query';
 import { Delete } from '../../../api/ExpenseApi';
-import { useState, useEffect } from 'react';
+import { useExpenseById, usePullToRefresh } from '../../../hooks/queries';
+
 const BuisnessDetailScreen = ({ navigation, route }) => {
   const [deleteModal4, SetDeleteModal4] = useState(false);
   const [selectedPaymentId4, setSelectedPaymentId4] = useState(null);
-  const [Get, setGet] = useState(null);
-  const [Loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  console.log('Business expense Id', route.params.id);
-  const onRefresh = async () => {
-    await handleGetById(true);
-  };
 
-  const handleGetById = async (isRefreshing = false) => {
-    try {
-      if (!isRefreshing) {
-        setLoading(true);
-      }
-
-      const response = await SelfGetById(route.params.id);
-      const data = await response.json();
-      console.log('myExpenseData', data);
-      if (data.Status === 200 && data.obj) {
-        setGet(data.obj);
-      }
-      console.log('Get Data:', response);
-    } catch (error) {
-      console.log('Get Error:', error.message);
-    } finally {
-      if (!isRefreshing) {
-        setLoading(false);
-      }
-      setRefreshing(false);
-    }
-  };
-  useEffect(() => {
-    handleGetById();
-  }, []);
+  const {
+    data: Get = null,
+    isLoading: Loading,
+    refetch,
+  } = useExpenseById(route.params.id);
+  const { refreshing, onRefresh } = usePullToRefresh(refetch);
 
   const deleteMutation2 = useMutation({
     mutationFn: Delete,
@@ -64,7 +39,7 @@ const BuisnessDetailScreen = ({ navigation, route }) => {
   const formatDate = date => {
     if (!date) return '';
 
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
     const monthNames = [
       'Jan',
       'Feb',
@@ -87,7 +62,7 @@ const BuisnessDetailScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         Get={Get}
@@ -107,5 +82,3 @@ const BuisnessDetailScreen = ({ navigation, route }) => {
 };
 
 export default BuisnessDetailScreen;
-
-const styles = StyleSheet.create({});

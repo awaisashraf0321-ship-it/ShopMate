@@ -13,13 +13,12 @@ import PaymentSummaryCard from '../../components/PaymentSummaryCard';
 import Loader from '../../components/Loader';
 import PaymentCard from '../../components/PaymentCard';
 import ConfirmModal from '../../components/ConfirmModal';
-import colors from '../../theme/colors';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import SearchBar from '../../components/SearchBar';
 import Filter from '../../components/Filter';
 import FilterModal from '../../components/FilterModal';
 import { useModule } from '../../components/ModuleContext';
+import { EmptyState } from '../../ui';
 
 const Design = ({
   navigation,
@@ -136,58 +135,10 @@ const Design = ({
           />
         </View>
         {payment.length === 0 && !loading ? (
-          <View style={styles.emptyContainer}>
-            {/* Empty State Illustration */}
-            <View style={styles.illustrationContainer}>
-              <View style={styles.illustrationCircle}>
-                <Icon
-                  name="receipt-long"
-                  size={sizeHelper.calHp(100)}
-                  color="#8B5CF6"
-                />
-
-                <View style={styles.storeIcon}>
-                  <Icon
-                    name="storefront"
-                    size={sizeHelper.calHp(35)}
-                    color="#8B5CF6"
-                  />
-                </View>
-              </View>
-
-              {/* Decorative Icons */}
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(18)}
-                color="#A78BFA"
-                style={styles.sparkleOne}
-              />
-
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(14)}
-                color="#A78BFA"
-                style={styles.sparkleTwo}
-              />
-
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(16)}
-                color="#A78BFA"
-                style={styles.sparkleThree}
-              />
-            </View>
-
-            {/* Empty State Text */}
-            <Text style={styles.emptyTitle}>
-              No Incoming Payments Available
-            </Text>
-
-            <Text style={styles.emptySubtitle}>
-              You haven't added any Incoming payments yet. Tap the plus icon
-              above to create one.
-            </Text>
-          </View>
+          <EmptyState
+            title="No Incoming Payments Available"
+            message="You haven't added any Incoming payments yet. Tap the plus icon above to create one."
+          />
         ) : (
           groupedPayments.map((group, index) => (
             <View key={group.date || index} style={styles.dateGroup}>
@@ -197,7 +148,7 @@ const Design = ({
                 </Text>
 
                 <Text style={styles.dateTotal}>
-                  − Rs {formatAmount(group.groupedAmmount)}
+                  + Rs {formatAmount(group.groupedAmmount)}
                 </Text>
               </View>
 
@@ -237,14 +188,12 @@ const Design = ({
         <ConfirmModal
           visible={deleteModal}
           icon="delete"
-          style={{ backgroundColor: colors.lightDot }}
-          iconColor={colors.redColor}
+          tone="danger"
           title="Are You Sure?"
           deleteText="Delete"
           subTitle1="This payment will be permanently deleted."
           subTitle2="Do you want to continue?"
           onClose={() => SetDeleteModal(false)}
-          btnStyle={{ backgroundColor: colors.redColor }}
           onOk={() => {
             handleDelete(selectedPaymentId);
             SetDeleteModal(false);

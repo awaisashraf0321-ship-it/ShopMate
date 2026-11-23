@@ -8,18 +8,17 @@ const SplashScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem('accessToken');
+
+      if (token) {
+        navigation.replace('Main');
+      } else {
+        navigation.replace('Auth');
+      }
+    };
     checkLogin();
-  }, []);
-
-  const checkLogin = async () => {
-    const token = await AsyncStorage.getItem('accessToken');
-
-    if (token) {
-      navigation.replace('Main');
-    } else {
-      navigation.replace('Auth');
-    }
-  };
+  }, [navigation]);
 
   return <Design />;
 };

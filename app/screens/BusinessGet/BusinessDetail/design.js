@@ -8,7 +8,7 @@ import { ScrollView } from 'react-native';
 import sizeHelper from '../../../helpers/sizeHelper';
 import ConfirmModal from '../../../components/ConfirmModal';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
-import colors from '../../../theme/colors';
+import { categoryStyle } from '../../../theme';
 const Design = ({
   Get,
   navigation,
@@ -23,39 +23,20 @@ const Design = ({
   setSelectedPaymentId4,
   Loading,
 }) => {
-  const selectedIcon = Category => {
-    if (Category === 'Office Expense') {
-      return {
-        icon: 'business',
-        color: '#FF6B6B',
-      };
-    }
-
-    if (Category === 'Other Expense') {
-      return {
-        icon: 'apps',
-        color: '#3B82F6',
-      };
-    }
-
-    return {
-      icon: 'category',
-      color: '#65A30D',
-    };
-  };
+  const selectedIcon = categoryStyle;
   return (
     <View>
       <DropdownStylishBtn
         navigation={navigation}
-        showDropdown={true}
+        showDropdown={false}
         showBack={true}
         showPlus={true}
         Margin={false}
         back={() => navigation.goBack()}
       />
       <LeadgerHeader
-        title={'Buisness Expense Details'}
-        subTitle={'View and manage Buisness Expense information'}
+        title={'Business Expense Details'}
+        subTitle={'View and manage business expense information'}
         btnText={'Save'}
         btn={false}
         plus={false}
@@ -93,14 +74,12 @@ const Design = ({
         <ConfirmModal
           visible={deleteModal4}
           icon="delete"
-          style={{ backgroundColor: colors.lightDot }}
-          iconColor={colors.redColor}
+          tone="danger"
           title="Are You Sure?"
           deleteText="Delete"
           subTitle1="This payment will be permanently deleted."
           subTitle2="Do you want to continue?"
           onClose={() => SetDeleteModal4(false)}
-          btnStyle={{ backgroundColor: colors.redColor }}
           onOk={() => {
             handleDelete1(selectedPaymentId4);
             SetDeleteModal4(false);

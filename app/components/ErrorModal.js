@@ -1,126 +1,88 @@
-import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native';
 import React from 'react';
-import sizeHelper from '../helpers/sizeHelper';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../theme/colors';
-import colors1 from '../theme/myColors';
+import { theme } from '../theme';
+import { AppText, Button } from '../ui';
 
-const ErrorModal = ({
-  visible,
-  text,
-  onClose,
-  errorMessage,
-  setErrorMessage,
-}) => {
+const { colors, spacing, radius, shadows } = theme;
+
+/**
+ * Error dialog: red icon, title (`text`), message, and an OK button.
+ * Tapping outside the card also closes it.
+ */
+const ErrorModal = ({ visible, text, onClose, errorMessage }) => {
   return (
-    <View style={styles.container}>
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={onClose}
-      >
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={8}
-          onPress={() => onClose()}
-        >
-          <View style={styles.card}>
-            <View style={styles.border}>
-              <Icon
-                name="error-outline"
-                size={sizeHelper.calHp(55)}
-                color={colors.redColor}
-              />
-            </View>
-
-            <Text style={styles.loginText}>{text}</Text>
-            <Text style={styles.text}>{errorMessage}</Text>
-            <Text style={styles.try}>Please try again.</Text>
-
-            <TouchableOpacity onPress={() => onClose()} style={styles.btn}>
-              <Text style={styles.okText}>Ok</Text>
-            </TouchableOpacity>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable onPress={() => {}} style={styles.card}>
+          <View style={styles.iconCircle}>
+            <Icon name="error-outline" size={28} color={colors.danger} />
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+
+          <AppText variant="h2" align="center">
+            {text}
+          </AppText>
+          {errorMessage ? (
+            <AppText
+              variant="body"
+              color="textSecondary"
+              align="center"
+              style={styles.message}
+            >
+              {errorMessage}
+            </AppText>
+          ) : null}
+          <AppText variant="caption" color="textMuted" style={styles.hint}>
+            Please try again.
+          </AppText>
+
+          <Button title="OK" onPress={onClose} style={styles.button} />
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 };
 
 export default ErrorModal;
 
 const styles = StyleSheet.create({
-  container: {},
-
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(26, 24, 24, 0.5)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: spacing.xl,
   },
-
   card: {
-    width: '80%',
-    justifyContent: 'center',
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: sizeHelper.calHp(35),
-    paddingVertical: sizeHelper.calHp(20),
-    paddingHorizontal: sizeHelper.calWp(20),
-    shadowColor: '#000',
-    shadowOffset: {
-      width: sizeHelper.calWp(0),
-      height: sizeHelper.calHp(8),
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    ...shadows.lg,
   },
-
-  border: {
-    backgroundColor: colors.lightDot,
-    height: sizeHelper.calHp(100),
-    marginTop: sizeHelper.calHp(10),
-    justifyContent: 'center',
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.pill,
+    backgroundColor: colors.dangerSoft,
     alignItems: 'center',
-    width: sizeHelper.calWp(100),
-    borderRadius: sizeHelper.calHp(70),
-  },
-
-  loginText: {
-    fontWeight: 'bold',
-    fontFamily: 'Poppins-Regular',
-    fontSize: sizeHelper.calHp(35),
-    marginTop: sizeHelper.calHp(20),
-  },
-
-  text: {
-    marginTop: sizeHelper.calHp(10),
-    fontSize: sizeHelper.calHp(30),
-    textAlign: 'center',
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  try: {
-    fontSize: sizeHelper.calHp(30),
-    fontFamily: 'PlusJakartaSans-Regular',
-    marginTop: sizeHelper.calHp(10),
-  },
-
-  btn: {
-    width: '65%',
-    height: sizeHelper.calHp(100),
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: sizeHelper.calHp(30),
-    marginBottom: sizeHelper.calHp(50),
-    borderRadius: sizeHelper.calHp(60),
-    backgroundColor: colors1.accent,
+    marginBottom: spacing.lg,
   },
-
-  okText: {
-    color: colors.white,
-    fontFamily: 'Poppins-Regular',
+  message: {
+    marginTop: spacing.xs,
+  },
+  hint: {
+    marginTop: spacing.xs,
+  },
+  button: {
+    marginTop: spacing.xl,
   },
 });

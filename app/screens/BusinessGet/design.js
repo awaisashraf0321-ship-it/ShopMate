@@ -3,16 +3,16 @@ import React from 'react';
 import LeadgerHeader from '../../components/LeadgerHeader';
 import PaymentCard from '../../components/PaymentCard';
 import Loader from '../../components/Loader';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../../helpers/sizeHelper';
 import styles from '../../screens/BusinessGet/style';
 import ConfirmModal from '../../components/ConfirmModal';
-import colors from '../../theme/colors';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import SearchBar from '../../components/SearchBar';
 import PaymentSummaryCard from '../../components/PaymentSummaryCard';
 import FilterModal from '../../components/FilterModal';
 import Filter from '../../components/Filter';
+import { EmptyState } from '../../ui';
+import { theme, categoryStyle } from '../../theme';
 
 const Design = ({
   navigation,
@@ -45,28 +45,7 @@ const Design = ({
   setPaymentMethodId,
 }) => {
   console.log('myExpenses:', myExpenses1);
-  const selectedIcon = Category => {
-    if (Category === 'Office Expense') {
-      return {
-        icon: 'business',
-        color: '#FCE8E8',
-        iconColor: colors.dot,
-      };
-    }
-
-    if (Category === 'Other Expense') {
-      return {
-        icon: 'apps',
-        color: '#E8F0FE',
-        iconColor: colors.categoryRing,
-      };
-    }
-
-    return {
-      icon: 'category',
-      color: '#ECF5D9',
-    };
-  };
+  const selectedIcon = categoryStyle;
   const filtering = [
     { id: 'All', label: 'All', PaymentMethodId: 0 },
     { id: 'Cash', label: 'Cash', PaymentMethodId: 1 },
@@ -143,56 +122,10 @@ const Design = ({
           setActiveTab={setActiveTab}
         />
         {groupedPayments.length === 0 && !Loading1 ? (
-          <View style={styles.emptyContainer}>
-            {/* Empty State Illustration */}
-            <View style={styles.illustrationContainer}>
-              <View style={styles.illustrationCircle}>
-                <Icon
-                  name="receipt-long"
-                  size={sizeHelper.calHp(100)}
-                  color="#8B5CF6"
-                />
-
-                <View style={styles.storeIcon}>
-                  <Icon
-                    name="storefront"
-                    size={sizeHelper.calHp(35)}
-                    color="#8B5CF6"
-                  />
-                </View>
-              </View>
-
-              {/* Decorative Icons */}
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(18)}
-                color="#A78BFA"
-                style={styles.sparkleOne}
-              />
-
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(14)}
-                color="#A78BFA"
-                style={styles.sparkleTwo}
-              />
-
-              <Icon
-                name="auto-awesome"
-                size={sizeHelper.calHp(16)}
-                color="#A78BFA"
-                style={styles.sparkleThree}
-              />
-            </View>
-
-            {/* Empty State Text */}
-            <Text style={styles.emptyTitle}>No Business Expense Available</Text>
-
-            <Text style={styles.emptySubtitle}>
-              You haven't added any Business payments yet. Tap the plus icon
-              above to create one.
-            </Text>
-          </View>
+          <EmptyState
+            title="No Business Expense Available"
+            message="You haven't added any Business payments yet. Tap the plus icon above to create one."
+          />
         ) : (
           groupedPayments.map(group => (
             <View key={group.date} style={styles.dateGroup}>
@@ -236,14 +169,12 @@ const Design = ({
         <ConfirmModal
           visible={deleteModal3}
           icon="delete"
-          style={{ backgroundColor: colors.lightDot }}
-          iconColor={colors.redColor}
+          tone="danger"
           title="Are You Sure?"
           deleteText="Delete"
           subTitle1="This payment will be permanently deleted."
           subTitle2="Do you want to continue?"
           onClose={() => SetDeleteModal3(false)}
-          btnStyle={{ backgroundColor: colors.redColor }}
           onOk={() => {
             handleDelete(selectedPaymentId2);
             SetDeleteModal3(false);

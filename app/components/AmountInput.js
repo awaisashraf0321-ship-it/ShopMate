@@ -1,157 +1,115 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors1 from '../theme/myColors';
-import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+import { theme } from '../theme';
+import { AppText } from '../ui';
 
-const MonthlySalary = ({
-  salary,
+const { colors, spacing, radius, shadows, sizes, typography } = theme;
+
+/**
+ * Large amount entry card at the top of the add/edit forms.
+ * `update` shows an "Update" pill that opens the salary modal.
+ */
+const AmountInput = ({
   amount,
   handleAmountChange,
   amountTitle,
   setSalaryModalVisible,
   placeholder,
-  onUpdate,
-  currency = 'Rs.',
+  currency = 'Rs',
   update = false,
-  onFocus,
-  onBlur,
 }) => {
   return (
-    <View style={styles.FirstamountContainer}>
-      <View style={styles.container}>
-        <View style={styles.salaryIcon}>
-          <Icon name="savings" size={sizeHelper.calHp(66)} color="#3520C9" />
-        </View>
-
-        <View style={styles.salaryInfo}>
-          <Text style={styles.title}>{amountTitle}</Text>
-
-          <View style={styles.amountContainer}>
-            <Text style={styles.currency}>{currency}</Text>
-
-            <TextInput
-              style={styles.amountInput}
-              value={amount}
-              // onFocus={onFocus}
-              // onBlur={onBlur}
-              onChangeText={handleAmountChange}
-              placeholder={placeholder}
-              placeholderTextColor={colors1.textMuted}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-
-        {update && (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.updateButton}
-            onPress={() => setSalaryModalVisible(true)}
-          >
-            <Icon name="edit" size={sizeHelper.calHp(38)} color="#0000009b" />
-            <Text style={styles.updateText}>Update</Text>
-          </TouchableOpacity>
-        )}
+    <View style={styles.card}>
+      <View style={styles.iconTile}>
+        <Icon name="savings" size={sizes.icon.xl - 2} color={colors.primary} />
       </View>
+
+      <View style={styles.info}>
+        <AppText variant="label">{amountTitle}</AppText>
+        <View style={styles.amountRow}>
+          <AppText variant="title" style={styles.currency}>
+            {currency}
+          </AppText>
+          <TextInput
+            style={styles.input}
+            value={amount}
+            onChangeText={handleAmountChange}
+            placeholder={placeholder}
+            placeholderTextColor={colors.textMuted}
+            keyboardType="numeric"
+            accessibilityLabel={amountTitle || 'Amount'}
+          />
+        </View>
+      </View>
+
+      {update && (
+        <Pressable
+          style={({ pressed }) => [styles.update, pressed && styles.pressed]}
+          onPress={() => setSalaryModalVisible(true)}
+          accessibilityRole="button"
+        >
+          <Icon name="edit" size={sizes.icon.sm} color={colors.primary} />
+          <AppText variant="label" color="primary">
+            Update
+          </AppText>
+        </Pressable>
+      )}
     </View>
   );
 };
 
-export default MonthlySalary;
+export default AmountInput;
 
 const styles = StyleSheet.create({
-  FirstamountContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    width: '92%',
-    minHeight: sizeHelper.calHp(200),
-    backgroundColor: colors1.white,
-    borderRadius: sizeHelper.calHp(48),
-    // marginHorizontal: sizeHelper.calWp(40),
-    borderWidth: 1,
-    borderColor: colors.borderColor,
+  card: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
+    minHeight: 88,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: sizeHelper.calWp(35),
-    paddingVertical: sizeHelper.calHp(32),
-    marginTop: sizeHelper.calHp(20),
-    elevation: 3,
-    shadowColor: colors.shadowColor,
-    shadowOffset: {
-      width: 0,
-      height: sizeHelper.calHp(3),
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: sizeHelper.calHp(6),
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    ...shadows.sm,
   },
-
-  salaryIcon: {
-    width: sizeHelper.calWp(136),
-    height: sizeHelper.calHp(106),
-    borderRadius: sizeHelper.calHp(48),
-    backgroundColor: colors.IconBackground,
+  iconTile: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  salaryInfo: {
+  info: {
     flex: 1,
-    marginLeft: sizeHelper.calWp(32),
+    marginLeft: spacing.md,
   },
-
-  title: {
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    fontSize: sizeHelper.calHp(33),
-    color: colors1.text,
-    marginBottom: sizeHelper.calHp(5),
-  },
-
-  amountContainer: {
+  amountRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: spacing.xxs,
   },
-
   currency: {
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    fontSize: sizeHelper.calHp(35),
-    color: colors1.text,
-    marginRight: sizeHelper.calWp(12),
+    marginRight: spacing.xs,
   },
-
-  amountInput: {
+  input: {
     flex: 1,
     padding: 0,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    fontSize: sizeHelper.calHp(35),
-    color: colors1.text,
+    ...typography.title,
+    lineHeight: undefined, // let iOS size single-line inputs naturally
+    color: colors.textPrimary,
   },
-
-  updateButton: {
-    height: sizeHelper.calHp(95),
-    borderRadius: sizeHelper.calHp(50),
-    backgroundColor: colors.BtnBackground,
+  update: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: sizeHelper.calWp(33),
-    gap: sizeHelper.calWp(20),
+    gap: spacing.xs,
+    height: 36,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
   },
-
-  updateText: {
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    fontSize: sizeHelper.calHp(30),
-    marginBottom: sizeHelper.calHp(10),
-    color: colors.textColor,
-  },
+  pressed: { opacity: 0.75 },
 });

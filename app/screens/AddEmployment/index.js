@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { Keyboard, StyleSheet, Text, View } from 'react-native';
 import React, { useRef } from 'react';
 import Design from './design';
@@ -41,7 +42,7 @@ const AddCustomerScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         handleCustomer={handleCustomer}

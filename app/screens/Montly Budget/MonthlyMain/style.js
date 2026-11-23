@@ -1,10 +1,10 @@
 import sizeHelper from '../../../helpers/sizeHelper';
 import { StyleSheet } from 'react-native';
-import colors1 from '../../../theme/myColors';
+import { theme } from '../../../theme';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors1.background,
+    backgroundColor: theme.colors.background,
   },
 
   scrollContent: {
@@ -14,11 +14,11 @@ const styles = StyleSheet.create({
   },
 
   mainCard: {
-    backgroundColor: colors1.white,
+    backgroundColor: theme.colors.surface,
     borderRadius: sizeHelper.calHp(48),
     padding: sizeHelper.calHp(40),
     borderWidth: 1,
-    borderColor: colors1.border,
+    borderColor: theme.colors.border,
     marginBottom: sizeHelper.calHp(38),
     elevation: 3,
   },
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calHp(135),
     height: sizeHelper.calHp(135),
     borderRadius: sizeHelper.calHp(80),
-    backgroundColor: colors1.infoLight,
+    backgroundColor: theme.colors.infoSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -45,8 +45,8 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: sizeHelper.calHp(43),
     fontWeight: '800',
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    color: colors1.text,
+    fontFamily: theme.fontFamily.extraBold,
+    color: theme.colors.textPrimary,
   },
 
   dateRow: {
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
 
   dateText: {
     fontSize: sizeHelper.calHp(32),
-    fontFamily: 'PlusJakartaSans-Regular',
-    color: colors1.textSecondary,
+    fontFamily: theme.fontFamily.regular,
+    color: theme.colors.textSecondary,
   },
 
   amountContainer: {
-    backgroundColor: colors1.accentLight,
+    backgroundColor: theme.colors.warningSoft,
     borderRadius: sizeHelper.calHp(60),
     paddingVertical: sizeHelper.calHp(42),
     marginTop: sizeHelper.calHp(54),
@@ -73,22 +73,22 @@ const styles = StyleSheet.create({
   amountText: {
     fontSize: sizeHelper.calHp(42),
     fontWeight: '900',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fontFamily.extraBold,
   },
 
   detailsCard: {
-    backgroundColor: colors1.white,
+    backgroundColor: theme.colors.surface,
     borderRadius: sizeHelper.calHp(40),
     padding: sizeHelper.calHp(40),
     borderWidth: 1,
-    borderColor: colors1.border,
+    borderColor: theme.colors.border,
     marginBottom: sizeHelper.calHp(50),
     elevation: 3,
   },
 
   sectionHeading: {
-    backgroundColor: colors1.primaryLight,
+    backgroundColor: theme.colors.primarySoft,
     borderRadius: sizeHelper.calHp(35),
     paddingVertical: sizeHelper.calHp(32),
     paddingHorizontal: sizeHelper.calWp(39),
@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: sizeHelper.calHp(36),
     fontWeight: '800',
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    color: colors1.text,
+    fontFamily: theme.fontFamily.extraBold,
+    color: theme.colors.textPrimary,
   },
 
   detailRow: {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: sizeHelper.calHp(150),
     borderBottomWidth: 1,
-    borderBottomColor: colors1.border,
+    borderBottomColor: theme.colors.border,
     paddingVertical: sizeHelper.calHp(30),
   },
 
@@ -125,16 +125,16 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     fontSize: sizeHelper.calHp(33),
-    color: colors1.textSecondary,
+    color: theme.colors.textSecondary,
     marginLeft: sizeHelper.calWp(25),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
     flex: 1,
   },
 
   detailValue: {
     fontSize: sizeHelper.calHp(31),
     fontWeight: '700',
-    color: colors1.text,
+    color: theme.colors.textPrimary,
     maxWidth: '48%',
     textAlign: 'right',
   },
@@ -142,21 +142,21 @@ const styles = StyleSheet.create({
   deleteButton: {
     height: sizeHelper.calHp(140),
     borderRadius: sizeHelper.calHp(65),
-    backgroundColor: colors1.dangerLight,
+    backgroundColor: theme.colors.dangerSoft,
     borderWidth: 1,
-    borderColor: '#FFB8B8',
+    borderColor: theme.colors.danger,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    fontFamily: theme.fontFamily.extraBold,
     gap: sizeHelper.calWp(28),
   },
 
   deleteButtonText: {
     fontSize: sizeHelper.calHp(37),
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    fontFamily: theme.fontFamily.extraBold,
     fontWeight: '800',
-    color: colors1.danger,
+    color: theme.colors.danger,
   },
 });
 

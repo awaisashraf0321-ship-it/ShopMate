@@ -1,42 +1,71 @@
-import { StyleSheet, Text, Image, View, TouchableOpacity } from 'react-native';
-import colors from '../theme/colors';
-import sizeHelper from '../helpers/sizeHelper';
+import React from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../theme';
+import { AppText, SegmentedControl } from '../ui';
+import { MODULE_OPTIONS, useModule } from './ModuleContext';
 
-const Header = ({ navigation, title, subTitle }) => {
+const AVATAR = 44;
+
+/**
+ * Dashboard header, one row: greeting, Personal | Business module switch,
+ * and the avatar (opens Profile).
+ * Dev builds only: long-press the greeting to open the style guide.
+ */
+const Header = ({ navigation, title, subTitle, initial }) => {
+  const insets = useSafeAreaInsets();
+  const { selectedModule, myModule } = useModule();
+
   return (
-    <View style={styles.mainContainer}>
-      <SafeAreaView edges={['left', 'right']}>
-        <View style={styles.topHeader}>
-          {/* Menu */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Profile')}
-            activeOpacity={0.5}
-          >
-            <Image
-              style={styles.img}
-              source={require('../assets/image/favicon1.png')}
-            />
-          </TouchableOpacity>
+    <View
+      style={[styles.container, { paddingTop: insets.top + theme.spacing.sm }]}
+    >
+      <View style={styles.row}>
+        <Pressable
+          style={styles.text}
+          onLongPress={
+            __DEV__ ? () => navigation.navigate('StyleGuide') : undefined
+          }
+          accessible={false}
+        >
+          <AppText variant="caption" color="textSecondary">
+            {title}
+          </AppText>
+          <AppText variant="title" numberOfLines={1}>
+            {subTitle}
+          </AppText>
+        </Pressable>
 
-          {/* Text */}
-          <View style={styles.content}>
-            <Text style={styles.headerText}>{title}</Text>
+        <SegmentedControl
+          options={MODULE_OPTIONS}
+          value={selectedModule}
+          onChange={value => {
+            if (value !== selectedModule) myModule(value);
+          }}
+          size="sm"
+        />
 
-            <Text style={styles.Hi}>{subTitle}</Text>
-            <View style={styles.main}></View>
-          </View>
-
-          {/* <View style={styles.bell}>
+        <Pressable
+          onPress={() => navigation.navigate('Profile')}
+          accessibilityRole="button"
+          accessibilityLabel="Open profile"
+          hitSlop={8}
+          style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
+        >
+          {initial ? (
+            <AppText variant="subtitle" color="primary">
+              {initial}
+            </AppText>
+          ) : (
             <Icon
-              name="notifications-none"
-              size={sizeHelper.calHp(40)}
-              color={colors.primary}
+              name="person"
+              size={theme.sizes.icon.lg}
+              color={theme.colors.primary}
             />
-          </View> */}
-        </View>
-      </SafeAreaView>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -44,86 +73,29 @@ const Header = ({ navigation, title, subTitle }) => {
 export default Header;
 
 const styles = StyleSheet.create({
-  mainContainer: {},
-
-  Animated: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    backgroundColor: colors.categoryTravel,
-    zIndex: 1,
-    width: sizeHelper.calWp(690),
+  container: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
   },
-
-  close: {
-    height: sizeHelper.calHp(70),
-    position: 'absolute',
-    top: sizeHelper.calHp(60),
-    left: sizeHelper.calWp(50),
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: sizeHelper.calWp(70),
-    backgroundColor: colors.white,
-    borderRadius: sizeHelper.calHp(70),
-  },
-
-  topHeader: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: sizeHelper.calWp(50),
-    paddingTop: sizeHelper.calHp(15),
-    paddingBottom: sizeHelper.calHp(15),
   },
-
-  img: {
-    height: sizeHelper.calHp(90),
-    width: sizeHelper.calWp(90),
-  },
-
-  content: {
-    marginLeft: sizeHelper.calWp(25),
-    marginBottom: sizeHelper.calHp(10),
-  },
-
-  headerText: {
-    fontSize: sizeHelper.calHp(28),
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  Hi: {
-    fontSize: sizeHelper.calHp(32),
-    fontFamily: 'PlusJakartaSans-Regular',
-    color: '#000',
-    fontWeight: 'bold',
-    marginTop: sizeHelper.calHp(2),
-  },
-
-  main: {
-    flexDirection: 'row',
-  },
-
-  today: {
-    fontSize: sizeHelper.calHp(25),
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  date: {
-    fontSize: sizeHelper.calHp(25),
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  end: {
+  text: {
     flex: 1,
-    justifyContent: 'flex-end',
-    fontFamily: 'PlusJakartaSans-Regular',
-    alignItems: 'flex-end',
+    marginRight: theme.spacing.sm,
   },
-
-  bell: {
-    flex: 1,
+  avatar: {
+    width: AVATAR,
+    height: AVATAR,
+    borderRadius: AVATAR / 2,
+    backgroundColor: theme.colors.primarySoft,
+    borderWidth: 2,
+    borderColor: theme.colors.surface,
+    marginLeft: theme.spacing.sm,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'flex-end',
+    ...theme.shadows.sm,
   },
+  pressed: { opacity: 0.7 },
 });

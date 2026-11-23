@@ -12,13 +12,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import LeadgerHeader from '../../components/LeadgerHeader';
 import sizeHelper from '../../helpers/sizeHelper';
 import styles from '../Profile/style';
-import colors from '../../theme/colors';
 import PhotoModal from '../../components/PhotoModal';
 import ConfirmModal from '../../components/ConfirmModal';
 import ImagePhotoOpen from '../../components/ImagePhotoOpen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import Loader from '../../components/Loader';
+import { Button } from '../../ui';
+import { theme } from '../../theme';
 
 const Design = ({
   photoOpenModal,
@@ -91,14 +92,13 @@ const Design = ({
                       }}
                     />
                   ) : (
-                    <Image
-                      source={require('../../assets/image/img.jpg')}
-                      style={{
-                        width: sizeHelper.calHp(200),
-                        height: sizeHelper.calHp(200),
-                        borderRadius: sizeHelper.calHp(100),
-                      }}
-                    />
+                    <View style={styles.avatarFallback}>
+                      <Icon
+                        name="person"
+                        size={64}
+                        color={theme.colors.primary}
+                      />
+                    </View>
                   )}
                 </Pressable>
 
@@ -117,7 +117,7 @@ const Design = ({
                   <Icon
                     name="camera-alt"
                     size={sizeHelper.calHp(26)}
-                    color={colors.white}
+                    color={theme.colors.onPrimary}
                   />
                 </TouchableOpacity>
               </View>
@@ -131,7 +131,7 @@ const Design = ({
                   <Icon
                     name="email"
                     size={sizeHelper.calHp(22)}
-                    color={colors.white}
+                    color={theme.colors.onPrimary}
                   />
                   <Text style={styles.infoText} numberOfLines={1}>
                     {profileRecordGet?.Email}
@@ -142,7 +142,7 @@ const Design = ({
                   <Icon
                     name="phone"
                     size={sizeHelper.calHp(22)}
-                    color={colors.white}
+                    color={theme.colors.onPrimary}
                   />
                   <Text style={styles.infoText} numberOfLines={1}>
                     {profileRecord?.PhoneNumber}
@@ -165,7 +165,7 @@ const Design = ({
                 <Icon
                   name="edit"
                   size={sizeHelper.calHp(20)}
-                  color={colors.white}
+                  color={theme.colors.onPrimary}
                 />
                 <Text style={styles.editButtonText}>Edit</Text>
               </TouchableOpacity>
@@ -178,7 +178,7 @@ const Design = ({
                   <Icon
                     name="person"
                     size={sizeHelper.calHp(35)}
-                    color={colors.primaryGradientStart}
+                    color={theme.colors.accent}
                   />
                 </View>
                 <Text style={styles.accountTitle}>
@@ -194,7 +194,7 @@ const Design = ({
                   <Icon
                     name="calendar-month"
                     size={sizeHelper.calHp(35)}
-                    color={colors.primaryGradientStart}
+                    color={theme.colors.accent}
                   />
                 </View>
                 <Text style={styles.accountTitle}>Since</Text>
@@ -210,7 +210,7 @@ const Design = ({
                   <Icon
                     name="verified"
                     size={sizeHelper.calHp(26)}
-                    color={colors.primaryGradientStart}
+                    color={theme.colors.accent}
                   />
                 </View>
                 <Text style={styles.accountTitle}>
@@ -240,7 +240,7 @@ const Design = ({
                 <Icon
                   name="person-outline"
                   size={sizeHelper.calHp(40)}
-                  color={colors.iconPrimary}
+                  color={theme.colors.primary}
                 />
               </View>
 
@@ -252,7 +252,7 @@ const Design = ({
               <Icon
                 name="chevron-right"
                 size={sizeHelper.calHp(40)}
-                color={colors.textSecondary}
+                color={theme.colors.textSecondary}
               />
             </TouchableOpacity>
 
@@ -265,7 +265,7 @@ const Design = ({
                 <Icon
                   name="lock-outline"
                   size={sizeHelper.calHp(40)}
-                  color={colors.iconPrimary}
+                  color={theme.colors.primary}
                 />
               </View>
 
@@ -277,7 +277,7 @@ const Design = ({
               <Icon
                 name="chevron-right"
                 size={sizeHelper.calHp(40)}
-                color={colors.textSecondary}
+                color={theme.colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
@@ -295,7 +295,7 @@ const Design = ({
                 <Icon
                   name="notifications-none"
                   size={sizeHelper.calHp(40)}
-                  color={colors.iconPrimary}
+                  color={theme.colors.primary}
                 />
               </View>
 
@@ -309,7 +309,7 @@ const Design = ({
               <Icon
                 name="chevron-right"
                 size={sizeHelper.calHp(40)}
-                color={colors.textSecondary}
+                color={theme.colors.textSecondary}
               />
             </TouchableOpacity> */}
 
@@ -323,7 +323,7 @@ const Design = ({
                 <Icon
                   name="language"
                   size={sizeHelper.calHp(40)}
-                  color={colors.iconPrimary}
+                  color={theme.colors.primary}
                 />
               </View>
 
@@ -335,31 +335,25 @@ const Design = ({
               <Icon
                 name="chevron-right"
                 size={sizeHelper.calHp(40)}
-                color={colors.textSecondary}
+                color={theme.colors.textSecondary}
               />
             </TouchableOpacity> */}
           {/* </View> */}
 
-          <TouchableOpacity
+          <Button
+            title="Logout"
+            icon="logout"
+            variant="dangerOutline"
+            size="lg"
             onPress={() => ModalOpen()}
             style={styles.logout}
-            activeOpacity={0.85}
-          >
-            <Icon
-              name="logout"
-              size={sizeHelper.calHp(40)}
-              color={colors.redColor}
-            />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
+          />
 
           <ConfirmModal
             visible={logoutModal}
             loader={loader}
             icon="logout"
-            style={{ backgroundColor: colors.lightPrimaryGradientStart }}
             title={'Are You Sure?'}
-            iconColor={colors.primaryGradientStart}
             deleteText="Logout"
             subTitle1={'you will be logged out from your account.'}
             subTitle2={'Do you want to continue?'}

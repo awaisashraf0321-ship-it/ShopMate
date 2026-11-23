@@ -10,7 +10,6 @@ import LeadgerHeader from '../../../components/LeadgerHeader';
 import sizeHelper from '../../../helpers/sizeHelper';
 import React from 'react';
 import ConfirmModal from '../../../components/ConfirmModal';
-import colors from '../../../theme/colors';
 import Loader from '../../../components/Loader';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
 
@@ -32,16 +31,14 @@ const Design = ({
     <View>
       <DropdownStylishBtn
         navigation={navigation}
-        showDropdown={true}
+        showDropdown={false}
         showBack={true}
         Margin={false}
         showPlus={false}
         back={() => navigation.goBack()}
-
-        // onPress={() => navigation.navigate('InComing')}
       />
       <LeadgerHeader
-        title={'Outcoming Details'}
+        title={'Outgoing Details'}
         subTitle={'View and manage payment information'}
         btnText={'Save'}
         btn={false}
@@ -79,14 +76,12 @@ const Design = ({
         <ConfirmModal
           visible={deleteModal2}
           icon="delete"
-          style={{ backgroundColor: colors.lightDot }}
-          iconColor={colors.redColor}
+          tone="danger"
           title="Are You Sure?"
           deleteText="Delete"
           subTitle1="This payment will be permanently deleted."
           subTitle2="Do you want to continue?"
           onClose={() => SetDeleteModal2(false)}
-          btnStyle={{ backgroundColor: colors.redColor }}
           onOk={() => {
             handleDelete(selectedPaymentId2);
             SetDeleteModal2(false);

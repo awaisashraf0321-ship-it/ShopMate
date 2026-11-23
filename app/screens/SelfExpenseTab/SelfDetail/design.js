@@ -7,8 +7,8 @@ import ExpenseDetail from '../../../components/ExpenseDetail';
 import { ScrollView } from 'react-native';
 import sizeHelper from '../../../helpers/sizeHelper';
 import ConfirmModal from '../../../components/ConfirmModal';
-import colors from '../../../theme/colors';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
+import { categoryStyle } from '../../../theme';
 const Design = ({
   Get,
   navigation,
@@ -23,33 +23,14 @@ const Design = ({
   onRefresh,
   Loading,
 }) => {
-  const selectedIcon = Category => {
-    if (Category === 'Bill Expense') {
-      return {
-        icon: 'receipt-long',
-        color: '#FF6B6B',
-      };
-    }
-
-    if (Category === 'Home Expense') {
-      return {
-        icon: 'home',
-        color: '#65A30D',
-      };
-    }
-
-    return {
-      icon: 'apps',
-      color: '#3B82F6',
-    };
-  };
+  const selectedIcon = categoryStyle;
   console.log('my data of self', Get);
   return (
     <View>
       <DropdownStylishBtn
         Margin={false}
         navigation={navigation}
-        showDropdown={true}
+        showDropdown={false}
         showBack={true}
         back={() => navigation.goBack()}
         showPlus={false}
@@ -93,14 +74,12 @@ const Design = ({
         <ConfirmModal
           visible={deleteModal3}
           icon="delete"
-          style={{ backgroundColor: colors.lightDot }}
-          iconColor={colors.redColor}
+          tone="danger"
           title="Are You Sure?"
           deleteText="Delete"
           subTitle1="This payment will be permanently deleted."
           subTitle2="Do you want to continue?"
           onClose={() => SetDeleteModal3(false)}
-          btnStyle={{ backgroundColor: colors.redColor }}
           onOk={() => {
             handleDelete(selectedPaymentId3);
             SetDeleteModal3(false);

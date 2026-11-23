@@ -1,18 +1,19 @@
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Modal,
-} from 'react-native';
-
 import React from 'react';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../theme/colors';
-import sizeHelper from '../helpers/sizeHelper';
+import { theme } from '../theme';
+import { AppText, Button } from '../ui';
 
+const { colors, spacing, radius, shadows } = theme;
+
+/**
+ * "Are you sure?" dialog.
+ *
+ *   <ConfirmModal tone="danger" icon="delete" title="Are You Sure?"
+ *     subTitle1="…" deleteText="Delete" onOk={…} onClose={…} loader={busy} />
+ *
+ * tone: danger (red, for deletes) | primary (brand, e.g. logout)
+ */
 const ConfirmModal = ({
   visible,
   onClose,
@@ -21,221 +22,108 @@ const ConfirmModal = ({
   subTitle1,
   subTitle2,
   icon,
-  style,
   deleteText,
-  iconColor,
   loader,
-  btnStyle,
+  tone = 'primary',
 }) => {
+  const danger = tone === 'danger';
   return (
-    <View>
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={onClose}
-      >
-        <Pressable style={styles.overlay}>
-          <Pressable onPress={() => {}} style={styles.card}>
-            <View style={styles.blob1} />
-            <View style={styles.blob2} />
-            <View style={styles.blob3} />
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable onPress={() => {}} style={styles.card}>
+          <View
+            style={[
+              styles.iconCircle,
+              {
+                backgroundColor: danger
+                  ? colors.dangerSoft
+                  : colors.primarySoft,
+              },
+            ]}
+          >
+            <Icon
+              name={icon}
+              size={28}
+              color={danger ? colors.danger : colors.primary}
+            />
+          </View>
 
-            <View style={[styles.iconCircle, style]}>
-              <Icon
-                name={icon}
-                size={sizeHelper.calHp(52)}
-                color={iconColor || colors.primaryGradientStart}
-              />
-            </View>
+          <AppText variant="h2" align="center" style={styles.title}>
+            {title}
+          </AppText>
 
-            <Text style={styles.title}>{title}</Text>
+          {subTitle1 ? (
+            <AppText variant="body" color="textSecondary" align="center">
+              {subTitle1}
+            </AppText>
+          ) : null}
+          {subTitle2 ? (
+            <AppText variant="body" color="textSecondary" align="center">
+              {subTitle2}
+            </AppText>
+          ) : null}
 
-            {subTitle1 ? (
-              <Text style={styles.subtitle}>{subTitle1}</Text>
-            ) : null}
-
-            {subTitle2 ? (
-              <Text style={styles.subtitle}>{subTitle2}</Text>
-            ) : null}
-
-            <View style={styles.row}>
-              <TouchableOpacity
-                onPress={() => onClose()}
-                style={styles.cancelBtn}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => onOk()}
-                style={[styles.okBtn, btnStyle]}
-                activeOpacity={0.85}
-              >
-                {loader ? (
-                  <View>
-                    <ActivityIndicator color={colors.white} size="small" />
-                  </View>
-                ) : (
-                  <Text style={styles.okText}>{deleteText}</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </Pressable>
+          <View style={styles.row}>
+            <Button
+              title="Cancel"
+              variant="secondary"
+              onPress={onClose}
+              style={styles.flex}
+            />
+            <Button
+              title={deleteText}
+              variant={danger ? 'danger' : 'primary'}
+              onPress={onOk}
+              loading={loader}
+              style={styles.flex}
+            />
+          </View>
         </Pressable>
-      </Modal>
-    </View>
+      </Pressable>
+    </Modal>
   );
 };
 
 export default ConfirmModal;
 
 const styles = StyleSheet.create({
-  /* ================= OVERLAY ================= */
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: spacing.lg,
   },
-
   card: {
-    width: '90%',
-    backgroundColor: colors.cardBackground,
-    borderRadius: sizeHelper.calHp(30),
-    paddingHorizontal: sizeHelper.calWp(24),
-    paddingVertical: sizeHelper.calHp(30),
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
     alignItems: 'center',
-
-    borderWidth: 1,
-    borderColor: colors.borderColor,
-
-    shadowColor: colors.dark,
-    shadowOffset: {
-      width: 0,
-      height: sizeHelper.calHp(10),
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: sizeHelper.calHp(20),
-    elevation: 8,
-
-    overflow: 'hidden',
+    ...shadows.lg,
   },
-
-  blob1: {
-    position: 'absolute',
-    top: -sizeHelper.calHp(70),
-    right: -sizeHelper.calWp(70),
-    width: sizeHelper.calWp(220),
-    height: sizeHelper.calHp(220),
-    borderRadius: sizeHelper.calHp(110),
-    backgroundColor: colors.lightPrimaryGradientStart,
-    opacity: 0.9,
-  },
-
-  blob2: {
-    position: 'absolute',
-    bottom: -sizeHelper.calHp(80),
-    left: -sizeHelper.calWp(80),
-    width: sizeHelper.calWp(240),
-    height: sizeHelper.calHp(240),
-    borderRadius: sizeHelper.calHp(120),
-    backgroundColor: colors.lightPrimaryGradientStart,
-    opacity: 0.7,
-  },
-
-  blob3: {
-    position: 'absolute',
-    top: sizeHelper.calHp(30),
-    left: -sizeHelper.calWp(60),
-    width: sizeHelper.calWp(140),
-    height: sizeHelper.calHp(140),
-    borderRadius: sizeHelper.calHp(70),
-    backgroundColor: colors.lightPrimaryGradientStart,
-    opacity: 0.5,
-  },
-
   iconCircle: {
-    width: sizeHelper.calHp(110),
-    height: sizeHelper.calHp(110),
-    borderRadius: sizeHelper.calHp(55),
-    backgroundColor: colors.lightPrimaryGradientStart,
-    justifyContent: 'center',
+    width: 64,
+    height: 64,
+    borderRadius: radius.pill,
     alignItems: 'center',
-    marginBottom: sizeHelper.calHp(22),
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
   },
-
   title: {
-    fontSize: sizeHelper.calHp(38),
-    fontWeight: '800',
-    color: colors.textPrimary,
-    textAlign: 'center',
-    letterSpacing: sizeHelper.calWp(0.4),
-    marginBottom: sizeHelper.calHp(10),
+    marginBottom: spacing.xs,
   },
-
-  subtitle: {
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '500',
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: sizeHelper.calHp(2),
-    lineHeight: sizeHelper.calHp(42),
-  },
-
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: sizeHelper.calHp(32),
+    gap: spacing.md,
+    marginTop: spacing.xl,
+    alignSelf: 'stretch',
   },
-
-  /* ================= CANCEL BUTTON ================= */
-  cancelBtn: {
-    flex: 1,
-    height: sizeHelper.calHp(96),
-    backgroundColor: colors.lightPrimaryGradientStart,
-    borderRadius: sizeHelper.calHp(22),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: sizeHelper.calWp(10),
-    borderWidth: 1,
-    borderColor: colors.primaryGradientStart,
-  },
-
-  cancelText: {
-    color: colors.primaryGradientStart,
-    fontSize: sizeHelper.calHp(32),
-    fontWeight: '700',
-    letterSpacing: sizeHelper.calWp(0.2),
-  },
-
-  /* ================= OK BUTTON ================= */
-  okBtn: {
-    flex: 1,
-    height: sizeHelper.calHp(96),
-    backgroundColor: colors.primaryGradientStart,
-    borderRadius: sizeHelper.calHp(22),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: sizeHelper.calWp(10),
-
-    shadowColor: colors.primaryGradientStart,
-    shadowOffset: {
-      width: 0,
-      height: sizeHelper.calHp(6),
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: sizeHelper.calHp(12),
-    elevation: 5,
-  },
-
-  okText: {
-    color: colors.white,
-    fontSize: sizeHelper.calHp(32),
-    fontWeight: '700',
-    letterSpacing: sizeHelper.calWp(0.2),
-  },
+  flex: { flex: 1 },
 });

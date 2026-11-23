@@ -1,15 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+import { StyleSheet, View } from 'react-native';
+import { theme } from '../theme';
+import { AppText } from '../ui';
 import DatePicker from './DatePicker';
 
+/** Screen title + optional subtitle, with an optional date picker on the right. */
 const LeadgerHeader = ({
-  btn = true,
-  onSave,
   title,
   subTitle,
-  btnText = 'Save',
   gaping = true,
   date,
   setDate,
@@ -19,35 +17,38 @@ const LeadgerHeader = ({
   setShowTime,
 }) => {
   return (
-    <View style={styles.safeContainer}>
-      <View style={gaping ? styles.header : styles.lowGap}>
-        <View style={styles.titleContainer}>
-          <Text numberOfLines={2} style={styles.title}>
-            {title}
-          </Text>
+    <View style={gaping ? styles.header : styles.lowGap}>
+      <View style={styles.titleContainer}>
+        <AppText variant="h1" numberOfLines={2} style={styles.title}>
+          {title}
+        </AppText>
 
-          {subTitle ? (
-            <Text numberOfLines={2} style={styles.subTitle}>
-              {subTitle}
-            </Text>
-          ) : null}
-        </View>
-
-        {date && setDate && (
-          <View style={styles.dateContainer}>
-            <DatePicker
-              showDate={showDate}
-              setShowDate={setShowDate}
-              showTime={showTime}
-              setShowTime={setShowTime}
-              setDate={setDate}
-              date={date}
-              timePicker={false}
-              compact={true}
-            />
-          </View>
-        )}
+        {subTitle ? (
+          <AppText
+            variant="body"
+            color="textSecondary"
+            numberOfLines={2}
+            style={styles.subTitle}
+          >
+            {subTitle}
+          </AppText>
+        ) : null}
       </View>
+
+      {date && setDate && (
+        <View style={styles.dateContainer}>
+          <DatePicker
+            showDate={showDate}
+            setShowDate={setShowDate}
+            showTime={showTime}
+            setShowTime={setShowTime}
+            setDate={setDate}
+            date={date}
+            timePicker={false}
+            compact={true}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -55,50 +56,36 @@ const LeadgerHeader = ({
 export default LeadgerHeader;
 
 const styles = StyleSheet.create({
-  safeContainer: {
-    backgroundColor: 'transparent',
-  },
-
   header: {
-    minHeight: sizeHelper.calHp(145),
-    marginHorizontal: sizeHelper.calWp(25),
+    minHeight: 66,
+    marginHorizontal: theme.spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    overflow: 'visible',
   },
 
   lowGap: {
-    minHeight: sizeHelper.calHp(40),
+    minHeight: 18,
   },
 
   titleContainer: {
     flex: 1,
     minWidth: 0,
-    marginLeft: sizeHelper.calWp(15),
-    marginRight: sizeHelper.calWp(12),
+    marginRight: theme.spacing.md,
     justifyContent: 'center',
   },
 
   title: {
-    fontSize: sizeHelper.calHp(54),
-    fontWeight: 'bold',
-    marginTop: sizeHelper.calHp(35),
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    color: colors.dark,
+    marginTop: theme.spacing.lg,
   },
 
   subTitle: {
-    marginTop: sizeHelper.calHp(4),
-    fontSize: sizeHelper.calHp(32),
-    color: '#64718A',
-    marginBottom: sizeHelper.calHp(30),
-    fontFamily: 'PlusJakartaSans-Regular',
+    marginTop: theme.spacing.xxs,
+    marginBottom: theme.spacing.md,
   },
 
   dateContainer: {
     width: '39%',
-    marginTop: sizeHelper.calHp(30),
+    marginTop: theme.spacing.md,
     flexShrink: 0,
   },
 });

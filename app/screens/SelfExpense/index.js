@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { StyleSheet, Text, View, Alert, Keyboard } from 'react-native';
 import React from 'react';
 import Design from '../SelfExpense/design';
@@ -147,7 +148,7 @@ const SelfExpenseScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View>
+    <View style={screenFill}>
       <ErrorModal
         visible={showErrorModal1}
         onClose={() => setShowErrorModal1(false)}

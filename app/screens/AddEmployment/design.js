@@ -18,11 +18,11 @@ import * as Yup from 'yup';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LeadgerHeader from '../../components/LeadgerHeader';
 
-import colors from '../../theme/colors';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import customerStyles from './style';
 import sizeHelper from '../../helpers/sizeHelper';
 import Loader from '../../components/Loader';
+import { theme } from '../../theme';
 
 const validationSchema = Yup.object().shape({
   customerName: Yup.string()
@@ -157,7 +157,7 @@ const CustomerScreen = ({
                       errors.customerName && customerStyles.inputError,
                     ]}
                     placeholder="e.g. Full Name"
-                    placeholderTextColor={colors.textSecondary || '#858392'}
+                    placeholderTextColor={theme.colors.textMuted}
                     value={values.customerName}
                     onChangeText={handleChange('customerName')}
                     returnKeyType="next"
@@ -191,7 +191,7 @@ const CustomerScreen = ({
                     <TextInput
                       style={customerStyles.phoneInput}
                       placeholder="300 1234567"
-                      placeholderTextColor={colors.textSecondary || '#858392'}
+                      placeholderTextColor={theme.colors.textMuted}
                       value={values.phoneNo}
                       onChangeText={text => {
                         const cleaned = text.replace(/[^\d]/g, '');
@@ -242,7 +242,11 @@ const CustomerScreen = ({
                     ]}
                   >
                     {values.sameWhatsapp ? (
-                      <Icon name="check" size={16} color="#FFFFFF" />
+                      <Icon
+                        name="check"
+                        size={16}
+                        color={theme.colors.onPrimary}
+                      />
                     ) : null}
                   </View>
 
@@ -265,7 +269,7 @@ const CustomerScreen = ({
                         errors.whatsappNumber && customerStyles.inputError,
                       ]}
                       placeholder="300 1234567"
-                      placeholderTextColor={colors.textSecondary || '#858392'}
+                      placeholderTextColor={theme.colors.textMuted}
                       value={values.whatsappNumber}
                       onChangeText={handleChange('whatsappNumber')}
                       keyboardType="phone-pad"
@@ -294,7 +298,7 @@ const CustomerScreen = ({
                       errors.email && customerStyles.inputError,
                     ]}
                     placeholder="name@example.com"
-                    placeholderTextColor={colors.textSecondary || '#858392'}
+                    placeholderTextColor={theme.colors.textMuted}
                     value={values.email}
                     onChangeText={handleChange('email')}
                     keyboardType="email-address"
@@ -319,7 +323,7 @@ const CustomerScreen = ({
                       <Icon
                         name="place"
                         size={21}
-                        color={colors.primary || '#4A24B8'}
+                        color={theme.colors.primary}
                       />
                     </View>
 
@@ -339,7 +343,7 @@ const CustomerScreen = ({
                           : 'keyboard-arrow-down'
                       }
                       size={25}
-                      color={colors.textSecondary || '#6B6880'}
+                      color={theme.colors.textSecondary}
                     />
                   </TouchableOpacity>
 
@@ -390,9 +394,7 @@ const CustomerScreen = ({
                           }}
                           onBlur={() => setOnFocus(false)}
                           placeholder="House, street, area"
-                          placeholderTextColor={
-                            colors.textSecondary || '#858392'
-                          }
+                          placeholderTextColor={theme.colors.textMuted}
                           value={values.addressLine1}
                           onChangeText={handleChange('addressLine1')}
                           returnKeyType="next"
@@ -413,9 +415,7 @@ const CustomerScreen = ({
                             }, 100);
                           }}
                           onBlur={() => setOnFocus(false)}
-                          placeholderTextColor={
-                            colors.textSecondary || '#858392'
-                          }
+                          placeholderTextColor={theme.colors.textMuted}
                           value={values.city}
                           onChangeText={handleChange('city')}
                           autoCapitalize="words"
@@ -436,7 +436,11 @@ const CustomerScreen = ({
                     onPress={handleSubmit}
                   >
                     <>
-                      <Icon name="check" size={21} color="#FFFFFF" />
+                      <Icon
+                        name="check"
+                        size={21}
+                        color={theme.colors.onPrimary}
+                      />
                       <Text style={customerStyles.saveButtonText}>
                         Save customer
                       </Text>

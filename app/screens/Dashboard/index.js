@@ -1,30 +1,34 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Design from './design';
-import { dashboardApi, DashboardGraph } from '../../api/DashboardApi';
 import { useModule } from '../../components/ModuleContext';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  moduleIdFor,
+  useBalanceSummary,
+  useProfile,
+  usePullToRefresh,
+  useRefreshOnFocus,
+  useSpendingGraph,
+} from '../../hooks/queries';
 
 const DashboardScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Today');
   const [selectedTab1, setSelectedTab1] = useState('Today');
-  const [refreshing, setRefreshing] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   // DashboardCard ke liye date navigation
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
-
-  const [loading, setLoading] = useState(false);
-  const [DashboardData, setDashboardData] = useState([]);
-
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
   const [Period, setPeriod] = useState('Today');
   const { selectedModule } = useModule();
-  const [Graph, setGraph] = useState([]);
-  const isSelected = selectedModule === 'Self Expense' ? 1 : 2;
+  const isSelected = moduleIdFor(selectedModule);
+
+  // "Hi, Faisal" from the cached profile; falls back while it loads.
+  const { data: profile } = useProfile();
+  const fullName = profile?.details?.FullName || profile?.user?.FullName || '';
+  const firstName = fullName.trim().split(/\s+/)[0];
+  const welcome = firstName ? `Hi, ${firstName}` : 'Hi there';
+  const initial = firstName ? firstName[0].toUpperCase() : '';
 
   const formatDate1 = date => {
     const year = date.getFullYear();
@@ -59,7 +63,7 @@ const DashboardScreen = ({ navigation }) => {
   const formatDate = date => {
     if (!date) return '';
 
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
     const monthNames = [
       'Jan',
       'Feb',
@@ -78,63 +82,40 @@ const DashboardScreen = ({ navigation }) => {
     return `${day}-${monthNames[Number(month) - 1]}-${year}`;
   };
 
-  const handleDashboard = async () => {
-    try {
-      const { fromDate: start, toDate: end } = getDateRange(selectedPeriod);
+  const { fromDate, toDate } = getDateRange(selectedPeriod);
 
-      setFromDate(start);
-      setToDate(end);
-
-      const response = await dashboardApi(isSelected, start, end);
-      const data = await response.json();
-
-      setDashboardData(data.obj);
-    } catch (error) {
-      setErrorModal(true);
-      setErrorMessage('No internet Connection');
-      console.log('Dashboard Api error', error);
-    }
-  };
-
-  const handleGraph = async () => {
-    try {
-      const response = await DashboardGraph(
-        isSelected,
-        Period === 'Today' ? 1 : Period === 'This Week' ? 2 : 3,
-      );
-
-      const data = await response.json();
-
-      setGraph(data.obj || []);
-    } catch (error) {
-      console.log('Graph API Error:', error);
-    }
-  };
-  useFocusEffect(
-    useCallback(() => {
-      const getData = async () => {
-        try {
-          setLoading(true);
-          await Promise.all([handleDashboard(), handleGraph()]);
-        } finally {
-          setLoading(false);
-        }
-      };
-      getData();
-    }, [selectedModule, selectedPeriod, Period]),
+  const {
+    data: DashboardData = [],
+    isLoading: summaryLoading,
+    error: summaryError,
+    refetch: refetchSummary,
+  } = useBalanceSummary(isSelected, fromDate, toDate);
+  const {
+    data: Graph = [],
+    isLoading: graphLoading,
+    refetch: refetchGraph,
+  } = useSpendingGraph(
+    isSelected,
+    Period === 'Today' ? 1 : Period === 'This Week' ? 2 : 3,
   );
+  useRefreshOnFocus(refetchSummary);
+  useRefreshOnFocus(refetchGraph);
 
-  const onRefresh = async () => {
-    try {
-      setRefreshing(true);
-      await handleGraph();
-      await handleDashboard();
-    } catch (error) {
-      console.log('Refreshing Api Error', error);
-    } finally {
-      setRefreshing(false);
+  const loading = summaryLoading || graphLoading;
+
+  // Same message the screen showed before when the summary failed to load.
+  useEffect(() => {
+    if (summaryError) {
+      setErrorMessage('No internet Connection');
+      setErrorModal(true);
     }
-  };
+  }, [summaryError]);
+
+  const refetchAll = useCallback(
+    () => Promise.all([refetchGraph(), refetchSummary()]),
+    [refetchGraph, refetchSummary],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refetchAll);
 
   const currentDate = new Date();
   const hours = currentDate.getHours();
@@ -161,11 +142,12 @@ const DashboardScreen = ({ navigation }) => {
       setModalVisible={setModalVisible}
       setActiveTab={setActiveTab}
       greeting={greeting}
+      welcome={welcome}
+      initial={initial}
       date={date}
       selectedTab={selectedTab}
       setSelectedTab={setSelectedTab}
       refreshing={refreshing}
-      setRefreshing={setRefreshing}
       navigation={navigation}
       selectedTab1={selectedTab1}
       setSelectedTab1={setSelectedTab1}
@@ -177,9 +159,7 @@ const DashboardScreen = ({ navigation }) => {
       loading={loading}
       onRefresh={onRefresh}
       fromDate={fromDate}
-      setFromDate={setFromDate}
       toDate={toDate}
-      setToDate={setToDate}
       getDateRange={getDateRange}
       setErrorModal={setErrorModal}
       errorModal={errorModal}

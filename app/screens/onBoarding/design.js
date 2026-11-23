@@ -1,12 +1,11 @@
-import { Text, View, Image, StatusBar } from 'react-native';
+import { View, Image, StatusBar } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import sizeHelper from '../../helpers/sizeHelper';
-import Bizo from '../../components/Bizo';
-import colors from '../../theme/colors';
 import styles from './style';
+import { theme } from '../../theme';
+import { AppText } from '../../ui';
 
 const Design = ({ SLIDES, onDone }) => {
   const renderItem = item => {
@@ -14,8 +13,12 @@ const Design = ({ SLIDES, onDone }) => {
     return (
       <View style={styles.slideContainer}>
         <Image source={slide.img} style={styles.img} />
-        <Text style={styles.titleText}>{slide.title}</Text>
-        <Text style={styles.context}>{slide.text}</Text>
+        <AppText variant="h1" style={styles.titleText}>
+          {slide.title}
+        </AppText>
+        <AppText variant="body" color="textSecondary" style={styles.context}>
+          {slide.text}
+        </AppText>
       </View>
     );
   };
@@ -25,8 +28,8 @@ const Design = ({ SLIDES, onDone }) => {
       <View style={styles.navButton} pointerEvents="none">
         <Icon
           name="arrow-forward"
-          size={sizeHelper.calHp(28)}
-          color={colors.white}
+          size={theme.sizes.icon.md}
+          color={theme.colors.onPrimary}
         />
       </View>
     );
@@ -37,25 +40,31 @@ const Design = ({ SLIDES, onDone }) => {
       <View style={styles.navButton} pointerEvents="none">
         <Icon
           name="arrow-back"
-          size={sizeHelper.calHp(28)}
-          color={colors.white}
+          size={theme.sizes.icon.md}
+          color={theme.colors.onPrimary}
         />
       </View>
     );
   };
 
   const renderSkipButton = () => {
-    return <Text style={styles.skipText}>Skip</Text>;
+    return (
+      <AppText variant="label" color="textSecondary" style={styles.skipText}>
+        Skip
+      </AppText>
+    );
   };
 
   const renderDoneButton = () => {
     return (
       <View style={styles.doneButton}>
-        <Text style={styles.doneButtonText}>Get Started</Text>
+        <AppText variant="bodyStrong" color="onPrimary">
+          Get started
+        </AppText>
         <Icon
           name={'arrow-forward'}
-          size={sizeHelper.calHp(32)}
-          color={colors.white}
+          size={theme.sizes.icon.md}
+          color={theme.colors.onPrimary}
         />
       </View>
     );
@@ -67,7 +76,7 @@ const Design = ({ SLIDES, onDone }) => {
         style={[styles.safeArea]}
         edges={['top', 'right', 'bottom', 'left']}
       >
-        <StatusBar hidden={true} />
+        <StatusBar barStyle="dark-content" />
 
         <View style={styles.sliderContainer}>
           <AppIntroSlider

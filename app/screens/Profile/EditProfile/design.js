@@ -1,45 +1,40 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  Image,
+  Pressable,
+  ScrollView,
+  View,
 } from 'react-native';
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import styles from '../EditProfile/style';
-import colors1 from '../../../theme/myColors';
-import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
-import sizeHelper from '../../../helpers/sizeHelper';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+import styles from './style';
+import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
 import PhotoModal from '../../../components/PhotoModal';
 import ImagePhotoOpen from '../../../components/ImagePhotoOpen';
-
-import * as Yup from 'yup';
-import { handleDataUpdate } from '../../../api/Profile';
 import Loader from '../../../components/Loader';
+import { useTheme } from '../../../theme';
+import { Button, Card, TextField } from '../../../ui';
+
+const API_BASE = 'https://api.app.shopmate.squarecod.com';
 
 const editScheme = Yup.object({
   userName: Yup.string().required('Name is required'),
-
   email: Yup.string()
     .email('Please enter a valid email')
     .required('Email is required'),
-
   phoneNumber: Yup.string()
     .matches(/^03[0-9]{9}$/, 'Enter a valid phone number')
     .required('Phone number is required'),
 });
 
+const fieldError = (touched, errors, name) =>
+  touched[name] && errors[name] ? errors[name] : undefined;
+
 const Design = ({
-  onBack,
-  onSave,
-  onChangePhoto,
   navigation,
   profileData,
   scrollRef,
@@ -56,135 +51,93 @@ const Design = ({
   imageVersion,
   accessToken,
 }) => {
-  const initialValues = {
-    userName: profileData?.FullName || '',
-    email: profileData?.Email || '',
-    phoneNumber: profileData?.PhoneNumber || '',
-  };
+  const { colors, sizes } = useTheme();
+
+  // A freshly picked local photo wins over the saved one on the server.
+  const serverUri =
+    profileData?.HasImage && profileData?.ImageUrl
+      ? `${API_BASE}${profileData.ImageUrl}?v=${imageVersion}`
+      : null;
+  const avatarSource = imageUri
+    ? { uri: imageUri }
+    : serverUri
+    ? { uri: serverUri, headers: { Authorization: `Bearer ${accessToken}` } }
+    : null;
+
+  const scrollToEnd = () =>
+    setTimeout(() => scrollRef?.current?.scrollToEnd({ animated: true }), 100);
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'height' : 'padding'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
       <Loader visible={loading} />
+      <DropdownStylishBtn
+        navigation={navigation}
+        showDropdown={false}
+        showBack
+        showPlus={false}
+        title="Edit Profile"
+        subTitle="Update your personal information"
+        back={() => navigation.goBack()}
+      />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.scrollContent}
       >
-        <DropdownStylishBtn
-          navigation={navigation}
-          showDropdown={false}
-          showBack={true}
-          showPlus={false}
-          title="Edit Profile"
-          subTitle="Update your personal information."
-          back={() => navigation.goBack()}
-        />
-
-        {/* Profile Image */}
-
         <View style={styles.profileSection}>
-          {imageUri ? (
-            <View style={styles.avatarContainer}>
-              <TouchableOpacity
-                onPress={() => setphotoOpenModal(true)}
-                style={styles.avatar}
-              >
+          <View>
+            <Pressable
+              onPress={() => avatarSource && setphotoOpenModal(true)}
+              style={styles.avatar}
+              accessibilityRole="imagebutton"
+              accessibilityLabel="View profile photo"
+            >
+              {avatarSource ? (
                 <Image
-                  source={{ uri: imageUri }}
-                  style={{
-                    width: sizeHelper.calHp(320),
-                    height: sizeHelper.calHp(320),
-                    borderRadius: sizeHelper.calHp(200),
-                  }}
+                  source={avatarSource}
+                  style={styles.avatarImage}
                   resizeMode="cover"
                 />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.cameraButton}
-                onPress={() => setShowPhotoModal(true)}
-              >
-                <Icon
-                  name="camera-alt"
-                  size={sizeHelper.calHp(47)}
-                  color={colors1.text}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : profileData?.HasImage && profileData?.ImageUrl ? (
-            <View style={styles.avatarContainer}>
-              <TouchableOpacity
-                onPress={() => setphotoOpenModal(true)}
-                style={styles.avatar}
-              >
-                <Image
-                  source={{
-                    uri: `https://api.app.shopmate.squarecod.com${profileData?.ImageUrl}?v=${imageVersion}`,
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                    },
-                  }}
-                  style={{
-                    width: sizeHelper.calHp(320),
-                    height: sizeHelper.calHp(320),
-                    borderRadius: sizeHelper.calHp(200),
-                  }}
-                  resizeMode="cover"
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.cameraButton}
-                onPress={() => setShowPhotoModal(true)}
-              >
-                <Icon
-                  name="camera-alt"
-                  size={sizeHelper.calHp(47)}
-                  color={colors1.text}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.avatarContainer}>
-              <View style={styles.avatar}>
-                <Icon
-                  name="person"
-                  size={sizeHelper.calHp(205)}
-                  color="#68452A"
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.cameraButton}
-                onPress={() => setShowPhotoModal(true)}
-              >
-                <Icon
-                  name="camera-alt"
-                  size={sizeHelper.calHp(47)}
-                  color={colors1.text}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={styles.changePhotoButton}
+              ) : (
+                <Icon name="person" size={64} color={colors.primary} />
+              )}
+            </Pressable>
+            <Pressable
+              style={styles.cameraButton}
+              onPress={() => setShowPhotoModal(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Change photo"
+              hitSlop={8}
+            >
+              <Icon
+                name="photo-camera"
+                size={sizes.icon.md}
+                color={colors.onPrimary}
+              />
+            </Pressable>
+          </View>
+          <Button
+            title="Change photo"
+            icon="image"
+            variant="ghost"
+            size="sm"
+            fullWidth={false}
             onPress={() => setShowPhotoModal(true)}
-          >
-            <Icon name="image" size={26} color={colors1.text} />
-            <Text style={styles.changePhotoText}>Change Photo</Text>
-          </TouchableOpacity>
+          />
         </View>
 
-        {/* Formik */}
         <Formik
-          initialValues={initialValues}
+          initialValues={{
+            userName: profileData?.FullName || '',
+            email: profileData?.Email || '',
+            phoneNumber: profileData?.PhoneNumber || '',
+          }}
           validationSchema={editScheme}
-          enableReinitialize={true}
+          enableReinitialize
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={UpdatingData}
@@ -197,119 +150,55 @@ const Design = ({
             handleBlur,
             handleSubmit,
           }) => (
-            <View>
-              {/* Full Name */}
-              <View style={styles.inputCard}>
-                <View style={styles.inputIcon}>
-                  <Icon
-                    name="person"
-                    size={sizeHelper.calHp(63)}
-                    color={colors1.text}
-                  />
-                </View>
-
-                <View style={styles.inputContent}>
-                  <Text style={styles.inputLabel}>Full Name</Text>
-
-                  <TextInput
-                    value={values.userName}
-                    onChangeText={handleChange('userName')}
-                    onBlur={handleBlur('userName')}
-                    style={styles.input}
-                    placeholder="Enter full name"
-                  />
-                </View>
-              </View>
-              {touched.userName && errors.userName && (
-                <Text style={styles.errors}>{errors.userName}</Text>
-              )}
-              {/* Email */}
-              <View style={styles.inputCard}>
-                <View style={styles.inputIcon}>
-                  <Icon
-                    name="email"
-                    size={sizeHelper.calHp(63)}
-                    color={colors1.text}
-                  />
-                </View>
-
-                <View style={styles.inputContent}>
-                  <Text style={styles.inputLabel}>Email Address</Text>
-
-                  <TextInput
-                    value={values.email}
-                    onChangeText={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    style={styles.input}
-                    onFocus={() =>
-                      setTimeout(() => {
-                        scrollRef?.current.scrollToEnd({
-                          animated: true,
-                        });
-                      }, 100)
-                    }
-                    placeholder="Enter email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                </View>
-              </View>
-              {touched.email && errors.email && (
-                <Text style={styles.errors}>{errors.email}</Text>
-              )}
-
-              {/* Phone Number */}
-              <View style={styles.inputCard}>
-                <View style={styles.inputIcon}>
-                  <Icon
-                    name="phone"
-                    size={sizeHelper.calHp(63)}
-                    color={colors1.text}
-                  />
-                </View>
-
-                <View style={styles.inputContent}>
-                  <Text style={styles.inputLabel}>Phone Number</Text>
-
-                  <TextInput
-                    value={values.phoneNumber}
-                    onChangeText={handleChange('phoneNumber')}
-                    // onBlur={handleBlur('phoneNumber')}
-                    style={styles.input}
-                    onFocus={() =>
-                      setTimeout(() => {
-                        scrollRef?.current.scrollToEnd({
-                          animated: true,
-                        });
-                      }, 100)
-                    }
-                    placeholder="Enter phone number"
-                    keyboardType="phone-pad"
-                  />
-                </View>
-              </View>
-
-              {touched.phoneNumber && errors.phoneNumber && (
-                <Text style={styles.errors}>{errors.phoneNumber}</Text>
-              )}
-
-              {/* Save Button */}
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSubmit}
-                activeOpacity={0.8}
-              >
-                <Icon
-                  name="save"
-                  size={sizeHelper.calHp(55)}
-                  color={colors1.text}
+            <>
+              <Card padding="lg">
+                <TextField
+                  inset={false}
+                  label="Full name"
+                  icon="person-outline"
+                  placeholder="Enter full name"
+                  autoCapitalize="words"
+                  value={values.userName}
+                  onChangeText={handleChange('userName')}
+                  onBlur={handleBlur('userName')}
+                  error={fieldError(touched, errors, 'userName')}
                 />
-                <Text style={styles.saveButtonText}>Save Changes</Text>
-              </TouchableOpacity>
-            </View>
+                <TextField
+                  inset={false}
+                  label="Email address"
+                  icon="mail-outline"
+                  placeholder="you@example.com"
+                  keyboardType="email-address"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  onFocus={scrollToEnd}
+                  error={fieldError(touched, errors, 'email')}
+                />
+                <TextField
+                  inset={false}
+                  label="Phone number"
+                  icon="phone-iphone"
+                  placeholder="03XXXXXXXXX"
+                  keyboardType="phone-pad"
+                  maxLength={11}
+                  value={values.phoneNumber}
+                  onChangeText={handleChange('phoneNumber')}
+                  onFocus={scrollToEnd}
+                  error={fieldError(touched, errors, 'phoneNumber')}
+                />
+              </Card>
+              <Button
+                title="Save changes"
+                icon="check-circle-outline"
+                onPress={handleSubmit}
+                style={styles.save}
+              />
+            </>
           )}
         </Formik>
       </ScrollView>
+
       <PhotoModal
         visible={showPhotoModal}
         onDelete={onDelete}
@@ -323,21 +212,12 @@ const Design = ({
           openCamera();
         }}
       />
-      {imageUri ? (
-        <ImagePhotoOpen
-          visible={photoOpenModal}
-          imageUri={imageUri}
-          accessToken={accessToken}
-          onClose={() => setphotoOpenModal(false)}
-        />
-      ) : (
-        <ImagePhotoOpen
-          visible={photoOpenModal}
-          accessToken={accessToken}
-          imageUri={`https://api.app.shopmate.squarecod.com${profileData?.ImageUrl}?v=${imageVersion}`}
-          onClose={() => setphotoOpenModal(false)}
-        />
-      )}
+      <ImagePhotoOpen
+        visible={photoOpenModal}
+        accessToken={accessToken}
+        imageUri={imageUri || serverUri}
+        onClose={() => setphotoOpenModal(false)}
+      />
     </KeyboardAvoidingView>
   );
 };

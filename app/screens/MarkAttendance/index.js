@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { StyleSheet, Text, View, Keyboard } from 'react-native';
 import React from 'react';
 import Design from './design';
@@ -183,7 +184,7 @@ const InComingScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View>
+    <View style={screenFill}>
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}

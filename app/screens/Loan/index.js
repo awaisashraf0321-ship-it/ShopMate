@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { Keyboard, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Design from './design';
@@ -11,7 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomerDelete } from '../../api/CustomerApi';
 import { useEffect } from 'react';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const LoanScreen = ({ navigation }) => {
   const [amount, setAmount] = useState('');
@@ -50,7 +51,6 @@ const LoanScreen = ({ navigation }) => {
       const paymentData = {
         customerId: selectedCustomerId,
         sentTo: sentTo,
-        customerId: selectedCustomerId,
         receiptDate: date.toISOString().split('T')[0],
         amount: Number(amount),
         image: base64Image1 || '',
@@ -204,7 +204,7 @@ const LoanScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View>
+    <View style={screenFill}>
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}

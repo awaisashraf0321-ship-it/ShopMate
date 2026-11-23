@@ -1,209 +1,168 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Swipeable } from 'react-native-gesture-handler';
+import { theme } from '../theme';
+import { AppText } from '../ui';
 
-import colors from '../theme/colors';
-import sizeHelper from '../helpers/sizeHelper';
+const { colors, spacing, radius, sizes } = theme;
 
+/** Avatar tint + icon for a payment mode name ("Cash", "Bank Transfer", …). */
+const modeStyle = paymentMode => {
+  const mode = String(paymentMode || '').toLowerCase();
+  if (mode.includes('cash')) {
+    return { bg: colors.warningSoft, fg: colors.warning, icon: 'payments' };
+  }
+  if (/bank|transfer|online/.test(mode)) {
+    return { bg: colors.infoSoft, fg: colors.info, icon: 'account-balance' };
+  }
+  if (/card|credit|debit/.test(mode)) {
+    return { bg: colors.successSoft, fg: colors.success, icon: 'credit-card' };
+  }
+  return { bg: colors.primarySoft, fg: colors.primary, icon: 'payment' };
+};
+
+const initialsOf = name =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase() || 'U';
+
+const SwipeAction = ({ icon, label, color, onPress, disabled }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.action,
+      { backgroundColor: color, opacity: pressed ? 0.85 : 1 },
+    ]}
+    onPress={onPress}
+    disabled={disabled}
+    accessibilityRole="button"
+    accessibilityLabel={label}
+  >
+    <Icon name={icon} size={sizes.icon.lg} color={colors.onPrimary} />
+    <AppText variant="label" color="onPrimary">
+      {label}
+    </AppText>
+  </Pressable>
+);
+
+/**
+ * One row in a payments / expenses list. Swipe left for Delete (and Edit
+ * when `editBtn`). Shows the payee, the date or payment mode, and the amount.
+ */
 const PaymentCard = ({
   sentTo,
   paymentMode,
   amount,
-  getPaymentModeIcon,
   onDelete,
   onPress,
   formatDate,
   handleBudgetUpdate,
-  categoryId,
   editDisabled,
   formatAmount,
-  budgetId,
   selectedIcon,
   editBtn = false,
   setEditModalVisible,
   date,
 }) => {
   const swipeRef = useRef(null);
-
-  const matching =
-    typeof selectedIcon === 'function' ? selectedIcon(sentTo) : 0;
-
   const name = String(sentTo || 'Unknown');
-
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map(part => part.charAt(0))
-    .join('')
-    .toUpperCase();
-
-  const mode = String(paymentMode || '').toLowerCase();
-
-  const isCash = mode.includes('cash');
-  const isBank =
-    mode.includes('bank') ||
-    mode.includes('transfer') ||
-    mode.includes('online');
-  const isCard =
-    mode.includes('card') || mode.includes('credit') || mode.includes('debit');
-
-  const avatarColor = isCash
-    ? '#FFEBD5'
-    : isBank
-    ? '#DCEAFF'
-    : isCard
-    ? '#DDF5E8'
-    : '#EDE7FF';
-
-  const avatarTextColor = isCash
-    ? '#A45A16'
-    : isBank
-    ? '#285BAA'
-    : isCard
-    ? '#247B52'
-    : '#4A24B8';
-
-  const paymentIcon = isCash
-    ? 'payments'
-    : isBank
-    ? 'account-balance'
-    : isCard
-    ? 'credit-card'
-    : 'payment';
+  const category =
+    typeof selectedIcon === 'function' ? selectedIcon(sentTo) : null;
+  const tone = modeStyle(paymentMode);
 
   const renderRightActions = () => (
-    <View style={styles.swipeActions}>
+    <View style={styles.actions}>
       {editBtn && (
-        <TouchableOpacity
-          style={styles.editButton}
-          activeOpacity={0.8}
+        <SwipeAction
+          icon="edit"
+          label="Edit"
+          color={colors.warning}
           disabled={editDisabled}
           onPress={() => {
             swipeRef.current?.close();
             handleBudgetUpdate?.();
             setEditModalVisible(true);
           }}
-        >
-          <Icon name="edit" size={sizeHelper.calHp(45)} color="#FFFFFF" />
-          <Text style={styles.actionText}>Edit</Text>
-        </TouchableOpacity>
-      )}
-
-      <TouchableOpacity
-        style={styles.deleteButton}
-        activeOpacity={0.8}
-        onPress={onDelete}
-      >
-        <Icon
-          name="delete-outline"
-          size={sizeHelper.calHp(45)}
-          color="#FFFFFF"
         />
-        <Text style={styles.actionText}>Delete</Text>
-      </TouchableOpacity>
+      )}
+      <SwipeAction
+        icon="delete-outline"
+        label="Delete"
+        color={colors.danger}
+        onPress={onDelete}
+      />
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.cardWrapper}>
-        <Swipeable
-          ref={swipeRef}
-          renderRightActions={renderRightActions}
-          overshootRight={false}
-          containerStyle={styles.swipeContainer}
-          rightThreshold={sizeHelper.calHp(40)}
+    <View style={styles.wrapper}>
+      <Swipeable
+        ref={swipeRef}
+        renderRightActions={renderRightActions}
+        overshootRight={false}
+        rightThreshold={18}
+      >
+        <Pressable
+          onPress={onPress}
+          style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel={`${name}, Rs ${formatAmount?.(amount)}`}
         >
-          <TouchableOpacity
-            onPress={onPress}
-            style={styles.row}
-            activeOpacity={0.8}
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: category?.color || tone.bg },
+            ]}
           >
-            {/* Initials avatar */}
-            <View
-              style={[
-                styles.avatar,
-                {
-                  backgroundColor: matching.color || avatarColor,
-                },
-              ]}
-            >
-              {matching?.icon ? (
-                <Icon
-                  name={matching.icon}
-                  size={sizeHelper.calHp(45)}
-                  color={matching.iconColor}
-                />
-              ) : (
-                <Text style={[styles.initials, { color: avatarTextColor }]}>
-                  {initials || 'U'}
-                </Text>
-              )}
-            </View>
+            {category?.icon ? (
+              <Icon
+                name={category.icon}
+                size={sizes.icon.md}
+                color={category.iconColor}
+              />
+            ) : (
+              <AppText variant="bodyStrong" color={tone.fg}>
+                {initialsOf(name)}
+              </AppText>
+            )}
+          </View>
 
-            {/* Payee name and payment method */}
-            <View style={styles.details}>
-              <Text
-                style={styles.receiverName}
+          <View style={styles.details}>
+            <AppText variant="bodyStrong" numberOfLines={1}>
+              {name}
+            </AppText>
+            <View style={styles.meta}>
+              <Icon
+                name={date ? 'calendar-today' : tone.icon}
+                size={sizes.icon.sm - 2}
+                color={colors.textMuted}
+              />
+              <AppText
+                variant="caption"
+                color="textSecondary"
                 numberOfLines={1}
-                ellipsizeMode="tail"
               >
-                {name}
-              </Text>
-
-              {date ? (
-                <View style={styles.paymentInfo}>
-                  <Icon
-                    name="calendar-today"
-                    size={sizeHelper.calHp(40)}
-                    color="#85839A"
-                  />
-
-                  <Text
-                    style={styles.paymentMode}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {formatDate(date)}
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.paymentInfo}>
-                  <Icon
-                    name={paymentIcon}
-                    size={sizeHelper.calHp(32)}
-                    color="#85839A"
-                  />
-
-                  <Text
-                    style={styles.paymentMode}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {paymentMode || 'Payment'}
-                  </Text>
-                </View>
-              )}
+                {date ? formatDate(date) : paymentMode || 'Payment'}
+              </AppText>
             </View>
+          </View>
 
-            {/* Outgoing amount */}
-            <View style={styles.amountWrap}>
-              <Text
-                style={styles.amount}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.7}
-              >
-                Rs {formatAmount?.(amount)}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </Swipeable>
-
-        <View style={styles.rowDivider} />
-      </View>
+          <AppText
+            variant="bodyStrong"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            style={styles.amount}
+          >
+            Rs {formatAmount?.(amount)}
+          </AppText>
+        </Pressable>
+      </Swipeable>
+      <View style={styles.divider} />
     </View>
   );
 };
@@ -211,141 +170,52 @@ const PaymentCard = ({
 export default PaymentCard;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
+  wrapper: {
+    backgroundColor: colors.surface,
   },
-
-  cardWrapper: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-  },
-
-  swipeContainer: {
-    width: '100%',
-  },
-
   row: {
-    width: '100%',
-    minHeight: sizeHelper.calHp(180),
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: sizeHelper.calHp(40),
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: sizeHelper.calWp(30),
-    paddingVertical: sizeHelper.calHp(30),
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
-
+  pressed: { opacity: 0.8 },
   avatar: {
-    width: sizeHelper.calHp(115),
-    height: sizeHelper.calHp(115),
-    borderRadius: sizeHelper.calHp(34),
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: sizeHelper.calWp(24),
+    marginRight: spacing.md,
   },
-
-  initials: {
-    fontSize: sizeHelper.calHp(37),
-    fontWeight: '700',
-  },
-
   details: {
     flex: 1,
     minWidth: 0,
-    justifyContent: 'center',
   },
-
-  receiverName: {
-    fontSize: sizeHelper.calHp(35),
-    fontWeight: '700',
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    color: colors.textPrimary || '#17142B',
-    marginBottom: sizeHelper.calHp(14),
-  },
-
-  paymentInfo: {
+  meta: {
     flexDirection: 'row',
     alignItems: 'center',
-    minWidth: 0,
+    gap: spacing.xs,
+    marginTop: spacing.xxs,
   },
-
-  paymentMode: {
-    flexShrink: 1,
-    fontSize: sizeHelper.calHp(30),
-    marginBottom: sizeHelper.calHp(10),
-    fontWeight: '400',
-
-    fontFamily: 'PlusJakartaSans-Regular',
-    color: colors.textSecondary || '#85839A',
-    marginLeft: sizeHelper.calWp(10),
-  },
-
-  referenceBadge: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: sizeHelper.calWp(6),
-    paddingVertical: sizeHelper.calHp(2),
-    borderRadius: sizeHelper.calHp(4),
-    marginLeft: sizeHelper.calWp(8),
-  },
-
-  referenceText: {
-    fontSize: sizeHelper.calHp(11),
-    color: '#6B7280',
-    fontFamily: 'PlusJakartaSans-Regular',
-    fontWeight: '500',
-  },
-
-  amountWrap: {
-    maxWidth: '40%',
-    marginLeft: sizeHelper.calWp(10),
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-
   amount: {
-    fontSize: sizeHelper.calHp(34),
-    fontWeight: 'bold',
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    color: colors.textPrimary || '#17142B',
+    maxWidth: '40%',
+    marginLeft: spacing.sm,
     textAlign: 'right',
   },
-
-  swipeActions: {
+  actions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: sizeHelper.calHp(10),
-    borderRadius: sizeHelper.calHp(25),
   },
-
-  editButton: {
-    width: sizeHelper.calWp(170),
-    height: sizeHelper.calHp(180),
-    backgroundColor: '#FFB52E',
+  action: {
+    width: 72,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: sizeHelper.calHp(8),
+    gap: spacing.xxs,
   },
-
-  deleteButton: {
-    width: sizeHelper.calWp(170),
-    height: sizeHelper.calHp(180),
-    borderTopEndRadius: sizeHelper.calHp(20),
-    backgroundColor: '#E53935',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: sizeHelper.calHp(8),
-  },
-
-  actionText: {
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '600',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  rowDivider: {
-    height: 1,
-    backgroundColor: '#F0EDF5',
-    width: '100%',
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.divider,
   },
 });

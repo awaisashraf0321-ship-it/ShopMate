@@ -1,46 +1,21 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import { screenFill } from '../../../theme';
+import { View } from 'react-native';
+import React, { useState } from 'react';
 import Design from '../SelfDetail/design';
 import { useMutation } from '@tanstack/react-query';
-import { Delete, SelfGetById } from '../../../api/ExpenseApi';
-import { useState, useEffect } from 'react';
+import { Delete } from '../../../api/ExpenseApi';
+import { useExpenseById, usePullToRefresh } from '../../../hooks/queries';
+
 const SelfDetailScreen = ({ navigation, route }) => {
   const [deleteModal3, SetDeleteModal3] = useState(false);
   const [selectedPaymentId3, setSelectedPaymentId3] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [Get, setGet] = useState(null);
-  const [Loading, setLoading] = useState(false);
-  console.log('Self expense Id', route.params.id);
-  const onRefresh = async () => {
-    await handleGetById(true);
-  };
 
-  const handleGetById = async (isRefreshing = false) => {
-    try {
-      if (!isRefreshing) {
-        setLoading(true);
-      }
-
-      const response = await SelfGetById(route.params.id);
-      const data = await response.json();
-      console.log('myExpenseData', data);
-      if (data.Status === 200 && data.obj) {
-        setGet(data.obj);
-      }
-
-      console.log('Get Data:', response);
-    } catch (error) {
-      console.log('Get Error:', error.message);
-    } finally {
-      if (!isRefreshing) {
-        setLoading(false);
-      }
-      setRefreshing(false);
-    }
-  };
-  useEffect(() => {
-    handleGetById();
-  }, []);
+  const {
+    data: Get = null,
+    isLoading: Loading,
+    refetch,
+  } = useExpenseById(route.params.id);
+  const { refreshing, onRefresh } = usePullToRefresh(refetch);
 
   const deleteMutation = useMutation({
     mutationFn: Delete,
@@ -63,7 +38,7 @@ const SelfDetailScreen = ({ navigation, route }) => {
   };
 
   const formatDate = date => {
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
 
     const monthNames = [
       'Jan',
@@ -86,7 +61,7 @@ const SelfDetailScreen = ({ navigation, route }) => {
     return Number(amount).toLocaleString('en-US');
   };
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         Get={Get}
         formatDate={formatDate}
@@ -98,7 +73,6 @@ const SelfDetailScreen = ({ navigation, route }) => {
         selectedPaymentId3={selectedPaymentId3}
         setSelectedPaymentId3={setSelectedPaymentId3}
         refreshing={refreshing}
-        setRefreshing={setRefreshing}
         onRefresh={onRefresh}
         Loading={Loading}
         loader={isPending}
@@ -108,5 +82,3 @@ const SelfDetailScreen = ({ navigation, route }) => {
 };
 
 export default SelfDetailScreen;
-
-const styles = StyleSheet.create({});

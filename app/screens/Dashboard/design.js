@@ -11,7 +11,6 @@ import DashboardCard from '../../components/DashboardCard';
 import QuickActions from '../../components/QuickActions';
 import sizeHelper from '../../helpers/sizeHelper';
 import ExpenseOverview from '../../components/ExpenseOverview';
-import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import Loader from '../../components/Loader';
 import ErrorModal from '../../components/ErrorModal';
 import styles from '../Dashboard/style';
@@ -20,6 +19,8 @@ const Design = ({
   selectedTab,
   setSelectedTab,
   greeting,
+  welcome,
+  initial,
   refreshing,
   DashboardData,
   formatAmount,
@@ -50,18 +51,10 @@ const Design = ({
     <View style={styles.main}>
       <StatusBar hidden={true} barStyle={'dark-content'} />
 
-      <DropdownStylishBtn
-        navigation={navigation}
-        showDropdown={true}
-        showBack={false}
-        showPlus={false}
-      />
       <Header
         title={greeting}
-        subTitle={'Hi, Everyone'}
-        icon1="menu"
-        icon2="notifications"
-        icon3="calendar-today"
+        subTitle={welcome}
+        initial={initial}
         navigation={navigation}
       />
       <Loader visible={loading} />
@@ -76,6 +69,7 @@ const Design = ({
       >
         <DashboardCard
           netBalance={DashboardData?.NetBalance}
+          openingBalance={DashboardData?.OpeningBalance}
           MoneyIn={DashboardData?.MoneyIn}
           MoneyOut={DashboardData?.MoneyOut}
           formatAmount={formatAmount}

@@ -1,77 +1,43 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-} from 'react-native';
-import LeadgerHeader from '../../components/LeadgerHeader';
-import styles from '../ChangePassword/style';
-import AuthTextField from '../../components/AuthTextField';
-import sizeHelper from '../../helpers/sizeHelper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import React from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import colors from '../../theme/colors';
+
+import LeadgerHeader from '../../components/LeadgerHeader';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
-const Design = ({
-  navigation,
-  handlePassword,
-  loading,
-  setLoading,
-  visible,
-  setVisible,
-  visible1,
-  setVisible1,
-  visible2,
-  setVisible2,
-}) => {
-  const textFieldStyles = {
-    usernameStyle: {
-      fontSize: sizeHelper.calHp(31),
-      marginLeft: sizeHelper.calHp(62),
-      marginTop: sizeHelper.calHp(20),
-    },
-    iconDesign: {
-      marginLeft: sizeHelper.calHp(10),
-    },
-    inputStyle: {
-      width: '90%',
-      height: sizeHelper.calHp(130),
-      borderRadius: sizeHelper.calHp(100),
-      marginLeft: sizeHelper.calHp(40),
-      elevation: 0,
-    },
-  };
-  const handleValidation = Yup.object({
-    currentPassword: Yup.string().required('Current password is required'),
-    newPassword: Yup.string()
-      .required('New password is required')
-      .min(6, 'Password must be at least 6 characters'),
-    confirmNewPassword: Yup.string()
-      .required('Confirm new password is required')
-      .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
-  });
-  return (
+import { AppText, Button, Card, TextField } from '../../ui';
+import styles from './style';
+
+const validationSchema = Yup.object({
+  currentPassword: Yup.string().required('Current password is required'),
+  newPassword: Yup.string()
+    .required('New password is required')
+    .min(6, 'Password must be at least 6 characters'),
+  confirmNewPassword: Yup.string()
+    .required('Confirm new password is required')
+    .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+});
+
+const fieldError = (touched, errors, name) =>
+  touched[name] && errors[name] ? errors[name] : undefined;
+
+const Design = ({ navigation, handlePassword, loading }) => (
+  <View style={styles.root}>
+    <DropdownStylishBtn
+      navigation={navigation}
+      showDropdown={false}
+      showBack
+      showPlus={false}
+      title="Change Password"
+      subTitle="Update your account password"
+      back={() => navigation.goBack()}
+    />
+    <LeadgerHeader gaping={false} btn={false} navigation={navigation} />
+
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'height' : 'padding'}
+      style={styles.root}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <DropdownStylishBtn
-        navigation={navigation}
-        showDropdown={false}
-        showBack={true}
-        showPlus={false}
-        title="Change Password"
-        subTitle="Update your account password"
-        back={() => navigation.goBack()}
-      />
-      <LeadgerHeader gaping={false} btn={false} navigation={navigation} />
       <Formik
         initialValues={{
           currentPassword: '',
@@ -81,7 +47,7 @@ const Design = ({
         onSubmit={handlePassword}
         validateOnChange={false}
         validateOnBlur={false}
-        validationSchema={handleValidation}
+        validationSchema={validationSchema}
       >
         {({
           values,
@@ -91,110 +57,64 @@ const Design = ({
           handleSubmit,
           handleBlur,
         }) => (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <ScrollView keyboardShouldPersistTaps="handled">
-              <View style={styles.passwordWrapper}>
-                <AuthTextField
-                  style={styles.input}
-                  label={'Current Password'}
-                  icon={'lock-outline'}
-                  value={values.currentPassword}
-                  onChangeText={handleChange('currentPassword')}
-                  onBlur={handleBlur('currentPassword')}
-                  secureTextEntry={!visible}
-                  placeholder="Enter Your Current Password"
-                  usernameStyle={textFieldStyles.usernameStyle}
-                  iconDesign={textFieldStyles.iconDesign}
-                  inputStyle={textFieldStyles.inputStyle}
-                />
-                <TouchableOpacity
-                  onPress={() => setVisible(!visible)}
-                  style={styles.passwordIcon1}
-                >
-                  <Icon
-                    name={visible ? 'visibility' : 'visibility-off'}
-                    size={sizeHelper.calHp(40)}
-                    color="#171717a9"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {touched.currentPassword && errors.currentPassword && (
-                <Text style={styles.errors}>{errors.currentPassword}</Text>
-              )}
-              <View style={styles.passwordWrapper}>
-                <AuthTextField
-                  style={styles.input}
-                  label={'New Password'}
-                  icon={'lock-outline'}
-                  value={values.newPassword}
-                  onChangeText={handleChange('newPassword')}
-                  onBlur={handleBlur('newPassword')}
-                  secureTextEntry={!visible1}
-                  placeholder="Enter Your New Password"
-                  usernameStyle={textFieldStyles.usernameStyle}
-                  iconDesign={textFieldStyles.iconDesign}
-                  inputStyle={textFieldStyles.inputStyle}
-                />
-                <TouchableOpacity
-                  onPress={() => setVisible1(!visible1)}
-                  style={styles.passwordIcon}
-                >
-                  <Icon
-                    name={visible1 ? 'visibility' : 'visibility-off'}
-                    size={sizeHelper.calHp(40)}
-                    color={colors.dark}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {touched.newPassword && errors.newPassword && (
-                <Text style={styles.errors}>{errors.newPassword}</Text>
-              )}
-              <View style={styles.passwordWrapper}>
-                <AuthTextField
-                  style={styles.input}
-                  label={'Confirm New Password'}
-                  icon={'lock-outline'}
-                  value={values.confirmNewPassword}
-                  onChangeText={handleChange('confirmNewPassword')}
-                  onBlur={handleBlur('confirmNewPassword')}
-                  secureTextEntry={!visible2}
-                  placeholder="Enter Your Confirm New Password"
-                  usernameStyle={textFieldStyles.usernameStyle}
-                  iconDesign={textFieldStyles.iconDesign}
-                  inputStyle={textFieldStyles.inputStyle}
-                />
-                <TouchableOpacity
-                  onPress={() => setVisible2(!visible2)}
-                  style={styles.passwordIcon2}
-                >
-                  <Icon
-                    name={visible2 ? 'visibility' : 'visibility-off'}
-                    size={sizeHelper.calHp(40)}
-                    color="#171717a9"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {touched.confirmNewPassword && errors.confirmNewPassword && (
-                <Text style={styles.errors}>{errors.confirmNewPassword}</Text>
-              )}
-              <View style={styles.btnCon}>
-                <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                  {loading ? (
-                    <ActivityIndicator color={colors.white} size={'small'} />
-                  ) : (
-                    <Text style={styles.buttonText}>Change Password</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </TouchableWithoutFeedback>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.content}
+          >
+            <Card padding="lg">
+              <AppText
+                variant="caption"
+                color="textSecondary"
+                style={styles.intro}
+              >
+                Your new password must be at least 6 characters.
+              </AppText>
+              <TextField
+                inset={false}
+                password
+                label="Current password"
+                icon="lock-outline"
+                placeholder="Enter your current password"
+                value={values.currentPassword}
+                onChangeText={handleChange('currentPassword')}
+                onBlur={handleBlur('currentPassword')}
+                error={fieldError(touched, errors, 'currentPassword')}
+              />
+              <TextField
+                inset={false}
+                password
+                label="New password"
+                icon="lock-reset"
+                placeholder="Enter a new password"
+                value={values.newPassword}
+                onChangeText={handleChange('newPassword')}
+                onBlur={handleBlur('newPassword')}
+                error={fieldError(touched, errors, 'newPassword')}
+              />
+              <TextField
+                inset={false}
+                password
+                label="Confirm new password"
+                icon="lock-reset"
+                placeholder="Re-enter the new password"
+                value={values.confirmNewPassword}
+                onChangeText={handleChange('confirmNewPassword')}
+                onBlur={handleBlur('confirmNewPassword')}
+                error={fieldError(touched, errors, 'confirmNewPassword')}
+              />
+            </Card>
+            <Button
+              title="Change password"
+              icon="check-circle-outline"
+              onPress={handleSubmit}
+              loading={loading}
+              style={styles.submit}
+            />
+          </ScrollView>
         )}
       </Formik>
     </KeyboardAvoidingView>
-  );
-};
+  </View>
+);
 
 export default Design;

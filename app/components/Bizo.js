@@ -2,7 +2,7 @@ import { StyleSheet, Text, Image, View } from 'react-native';
 import React from 'react';
 
 import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+import { theme } from '../theme';
 
 const sizing = {
   large: {
@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
   },
 
   tagline: {
-    fontFamily: 'InterRegular',
-    color: colors.tagLineColor,
+    fontFamily: theme.fontFamily.regular,
+    color: theme.colors.onPrimaryMuted,
     marginTop: sizeHelper.calHp(12),
     textAlign: 'center',
     letterSpacing: sizeHelper.calWp(0.4),

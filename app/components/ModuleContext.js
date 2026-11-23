@@ -48,3 +48,9 @@ export const ModuleProvider = ({ children }) => {
 };
 
 export const useModule = () => useContext(ModuleContext);
+
+/** Options for the Personal | Business switch shown in screen headers. */
+export const MODULE_OPTIONS = [
+  { value: 'Self Expense', label: 'Personal', icon: 'person' },
+  { value: 'Business Expense', label: 'Business', icon: 'storefront' },
+];

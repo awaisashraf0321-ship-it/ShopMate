@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
 import Design from '../Montly Budget/design';
 import { useState, useCallback } from 'react';
@@ -6,9 +6,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GetCategories } from '../../api/ExpenseApi';
 import { GetBudget, budgetDelete, updateBudget } from '../../api/MontlyApi';
 import { useRef } from 'react';
-import { budget, monthlybudgetDashboard } from '../../api/MontlyApi';
-import { useFocusEffect } from '@react-navigation/native';
+import { budget } from '../../api/MontlyApi';
 import ErrorModal from '../../components/ErrorModal';
+import {
+  useMonthlyBudgetSummary,
+  usePullToRefresh,
+  useRefreshOnFocus,
+} from '../../hooks/queries';
 const MonthlyBudgetScreen = ({ navigation }) => {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
@@ -26,12 +30,10 @@ const MonthlyBudgetScreen = ({ navigation }) => {
   const [budgetDeleteModal, setBudgetdeleteModal] = useState(false);
   const [selectedPaymentId2, setSelectedPaymentId2] = useState(null);
   const [loader, setLoader] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [salaryModalVisible, setSalaryModalVisible] = useState(false);
   const [salary, setSalary] = useState('');
-  const [monthlyDashboard, setMonthlyDashboard] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const swipeRef = React.useRef(null);
@@ -61,8 +63,7 @@ const MonthlyBudgetScreen = ({ navigation }) => {
       const data = await response.json();
       console.log('Monthly Api Budget response', data);
       if (response.ok) {
-        await refetch();
-        await handleMonthlyBudget();
+        await Promise.all([refetch(), refetchSummary()]);
       }
     } catch (error) {
       console.log('get api error', error);
@@ -74,51 +75,31 @@ const MonthlyBudgetScreen = ({ navigation }) => {
   const currentDate = new Date();
   const month = currentDate.getMonth() + 1;
   const year = currentDate.getFullYear();
-  const handleMonthlyBudget = async () => {
-    try {
-      setLoader(true);
-      const response = await monthlybudgetDashboard(month, year);
-      const data = await response.json();
-      setMonthlyDashboard(data.obj);
-      console.log('Monthly BudgetAoi REsposne', data);
-    } catch (error) {
-      console.log('api error', error);
-    } finally {
-      setLoader(false);
-    }
-  };
+
+  const {
+    data: monthlyDashboard = null,
+    isLoading: summaryLoading,
+    refetch: refetchSummary,
+  } = useMonthlyBudgetSummary(month, year);
 
   const {
     data: getMonthlyBudget,
     isLoading: getMonthlyBudgetLoading,
-    isFetching,
     refetch,
-    error: getMonthlyBudgetError,
   } = useQuery({
     queryKey: ['getBudget'],
     queryFn: () => GetBudget(),
   });
-  console.log(' Get response', getMonthlyBudget);
-  console.log(' Get Loading', getMonthlyBudgetLoading);
-  console.log(' Get Error', getMonthlyBudgetError);
-  const {
-    data: categories,
-    isLoading: categoriesLoading,
-    error: categoriesError,
-  } = useQuery({
+  const { data: categories, refetch: refetchCategories } = useQuery({
     queryKey: ['Expense Categories', 1],
     queryFn: () => GetCategories(1),
   });
-  console.log('Categories:', categories);
-  console.log('Loading:', categoriesLoading);
-  console.log('Error:', categoriesError);
+  useRefreshOnFocus(refetch);
+  useRefreshOnFocus(refetchSummary);
 
   const queryClient = useQueryClient();
   const deleteBudget = useMutation({
     mutationFn: id => budgetDelete(id),
-    onSuccess: async () => {
-      await handleMonthlyBudget();
-    },
     onMutate: async id => {
       await queryClient.cancelQueries({ queryKey: ['getBudget'] });
       const previousData = queryClient.getQueryData(['getBudget']);
@@ -129,39 +110,18 @@ const MonthlyBudgetScreen = ({ navigation }) => {
     },
     onError: (error, id, context) => {
       queryClient.setQueryData(['getBudget'], context?.previousData);
-      console.log('delete api error', error);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['getBudget'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlyBudgetSummary'] });
     },
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      const getdata = async () => {
-        try {
-          setLoader(true);
-          await Promise.all([refetch(), handleMonthlyBudget()]);
-        } finally {
-          setLoader(false);
-        }
-      };
-      getdata();
-    }, [refetch]),
+  const refetchAll = useCallback(
+    () => Promise.all([refetch(), refetchSummary(), refetchCategories()]),
+    [refetch, refetchSummary, refetchCategories],
   );
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await refetch();
-      await handleMonthlyBudget();
-      await categories();
-    } catch (error) {
-      console.log('Get Fetching api error', error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  const { refreshing, onRefresh } = usePullToRefresh(refetchAll);
   const handleBudgetUpdate = item => {
     setSelectedBudget(item);
 
@@ -203,6 +163,9 @@ const MonthlyBudgetScreen = ({ navigation }) => {
         await queryClient.invalidateQueries({
           queryKey: ['getBudget'],
         });
+        await queryClient.invalidateQueries({
+          queryKey: ['monthlyBudgetSummary'],
+        });
       }
     } catch (error) {
       console.log('Update API Error:', error);
@@ -225,8 +188,10 @@ const MonthlyBudgetScreen = ({ navigation }) => {
   const formatAmount = amount => {
     return (Number(amount) || 0).toLocaleString('en-US');
   };
+  // Accepts '2026-11-23' or a full timestamp like '2026-11-23T00:00:00'.
   const formatDate = date => {
-    const [year, month, day] = date.split('-');
+    if (!date) return '';
+    const [year, month, day] = String(date).slice(0, 10).split('-');
 
     const monthNames = [
       'Jan',
@@ -288,8 +253,8 @@ const MonthlyBudgetScreen = ({ navigation }) => {
         setBudgetdeleteModal={setBudgetdeleteModal}
         selectedPaymentId2={selectedPaymentId2}
         setSelectedPaymentId2={setSelectedPaymentId2}
-        loader={loader}
-        isFetching={isFetching}
+        loader={loader || summaryLoading}
+        listLoading={getMonthlyBudgetLoading}
         refreshing={refreshing}
         onRefresh={onRefresh}
         handleBudgetUpdate={handleBudgetUpdate}

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,6 +20,7 @@ import IngoingTab from '../screens/GetIngoingPayments/index';
 import LoanScreen from '../screens/Loan/index';
 import CollectionScreen from '../screens/Collection/index';
 import ChangePasswordScreen from '../screens/ChangePassword/index';
+import StyleGuideScreen from '../screens/StyleGuide/index';
 import MonthlyBudgetScreen from '../screens/Montly Budget';
 import BusinessExpenseScreen from '../screens/Business Expense';
 import { useModule } from '../components/ModuleContext';
@@ -28,12 +29,25 @@ import MonthlyDetailScreen from '../screens/Montly Budget/MonthlyMain/index';
 import EditProfileScreen from '../screens/Profile/EditProfile/index';
 import PersonalDetailScreen from '../screens/Profile/PersonalDetail/index';
 
-import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
-import { Screen } from 'react-native-screens';
+import { theme } from '../theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const HIDDEN_TAB = { display: 'none' };
+const VISIBLE_TAB = { flex: 1 };
+
+// Defined once at module level so React keeps the same component between
+// renders (an inline component would remount every icon on each render).
+const TabIcon = ({ name, color, focused }) => (
+  <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+    <Icon
+      name={name}
+      size={focused ? theme.sizes.icon.lg : theme.sizes.icon.md + 2}
+      color={color}
+    />
+  </View>
+);
 
 // ========================================
 // Self Expense Tab Wrapper
@@ -123,7 +137,7 @@ const OutgoingDetailWrapper = props => {
 
   return <OutgoingDetailscreen {...props} />;
 };
-const outcomingScreenWrapper = props => {
+const OutgoingPaymentsWrapper = props => {
   const { selectedModule } = useModule();
   const previousModule = React.useRef(selectedModule);
 
@@ -184,31 +198,31 @@ const MainTabs = () => {
     {
       name: 'DashboardTab',
       component: DashboardScreen,
-      label: 'Dashboard',
+      label: 'Home',
       icon: 'home-filled',
     },
     {
       name: 'SelfExpensesTab',
       component: SelfExpensesModuleTab,
-      label: 'Self Expense',
+      label: 'Expenses',
       icon: 'inventory-2',
     },
     {
       name: 'BusinessExpensesTab',
       component: BusinessExpensesModuleTab,
-      label: 'Business Expense',
+      label: 'Expenses',
       icon: 'account-balance',
     },
     {
       name: 'OutgoingPaymentsTab',
-      component: outcomingScreenWrapper,
-      label: selectedModule === 'Self Expense' ? 'Sending' : 'Outgoing ',
+      component: OutgoingPaymentsWrapper,
+      label: 'Sent',
       icon: 'payments',
     },
     {
       name: 'IngoingTab',
       component: IngoingScreenWrapper,
-      label: selectedModule === 'Self Expense' ? 'Receiving' : 'Incoming',
+      label: 'Received',
       icon: 'input',
     },
   ];
@@ -230,45 +244,30 @@ const MainTabs = () => {
           animation: 'none',
 
           tabBarStyle: {
-            left: '4%',
-            right: '4%',
-            bottom: insets.bottom + sizeHelper.calHp(10),
-            height: sizeHelper.calHp(150),
-            backgroundColor: colors.white,
-            borderRadius: 0,
+            height: 68 + insets.bottom,
+            paddingTop: theme.spacing.xs,
+            paddingBottom: insets.bottom + theme.spacing.xs,
+            backgroundColor: theme.colors.surface,
             borderTopWidth: 0,
-            paddingTop: sizeHelper.calHp(8),
-            paddingBottom: sizeHelper.calHp(8),
-            elevation: 8,
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: sizeHelper.calHp(4),
-            },
-            shadowOpacity: 0.08,
-            shadowRadius: sizeHelper.calHp(12),
+            ...theme.shadows.lg,
           },
 
-          tabBarItemStyle: isHidden ? { display: 'none' } : { flex: 1 },
+          tabBarItemStyle: isHidden ? HIDDEN_TAB : VISIBLE_TAB,
 
           tabBarLabelStyle: {
-            fontSize: sizeHelper.calHp(22),
-            fontFamily: 'Poppins-Regular',
-            fontWeight: '600',
-            marginTop: sizeHelper.calHp(0),
+            ...theme.typography.caption,
+            fontFamily: theme.fontFamily.semiBold,
           },
 
-          tabBarActiveTintColor: colors.primaryGradientStart,
-          tabBarInactiveTintColor: '#8E8E93',
+          tabBarActiveTintColor: theme.colors.iconActive,
+          tabBarInactiveTintColor: theme.colors.iconInactive,
 
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-              <Icon
-                name={item ? item.icon : 'help-outline'}
-                size={sizeHelper.calHp(focused ? 40 : 38)}
-                color={color}
-              />
-            </View>
+            <TabIcon
+              name={item ? item.icon : 'help-outline'}
+              color={color}
+              focused={focused}
+            />
           ),
 
           tabBarHideOnKeyboard: true,
@@ -299,7 +298,7 @@ const SelfExpenseWrapper = props => {
   useEffect(() => {
     if (selectedModule === 'Business Expense') {
       props.navigation.replace('MainTabs', {
-        screen: 'Dashboard',
+        screen: 'DashboardTab',
       });
     }
   }, [selectedModule, props.navigation]);
@@ -307,7 +306,7 @@ const SelfExpenseWrapper = props => {
   return <SelfExpenseScreen {...props} />;
 };
 
-const outgoingScreen = props => {
+const LoanScreenWrapper = props => {
   const { selectedModule } = useModule();
   const previousModule = React.useRef(selectedModule);
   useEffect(() => {
@@ -347,7 +346,7 @@ const BusinessExpenseWrapper = props => {
   useEffect(() => {
     if (selectedModule === 'Self Expense') {
       props.navigation.replace('MainTabs', {
-        screen: 'Dashboard',
+        screen: 'DashboardTab',
       });
     }
   }, [selectedModule, props.navigation]);
@@ -361,29 +360,13 @@ const BusinessExpenseWrapper = props => {
 const AddCustomerWrapper = props => {
   return <AddCustomerScreen {...props} />;
 };
-const AddProfileWrapper = props => {
-  const { selectedModule } = useModule();
-  useEffect(() => {
-    if (
-      selectedModule === 'Self Expense' ||
-      selectedModule === 'Business Expense'
-    ) {
-      {
-        props.navigation.navigate('MainTabs', {
-          screen: 'DasboardTab',
-        });
-      }
-    }
-  }, [selectedModule, props.navigation]);
-  return <ProfileScreen {...props} />;
-};
 // ========================================
 // Main Stack
 // ========================================
 const MainStack = () => {
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.dropdownContainer}></View>
+      <View style={styles.dropdownContainer} />
 
       <View style={styles.navigatorContainer}>
         <Stack.Navigator
@@ -428,12 +411,15 @@ const MainStack = () => {
 
           <Stack.Screen name="Monthly" component={MonthlyBudgetScreen} />
 
-          <Stack.Screen name="Loan" component={outgoingScreen} />
+          <Stack.Screen name="Loan" component={LoanScreenWrapper} />
 
           <Stack.Screen
             name="ChangePassword"
             component={ChangePasswordScreen}
           />
+          {__DEV__ && (
+            <Stack.Screen name="StyleGuide" component={StyleGuideScreen} />
+          )}
         </Stack.Navigator>
       </View>
     </View>
@@ -448,7 +434,7 @@ export default MainStack;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#F6F5FB',
+    backgroundColor: theme.colors.background,
   },
 
   navigatorContainer: {
@@ -456,15 +442,14 @@ const styles = StyleSheet.create({
   },
 
   iconWrap: {
-    width: sizeHelper.calHp(70),
-    height: sizeHelper.calHp(70),
-    borderRadius: sizeHelper.calHp(35),
+    width: 36,
+    height: 36,
+    borderRadius: theme.radius.pill,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
   },
 
   iconWrapActive: {
-    backgroundColor: colors.lightPrimaryGradientStart,
+    backgroundColor: theme.colors.primarySoft,
   },
 });

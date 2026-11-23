@@ -1,284 +1,171 @@
-import { StyleSheet, Platform } from 'react-native';
-import colors from '../../theme/colors';
-import sizeHelper from '../../helpers/sizeHelper';
+import { StyleSheet } from 'react-native';
+import { theme } from '../../theme';
 
-const PURPLE = colors.primary || '#4A24B8';
-const BG = colors.background || '#F6F5FB';
-const SURFACE = colors.surface || '#FFFFFF';
-const TEXT = colors.textPrimary || '#17142B';
-const MUTED = colors.textSecondary || '#6B6880';
-const BORDER = colors.border || '#E5E7EB';
+// Matches ui/TextField and ui/Button so this form looks like every other
+// form in the app.
+const { colors, spacing, radius, typography, sizes } = theme;
+const FIELD_HEIGHT = 52;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    // flex: 1,
-    backgroundColor: BG,
-  },
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: colors.background },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingHorizontal: spacing.lg },
+  dropdownWrapper: { marginBottom: spacing.sm },
 
-  container: {
-    // flex: 1,
-    backgroundColor: BG,
-  },
-
-  scrollView: {
-    // flex: 1,
-  },
-
-  scrollContent: {
-    paddingHorizontal: sizeHelper.calWp(42),
-    // paddingTop: 12,
-  },
-
-  dropdownWrapper: {
-    marginBottom: sizeHelper.calHp(22),
-  },
-
-  heading: {
-    marginBottom: sizeHelper.calHp(30),
-  },
-
-  screenTitle: {
-    fontSize: sizeHelper.calHp(69),
-    lineHeight: sizeHelper.calHp(77),
-    fontFamily: 'Poppins-SemiBold',
-    fontWeight: 'bold',
-    color: TEXT,
-  },
-
-  screenSubtitle: {
-    marginTop: sizeHelper.calHp(8),
-    fontSize: sizeHelper.calHp(30),
-    lineHeight: sizeHelper.calHp(41),
-    fontFamily: 'Poppins-Regular',
-    color: MUTED,
-  },
-
-  fieldContainer: {
-    width: '100%',
-    marginBottom: sizeHelper.calHp(25),
-  },
-
+  fieldContainer: { width: '100%', marginBottom: spacing.md },
   fieldLabel: {
-    marginBottom: sizeHelper.calHp(17),
-    fontSize: sizeHelper.calHp(30),
-    lineHeight: sizeHelper.calHp(39),
-    fontFamily: 'Poppins-Medium',
-    marginHorizontal: sizeHelper.calWp(10),
-    color: TEXT,
+    ...typography.label,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
   },
-
-  requiredText: {
-    color: PURPLE,
-    fontFamily: 'Poppins-SemiBold',
-  },
-
-  optionalText: {
-    color: MUTED,
-    fontFamily: 'Poppins-Regular',
-  },
+  requiredText: { color: colors.danger },
+  optionalText: { ...typography.caption, color: colors.textSecondary },
 
   input: {
     width: '100%',
-    height: sizeHelper.calHp(123),
+    minHeight: FIELD_HEIGHT,
     borderWidth: 1,
-    borderColor: BORDER,
-    borderRadius: sizeHelper.calHp(35),
-    backgroundColor: SURFACE,
-    paddingHorizontal: sizeHelper.calWp(44),
-    paddingVertical: sizeHelper.calHp(0),
-    fontSize: sizeHelper.calHp(32),
-    fontFamily: 'Poppins-Regular',
-    color: TEXT,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    ...typography.body,
+    lineHeight: undefined,
+    color: colors.textPrimary,
   },
-
-  inputError: {
-    borderColor: '#D93025',
-  },
-
+  inputError: { borderColor: colors.danger },
   errorText: {
-    marginTop: sizeHelper.calHp(15),
-    marginLeft: sizeHelper.calWp(6),
-    fontSize: sizeHelper.calHp(27),
-    fontFamily: 'Poppins-Regular',
-    color: '#D93025',
+    ...typography.caption,
+    color: colors.danger,
+    marginTop: spacing.xs,
   },
 
   phoneWrapper: {
     width: '100%',
-    height: sizeHelper.calHp(126),
+    height: FIELD_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     overflow: 'hidden',
-    backgroundColor: SURFACE,
-    borderWidth: 2,
-    borderColor: BORDER,
-    borderRadius: sizeHelper.calHp(35),
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
   },
-
   countryCode: {
     height: '100%',
-    paddingHorizontal: sizeHelper.calWp(30),
+    paddingHorizontal: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F1EFF7',
-    borderRightWidth: 2,
-    borderRightColor: BORDER,
+    backgroundColor: colors.surfaceMuted,
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
   },
-
-  countryCodeText: {
-    fontSize: sizeHelper.calHp(28),
-    fontFamily: 'Poppins-SemiBold',
-    color: MUTED,
-  },
-
+  countryCodeText: { ...typography.label, color: colors.textSecondary },
   phoneInput: {
     flex: 1,
     height: '100%',
-    paddingHorizontal: sizeHelper.calWp(28),
-    paddingVertical: sizeHelper.calHp(0),
-    fontSize: sizeHelper.calHp(32),
-    fontFamily: 'Poppins-Regular',
-    color: TEXT,
+    paddingHorizontal: spacing.md,
+    ...typography.body,
+    lineHeight: undefined,
+    color: colors.textPrimary,
   },
 
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    marginTop: sizeHelper.calHp(0),
-    marginBottom: sizeHelper.calHp(45),
-    minHeight: sizeHelper.calHp(66),
-    marginHorizontal: sizeHelper.calWp(10),
+    minHeight: sizes.touchTarget,
+    marginBottom: spacing.md,
   },
-
   checkbox: {
-    width: sizeHelper.calWp(63),
-    height: sizeHelper.calHp(53),
+    width: 22,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: sizeHelper.calHp(10),
+    borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: BORDER,
-    backgroundColor: SURFACE,
-    marginRight: sizeHelper.calWp(20),
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
+    marginRight: spacing.sm,
   },
-
   checkboxChecked: {
-    backgroundColor: PURPLE,
-    borderColor: PURPLE,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
-
-  checkboxLabel: {
-    fontSize: sizeHelper.calHp(30),
-    fontFamily: 'Poppins-Regular',
-    color: TEXT,
-  },
+  checkboxLabel: { ...typography.body, color: colors.textPrimary },
 
   addressCard: {
     width: '100%',
-    backgroundColor: SURFACE,
-    borderWidth: 2,
-    borderColor: BORDER,
-    borderRadius: sizeHelper.calHp(35),
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
     overflow: 'hidden',
-    marginTop: sizeHelper.calHp(3),
-    marginBottom: sizeHelper.calHp(18),
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-
   addressHeader: {
-    minHeight: sizeHelper.calHp(130),
+    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: sizeHelper.calWp(33),
+    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
   },
-
   addressIconBox: {
-    width: sizeHelper.calWp(74),
-    height: sizeHelper.calHp(74),
-    borderRadius: sizeHelper.calHp(30),
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EDE7FF',
-    marginRight: sizeHelper.calWp(27),
+    backgroundColor: colors.primarySoft,
   },
-
-  addressHeadingText: {
-    flex: 1,
-  },
-
-  addressTitle: {
-    fontSize: sizeHelper.calHp(35),
-    fontFamily: 'Poppins-SemiBold',
-    color: TEXT,
-  },
-
+  addressHeadingText: { flex: 1 },
+  addressTitle: { ...typography.subtitle, color: colors.textPrimary },
   addressBody: {
-    borderTopWidth: 2,
-    borderTopColor: '#F0EEF6',
-    paddingHorizontal: sizeHelper.calWp(35),
-    paddingTop: sizeHelper.calHp(35),
-    paddingBottom: sizeHelper.calHp(30),
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+    padding: spacing.lg,
   },
-
   addressTypeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: sizeHelper.calWp(20),
-    marginBottom: sizeHelper.calHp(40),
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
-
+  // Same look as ui/Chip
   addressTypeButton: {
-    minWidth: sizeHelper.calWp(127),
-    minHeight: sizeHelper.calHp(87),
-    paddingHorizontal: sizeHelper.calWp(40),
+    height: 36,
+    paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: BORDER,
-    borderRadius: sizeHelper.calHp(50),
-    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
   },
-
   addressTypeSelected: {
-    backgroundColor: PURPLE,
-    borderColor: PURPLE,
+    backgroundColor: colors.textPrimary,
+    borderColor: colors.textPrimary,
   },
+  addressTypeText: { ...typography.label, color: colors.textPrimary },
+  addressTypeTextSelected: { color: colors.textInverse },
+  addressField: { marginBottom: spacing.md },
 
-  addressTypeText: {
-    fontSize: sizeHelper.calHp(28),
-    fontFamily: 'Poppins-Medium',
-    color: TEXT,
-  },
-
-  addressTypeTextSelected: {
-    color: '#FFFFFF',
-  },
-
-  addressField: {
-    marginBottom: sizeHelper.calHp(30),
-  },
-
+  bottomBar: { paddingVertical: spacing.lg },
+  // Same look as ui/Button (primary, md)
   saveButton: {
     width: '100%',
-    minHeight: sizeHelper.calHp(126),
+    height: sizes.buttonHeight.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: sizeHelper.calWp(19),
-    backgroundColor: PURPLE,
-    borderRadius: sizeHelper.calHp(35),
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
   },
-
-  saveButtonDisabled: {
-    opacity: 1,
-  },
-
-  saveButtonText: {
-    fontSize: sizeHelper.calHp(37),
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
+  saveButtonDisabled: { opacity: 0.6 },
+  saveButtonText: { ...typography.bodyStrong, color: colors.onPrimary },
 });
 
 export default styles;

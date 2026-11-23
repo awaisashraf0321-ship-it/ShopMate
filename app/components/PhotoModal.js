@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../helpers/sizeHelper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../theme';
 
 const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
   return (
@@ -41,7 +42,7 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
               <Icon
                 name="camera-alt"
                 size={sizeHelper.calHp(65)}
-                color="#1A1A1A"
+                color={theme.colors.textPrimary}
               />
 
               <Text style={styles.optionText}>Camera</Text>
@@ -51,7 +52,7 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
               <Icon
                 name="photo-library"
                 size={sizeHelper.calHp(65)}
-                color="#1A1A1A"
+                color={theme.colors.textPrimary}
               />
 
               <Text style={styles.optionText}>Gallery</Text>
@@ -72,7 +73,7 @@ export default PhotoModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(26, 24, 24, 0.5)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'flex-end',
   },
 
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   },
 
   modalBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
 
     borderTopLeftRadius: sizeHelper.calHp(70),
     borderTopRightRadius: sizeHelper.calHp(70),
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: sizeHelper.calHp(37),
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: theme.colors.textPrimary,
     marginBottom: sizeHelper.calHp(43),
   },
 
@@ -106,13 +107,13 @@ const styles = StyleSheet.create({
     paddingVertical: sizeHelper.calHp(34),
 
     borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
+    borderBottomColor: theme.colors.border,
   },
 
   optionText: {
     marginLeft: sizeHelper.calHp(35),
     fontSize: sizeHelper.calHp(35),
-    color: '#1A1A1A',
+    color: theme.colors.textPrimary,
   },
 
   cancel: {
@@ -123,6 +124,6 @@ const styles = StyleSheet.create({
   cancelText: {
     fontSize: sizeHelper.calHp(35),
     fontWeight: '600',
-    color: '#5F6368',
+    color: theme.colors.textMuted,
   },
 });

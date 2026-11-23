@@ -1,420 +1,319 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-  FlatList,
-} from 'react-native';
-
+import React from 'react';
+import { StyleSheet, View, Pressable, Modal, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import sizeHelper from '../helpers/sizeHelper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import colors1 from '../theme/myColors';
-import colors from '../theme/colors';
+import { theme } from '../theme';
+import { AppText, FormField } from '../ui';
 
+const { colors, spacing, radius, sizes, shadows } = theme;
+
+const DEFAULT_STYLE = {
+  icon: 'category',
+  color: colors.primarySoft,
+  iconColor: colors.primary,
+};
+
+/**
+ * Category field + bottom-sheet picker.
+ *
+ * selectedIcon(name) -> { icon, color, iconColor } styles each category.
+ * compact: the small inline version used inside the Monthly Budget form.
+ */
 const CategorySelector = ({
   categories = [],
   category,
   selectedIcon,
   setCategory,
   title,
-  placeholder = 'Select a Category',
-  amount,
+  placeholder,
   visible,
   setVisible,
   compact = false,
-  myOverlay = false,
 }) => {
   const insets = useSafeAreaInsets();
-  const [activeCategory, setActiveCategory] = useState(null);
+  // The compact field sits under its own "Category" label, so keep it short.
+  const placeholderText =
+    placeholder ?? (compact ? 'Select' : 'Select a Category');
+  const styleFor = name =>
+    (typeof selectedIcon === 'function' && selectedIcon(name)) || DEFAULT_STYLE;
+
+  const selected = categories.find(cat => cat.Id === category);
+  const current = selected ? styleFor(selected.Name) : DEFAULT_STYLE;
 
   const handleSelect = id => {
-    setActiveCategory(id);
     setCategory(id);
     setVisible(false);
   };
 
-  const selectedCategory = categories.find(cat => cat.Id === category);
-
-  const matching =
-    selectedCategory && typeof selectedIcon === 'function'
-      ? selectedIcon(selectedCategory.Name)
-      : {
-          icon: 'category',
-          iconColor: colors1.textSecondary,
-          color: colors1.primaryLight,
-        };
-
-  return (
-    <View style={[styles.container, compact && styles.compactContainer]}>
-      {!compact && (
-        <View style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
-      )}
-
-      <View style={[styles.CateCon, compact && styles.compactCateCon]}>
-        <TouchableOpacity
-          style={[styles.inputWrapper, compact && styles.compactInputWrapper]}
-          activeOpacity={0.7}
-          onPress={() => setVisible(true)}
-        >
-          <Icon
-            name={matching.icon}
-            size={sizeHelper.calHp(compact ? 30 : 38)}
-            color={colors1.black}
-            style={styles.categoryIcon}
-          />
-
-          <Text
-            style={[
-              styles.inputText,
-              !selectedCategory && styles.placeholder,
-              compact && styles.compactInputText,
-            ]}
-            numberOfLines={1}
-          >
-            {selectedCategory?.Name || placeholder}
-          </Text>
-
-          <Icon
-            name="keyboard-arrow-down"
-            size={sizeHelper.calHp(compact ? 25 : 42)}
-            color={colors1.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setVisible(false)}
+  const field = (
+    <Pressable
+      style={({ pressed }) => [
+        styles.field,
+        compact && styles.fieldCompact,
+        pressed && styles.pressed,
+      ]}
+      onPress={() => setVisible(true)}
+      accessibilityRole="button"
+      accessibilityLabel={`${title || 'Category'}: ${
+        selected?.Name || 'none selected'
+      }. Choose category`}
+    >
+      <Icon
+        name={current.icon}
+        size={compact ? sizes.icon.sm : sizes.icon.md}
+        color={selected ? current.iconColor : colors.textMuted}
+      />
+      <AppText
+        variant={compact ? 'caption' : 'body'}
+        color={selected ? 'textPrimary' : 'textMuted'}
+        numberOfLines={1}
+        style={styles.fieldText}
       >
+        {selected?.Name || placeholderText}
+      </AppText>
+      <Icon
+        name="keyboard-arrow-down"
+        size={compact ? sizes.icon.sm : sizes.icon.lg}
+        color={colors.textMuted}
+      />
+    </Pressable>
+  );
+
+  const sheet = (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={() => setVisible(false)}
+    >
+      <View style={styles.overlay}>
+        <Pressable
+          style={styles.backdrop}
+          onPress={() => setVisible(false)}
+          accessibilityLabel="Close"
+        />
         <View
-          style={[
-            styles.modalOverlay,
-            {
-              paddingBottom: insets.bottom,
-              backgroundColor: myOverlay
-                ? 'rgba(23,21,47,0.45)'
-                : 'rgba(26, 24, 24, 0.25)',
-            },
-          ]}
+          style={[styles.sheet, { paddingBottom: insets.bottom + spacing.md }]}
         >
-          <Pressable
-            style={styles.modalBackdrop}
-            onPress={() => setVisible(false)}
-          />
+          <View style={styles.handle} />
 
-          <View style={styles.bottomSheet}>
-            <View style={styles.dragHandle} />
-
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderIcon}>
-                <Icon
-                  name="category"
-                  size={sizeHelper.calHp(45)}
-                  color={colors1.primary}
-                />
-              </View>
-
-              <View style={styles.modalHeaderText}>
-                <Text style={styles.modalTitle}>Select Category</Text>
-                <Text style={styles.modalSubtitle}>
-                  Choose the category for your expense
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setVisible(false)}
-                activeOpacity={0.7}
-              >
-                <Icon
-                  name="close"
-                  size={sizeHelper.calHp(44)}
-                  color={colors1.textSecondary}
-                />
-              </TouchableOpacity>
+          <View style={styles.sheetHeader}>
+            <View style={styles.sheetIcon}>
+              <Icon
+                name="category"
+                size={sizes.icon.md}
+                color={colors.primary}
+              />
             </View>
-
-            <FlatList
-              data={categories}
-              keyExtractor={item => item.Id.toString()}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.modalList}
-              ListEmptyComponent={
-                <Text style={styles.emptyText}>No Category found</Text>
-              }
-              initialNumToRender={30}
-              keyboardShouldPersistTaps="handled"
-              renderItem={({ item }) => {
-                const isSelected = category === item.Id;
-
-                const itemStyle =
-                  typeof selectedIcon === 'function'
-                    ? selectedIcon(item.Name)
-                    : {
-                        icon: 'category',
-                        color: colors1.primaryLight,
-                        iconColor: colors1.primary,
-                      };
-
-                return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={[
-                      styles.modalCategoryRow,
-                      isSelected && styles.modalSelectedRow,
-                    ]}
-                    onPress={() => handleSelect(item.Id)}
-                  >
-                    <View
-                      style={[
-                        styles.modalCategoryIcon,
-                        {
-                          backgroundColor:
-                            itemStyle.color || colors1.primaryLight,
-                        },
-                      ]}
-                    >
-                      <Icon
-                        name={itemStyle.icon}
-                        size={sizeHelper.calHp(45)}
-                        color={itemStyle.iconColor}
-                      />
-                    </View>
-
-                    <Text style={styles.modalCategoryName} numberOfLines={1}>
-                      {item.Name}
-                    </Text>
-
-                    <View
-                      style={[
-                        styles.checkContainer,
-                        isSelected && styles.selectedCheck,
-                      ]}
-                    >
-                      <Icon
-                        name={isSelected ? 'check' : 'chevron-right'}
-                        size={sizeHelper.calHp()}
-                        color={isSelected ? colors1.white : colors1.textMuted}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-            />
+            <View style={styles.flex}>
+              <AppText variant="title">Select Category</AppText>
+              <AppText variant="caption" color="textSecondary">
+                Choose the category for your expense
+              </AppText>
+            </View>
+            <Pressable
+              onPress={() => setVisible(false)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            >
+              <Icon
+                name="close"
+                size={sizes.icon.lg}
+                color={colors.textMuted}
+              />
+            </Pressable>
           </View>
+
+          <FlatList
+            data={categories}
+            keyExtractor={item => item.Id.toString()}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+            initialNumToRender={30}
+            keyboardShouldPersistTaps="handled"
+            ListEmptyComponent={
+              <AppText
+                color="textSecondary"
+                align="center"
+                style={styles.empty}
+              >
+                No category found
+              </AppText>
+            }
+            renderItem={({ item }) => {
+              const isSelected = category === item.Id;
+              const itemStyle = styleFor(item.Name);
+              return (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.row,
+                    isSelected && styles.rowSelected,
+                    pressed && styles.pressed,
+                  ]}
+                  onPress={() => handleSelect(item.Id)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={item.Name}
+                >
+                  <View
+                    style={[
+                      styles.rowIcon,
+                      {
+                        backgroundColor: itemStyle.color || colors.primarySoft,
+                      },
+                    ]}
+                  >
+                    <Icon
+                      name={itemStyle.icon}
+                      size={sizes.icon.md}
+                      color={itemStyle.iconColor}
+                    />
+                  </View>
+                  <AppText
+                    variant="bodyStrong"
+                    numberOfLines={1}
+                    style={styles.flex}
+                  >
+                    {item.Name}
+                  </AppText>
+                  <View style={[styles.rowEnd, isSelected && styles.rowEndOn]}>
+                    <Icon
+                      name={isSelected ? 'check' : 'chevron-right'}
+                      size={sizes.icon.sm}
+                      color={isSelected ? colors.onPrimary : colors.textMuted}
+                    />
+                  </View>
+                </Pressable>
+              );
+            }}
+          />
         </View>
-      </Modal>
-    </View>
+      </View>
+    </Modal>
+  );
+
+  if (compact) {
+    return (
+      <View style={styles.flex}>
+        {field}
+        {sheet}
+      </View>
+    );
+  }
+  return (
+    <FormField label={title} style={styles.formField}>
+      {field}
+      {sheet}
+    </FormField>
   );
 };
 
 export default CategorySelector;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    marginTop: sizeHelper.calHp(25),
-    paddingHorizontal: sizeHelper.calWp(35),
+  flex: { flex: 1 },
+  pressed: { opacity: 0.8 },
+  formField: {
+    marginTop: spacing.lg,
   },
-
-  compactContainer: {
-    flex: 1,
-    width: '100%',
-    marginTop: 0,
-    paddingHorizontal: 0,
-  },
-
-  title: {
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '700',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-  },
-
-  CateCon: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: sizeHelper.calHp(30),
-  },
-
-  compactCateCon: {
-    marginBottom: 0,
-    alignItems: 'stretch',
-  },
-
-  inputWrapper: {
-    marginTop: sizeHelper.calHp(22),
-    minHeight: sizeHelper.calHp(145),
-    borderRadius: sizeHelper.calHp(35),
-    backgroundColor: colors1.white,
-    width: '102%',
-    borderWidth: 1,
-    borderColor: colors1.border,
-    paddingHorizontal: sizeHelper.calWp(22),
+  field: {
+    minHeight: 56,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-
-  compactInputWrapper: {
-    marginTop: 0,
-    minHeight: sizeHelper.calHp(85),
-    width: '100%',
-    borderRadius: sizeHelper.calHp(18),
-    paddingHorizontal: sizeHelper.calWp(9),
-    borderColor: colors1.border,
+  fieldCompact: {
+    minHeight: 52,
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
   },
-
-  categoryIcon: {
-    marginRight: sizeHelper.calWp(10),
-  },
-
-  inputText: {
+  fieldText: {
     flex: 1,
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '400',
-    fontFamily: 'PlusJakartaSans-Regular',
-    color: colors1.text,
   },
-
-  compactInputText: {
-    fontSize: sizeHelper.calHp(26),
-    fontWeight: 'bold',
-  },
-
-  placeholder: {
-    color: '#000000c5',
-    fontWeight: '400',
-  },
-
-  modalOverlay: {
+  overlay: {
     flex: 1,
     justifyContent: 'flex-end',
+    backgroundColor: colors.overlay,
   },
-
-  bottomSheet: {
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  sheet: {
     maxHeight: '75%',
-    width: '100%',
-    backgroundColor: colors1.white,
-    borderTopLeftRadius: sizeHelper.calHp(50),
-    borderTopRightRadius: sizeHelper.calHp(50),
-    paddingHorizontal: sizeHelper.calWp(38),
-    paddingTop: sizeHelper.calHp(30),
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    ...shadows.lg,
   },
-
-  dragHandle: {
-    width: sizeHelper.calWp(110),
-    height: sizeHelper.calHp(12),
-    borderRadius: sizeHelper.calHp(20),
-    backgroundColor: colors1.border,
+  handle: {
     alignSelf: 'center',
-    marginBottom: sizeHelper.calHp(50),
+    width: 40,
+    height: 4,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    marginBottom: spacing.md,
   },
-
-  modalHeader: {
+  sheetHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: sizeHelper.calHp(45),
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
-
-  modalHeaderIcon: {
-    width: sizeHelper.calWp(130),
-    height: sizeHelper.calHp(100),
-    borderRadius: sizeHelper.calHp(100),
-    backgroundColor: colors1.primaryLight,
+  sheetIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  modalHeaderText: {
-    flex: 1,
-    marginLeft: sizeHelper.calWp(28),
+  list: {
+    gap: spacing.sm,
+    paddingBottom: spacing.md,
   },
-
-  emptyText: {
-    textAlign: 'center',
-    paddingVertical: sizeHelper.calHp(50),
-    color: colors.textSecondary,
-    fontFamily: 'PlusJakartaSans-Regular',
+  empty: {
+    paddingVertical: spacing.xl,
   },
-
-  modalTitle: {
-    fontSize: sizeHelper.calHp(40),
-    fontWeight: '800',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-  },
-
-  modalSubtitle: {
-    fontSize: sizeHelper.calHp(27),
-    color: colors1.textSecondary,
-    marginTop: sizeHelper.calHp(8),
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  closeButton: {
-    width: sizeHelper.calWp(110),
-    height: sizeHelper.calHp(90),
-    borderRadius: sizeHelper.calHp(50),
-    backgroundColor: colors1.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  modalList: {
-    paddingBottom: sizeHelper.calHp(25),
-  },
-
-  modalCategoryRow: {
-    minHeight: sizeHelper.calHp(130),
-    borderWidth: 1,
-    borderColor: colors1.border,
-    borderRadius: sizeHelper.calHp(35),
-    paddingHorizontal: sizeHelper.calWp(30),
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: sizeHelper.calHp(25),
-    backgroundColor: colors1.white,
+    gap: spacing.md,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceMuted,
   },
-
-  modalSelectedRow: {
-    backgroundColor: colors1.primaryLight,
-    borderColor: colors1.primary,
+  rowSelected: {
+    backgroundColor: colors.primarySoft,
   },
-
-  modalCategoryIcon: {
-    width: sizeHelper.calWp(100),
-    height: sizeHelper.calHp(80),
-    borderRadius: sizeHelper.calHp(30),
+  rowIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: sizeHelper.calWp(35),
   },
-
-  modalCategoryName: {
-    flex: 1,
-    fontSize: sizeHelper.calHp(32),
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  checkContainer: {
-    height: sizeHelper.calWp(63),
-    width: sizeHelper.calWp(63),
-    justifyContent: 'center',
+  rowEnd: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
     alignItems: 'center',
-    borderRadius: sizeHelper.calHp(50),
+    justifyContent: 'center',
   },
-
-  selectedCheck: {
-    backgroundColor: colors1.primary,
+  rowEndOn: {
+    backgroundColor: colors.primary,
   },
 });

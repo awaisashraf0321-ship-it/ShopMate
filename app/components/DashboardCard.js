@@ -1,13 +1,56 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { theme } from '../theme';
+import { AppText, Card, formatMoney } from '../ui';
 
-import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+const { colors, spacing, radius, sizes } = theme;
 
+// Today -> Week -> Month, stepped with the arrows.
+const PERIODS = ['Today', 'Week', 'Month'];
+
+const StepButton = ({ icon, disabled, onPress, label }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.step,
+      disabled && styles.stepDisabled,
+      pressed && styles.pressed,
+    ]}
+    disabled={disabled}
+    onPress={onPress}
+    hitSlop={6}
+    accessibilityRole="button"
+    accessibilityLabel={label}
+    accessibilityState={{ disabled }}
+  >
+    <Icon name={icon} size={sizes.icon.md} color={colors.onPrimary} />
+  </Pressable>
+);
+
+const Summary = ({ icon, label, value }) => (
+  <View style={styles.summary}>
+    <View style={styles.summaryLabel}>
+      <Icon name={icon} size={sizes.icon.md} color={colors.onPrimaryMuted} />
+      <AppText variant="caption" color="onPrimaryMuted" numberOfLines={1}>
+        {label}
+      </AppText>
+    </View>
+    <AppText variant="bodyStrong" color="onPrimary" numberOfLines={1}>
+      {value}
+    </AppText>
+  </View>
+);
+
+/**
+ * Home balance card: period stepper, net balance, money in / money out.
+ * Net balance = opening balance (carried over from before the period)
+ * + money in - money out, so the opening balance is shown when non-zero;
+ * otherwise the three numbers don't appear to add up.
+ */
 const DashboardCard = ({
   formatAmount,
   netBalance,
+  openingBalance,
   MoneyIn,
   MoneyOut,
   getDateRange,
@@ -16,217 +59,130 @@ const DashboardCard = ({
   formatDate,
 }) => {
   const { fromDate, toDate } = getDateRange(selectedPeriod);
-
-  const handlePrevious = () => {
-    if (selectedPeriod === 'Month') {
-      setSelectedPeriod('Week');
-    } else if (selectedPeriod === 'Week') {
-      setSelectedPeriod('Today');
-    }
-  };
-
-  const handleNext = () => {
-    if (selectedPeriod === 'Today') {
-      setSelectedPeriod('Week');
-    } else if (selectedPeriod === 'Week') {
-      setSelectedPeriod('Month');
-    }
-  };
-
-  const isPreviousDisabled = selectedPeriod === 'Today';
-  const isNextDisabled = selectedPeriod === 'Month';
+  const index = PERIODS.indexOf(selectedPeriod);
+  const isFirst = index <= 0;
+  const isLast = index === PERIODS.length - 1;
+  const range =
+    fromDate === toDate
+      ? formatDate(fromDate)
+      : `${formatDate(fromDate)} - ${formatDate(toDate)}`;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        {/* Date navigation */}
-        <View style={styles.dateRow}>
-          <TouchableOpacity
-            style={[
-              styles.dateButton,
-              isPreviousDisabled && styles.disabledButton,
-            ]}
-            disabled={isPreviousDisabled}
-            onPress={handlePrevious}
-          >
-            <Icon
-              name="chevron-back"
-              size={sizeHelper.calHp(40)}
-              color={isPreviousDisabled ? '#FFFFFF55' : '#FFFFFF'}
-            />
-          </TouchableOpacity>
-
-          <View style={styles.dateCenter}>
-            <Text style={styles.dateText}>
-              {fromDate === toDate
-                ? formatDate(fromDate)
-                : `${formatDate(fromDate)} - ${formatDate(toDate)}`}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.dateButton, isNextDisabled && styles.disabledButton]}
-            disabled={isNextDisabled}
-            onPress={handleNext}
-          >
-            <Icon
-              name="chevron-forward"
-              size={sizeHelper.calHp(40)}
-              color={isNextDisabled ? '#FFFFFF55' : '#FFFFFF'}
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Total Balance */}
-        <Text style={styles.balanceLabel}>Net Balance</Text>
-
-        <Text style={styles.balanceAmount} numberOfLines={1}>
-          Rs {formatAmount(netBalance)}
-        </Text>
-
-        {/* Money In and Money Out */}
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryBox}>
-            <View style={styles.summaryTitleRow}>
-              <Icon
-                name="arrow-down-outline"
-                size={sizeHelper.calHp(43)}
-                color="#D8CCFF"
-              />
-              <Text style={styles.summaryLabel}>Money in</Text>
-            </View>
-
-            <Text style={styles.summaryAmount} numberOfLines={1}>
-              Rs {formatAmount(MoneyIn)}
-            </Text>
-          </View>
-
-          <View style={styles.summaryBox}>
-            <View style={styles.summaryTitleRow}>
-              <Icon
-                name="arrow-up-outline"
-                size={sizeHelper.calHp(43)}
-                color="#D8CCFF"
-              />
-              <Text style={styles.summaryLabel}>Money out</Text>
-            </View>
-
-            <Text style={styles.summaryAmount} numberOfLines={1}>
-              Rs {formatAmount(MoneyOut)}
-            </Text>
-          </View>
-        </View>
+    <Card tone="primary" padding="lg" style={styles.card}>
+      <View style={styles.dateRow}>
+        <StepButton
+          icon="chevron-back"
+          label="Previous period"
+          disabled={isFirst}
+          onPress={() => setSelectedPeriod(PERIODS[index - 1])}
+        />
+        <AppText
+          variant="bodyStrong"
+          color="onPrimary"
+          align="center"
+          style={styles.range}
+        >
+          {range}
+        </AppText>
+        <StepButton
+          icon="chevron-forward"
+          label="Next period"
+          disabled={isLast}
+          onPress={() => setSelectedPeriod(PERIODS[index + 1])}
+        />
       </View>
-    </View>
+
+      <AppText variant="label" color="onPrimaryMuted">
+        Net Balance
+      </AppText>
+      <AppText
+        variant="display"
+        color="onPrimary"
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.6}
+        style={styles.balance}
+      >
+        {formatMoney(netBalance)}
+      </AppText>
+      {Number(openingBalance) ? (
+        <AppText
+          variant="caption"
+          color="onPrimaryMuted"
+          style={styles.opening}
+        >
+          Includes {formatMoney(openingBalance)} carried over from before
+        </AppText>
+      ) : null}
+
+      <View style={styles.summaryRow}>
+        <Summary
+          icon="arrow-down-outline"
+          label="Money in"
+          value={`Rs ${formatAmount(MoneyIn)}`}
+        />
+        <Summary
+          icon="arrow-up-outline"
+          label="Money out"
+          value={`Rs ${formatAmount(MoneyOut)}`}
+        />
+      </View>
+    </Card>
   );
 };
 
 export default DashboardCard;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: sizeHelper.calHp(12),
+  opening: {
+    marginTop: -spacing.xs,
+    marginBottom: spacing.sm,
   },
-
   card: {
-    width: '94%',
-    backgroundColor: colors.summaryBackground || '#4A24B8',
-    borderRadius: sizeHelper.calHp(46),
-    paddingVertical: sizeHelper.calHp(20),
-    paddingHorizontal: sizeHelper.calWp(20),
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.xs,
   },
-
+  pressed: { opacity: 0.75 },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: sizeHelper.calHp(22),
+    marginBottom: spacing.md,
   },
-
-  dateCenter: {
+  range: {
     flex: 1,
-    alignItems: 'center',
   },
-
-  periodLabel: {
-    color: colors.summaryTextSecondary,
-    fontSize: sizeHelper.calHp(23),
-    marginBottom: sizeHelper.calHp(4),
-  },
-
-  dateButton: {
-    width: sizeHelper.calWp(85),
-    height: sizeHelper.calHp(85),
-    borderRadius: sizeHelper.calHp(23),
-    marginTop: sizeHelper.calHp(10),
-    marginHorizontal: sizeHelper.calWp(10),
-    borderWidth: 1,
-    borderColor: colors.BorderColor,
-    backgroundColor: colors.dateBackground,
+  step: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.onPrimaryMuted,
+    backgroundColor: colors.onPrimarySurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  disabledButton: {
-    opacity: 0.45,
+  stepDisabled: {
+    opacity: 0.4,
   },
-
-  dateText: {
-    textAlign: 'center',
-    color: colors.white,
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '600',
+  balance: {
+    marginTop: spacing.xxs,
+    marginBottom: spacing.md,
   },
-
-  balanceLabel: {
-    color: colors.summaryTextSecondary,
-    fontSize: sizeHelper.calHp(28),
-    fontFamily: 'Poppins-Regular',
-  },
-
-  balanceAmount: {
-    color: colors.white,
-    fontSize: sizeHelper.calHp(65),
-    fontWeight: '700',
-    fontFamily: 'Poppins-SemiBold',
-    marginTop: sizeHelper.calHp(3),
-    marginBottom: sizeHelper.calHp(20),
-  },
-
   summaryRow: {
     flexDirection: 'row',
-    gap: sizeHelper.calWp(10),
+    gap: spacing.sm,
   },
-
-  summaryBox: {
+  summary: {
     flex: 1,
     minWidth: 0,
-    paddingVertical: sizeHelper.calHp(23),
-    paddingHorizontal: sizeHelper.calWp(23),
-    borderRadius: sizeHelper.calHp(27),
-    backgroundColor: colors.summarybox,
-    marginBottom: sizeHelper.calHp(20),
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.onPrimarySurface,
   },
-
-  summaryTitleRow: {
+  summaryLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: sizeHelper.calWp(5),
-    marginBottom: sizeHelper.calHp(8),
-  },
-
-  summaryLabel: {
-    color: colors.summaryTextSecondary,
-    fontSize: sizeHelper.calHp(25),
-    flexShrink: 1,
-  },
-
-  summaryAmount: {
-    color: colors.white,
-    fontSize: sizeHelper.calHp(31),
-    fontWeight: 'bold',
-    marginLeft: sizeHelper.calWp(10),
+    gap: spacing.xs,
+    marginBottom: spacing.xxs,
   },
 });

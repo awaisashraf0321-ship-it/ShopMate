@@ -1,123 +1,71 @@
-import { Text, View } from 'react-native';
-import React, { useCallback } from 'react';
+import { screenFill } from '../../theme';
+import { View } from 'react-native';
+import React, { useState, useCallback } from 'react';
 import Design from './design';
-import { useFocusEffect } from '@react-navigation/native';
 import { deleteIngoingPayments } from '../../api/IngoingPayments';
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
-import { GetIngoingPayments } from '../../api/IngoingPayments';
 import { useModule } from '../../components/ModuleContext';
-import { getOutInDashboard } from '../../api/OutgoingPaymentsApi';
-const IngoingTab = ({ navigation }) => {
-  const [payment, setPayment] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState('All');
+import {
+  moduleIdFor,
+  periodIdFor,
+  queryKeys,
+  useIncomingPayments,
+  useOptimisticDelete,
+  usePaymentDashboard,
+  usePullToRefresh,
+  useRefreshOnFocus,
+} from '../../hooks/queries';
 
+const IngoingTab = ({ navigation }) => {
   const [deleteModal, SetDeleteModal] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('All');
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
-  const [Ingoingdashboard, setIngoingDashboard] = useState([]);
-  const [PaymentMethodId, setPaymentMethodId] = useState(0);
-  const [visible, setVisible] = useState(false);
   const [PaymentMode, setPaymentMode] = useState(0);
   const [Page, setPage] = useState(1);
   const [PageSize, setPageSize] = useState(10);
+  const [visible, setVisible] = useState(false);
 
-  const onRefresh = async () => {
-    try {
-      setRefreshing(true);
-      await handleIngoing();
-      await handleIngoingDashboard();
-    } catch (error) {
-      console.log('refreshing error', error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
   const { selectedModule } = useModule();
-
-  const moduleId = selectedModule === 'Self Expense' ? 1 : 2;
-  const handleIngoing = async () => {
-    try {
-      setLoading(true);
-      const response = await GetIngoingPayments(PaymentMode, Page, PageSize);
-      const data = await response.json();
-      console.log('Ingoing response', data);
-      if (response.ok) {
-        setPayment(data.obj.data);
-      } else {
-        console.log('Ingoing Payment error', data);
-      }
-    } catch (error) {
-      console.log('Ingoing Payment error', error.message);
-    } finally {
-      setLoading(false);
-    }
+  const listParams = {
+    paymentMode: PaymentMode,
+    page: Page,
+    pageSize: PageSize,
   };
-  const isSelected = selectedModule === 'Self Expense' ? 1 : 2;
-  const myPeriod =
-    selectedPeriod === 'Today'
-      ? 1
-      : selectedPeriod === 'This Week'
-      ? 2
-      : selectedPeriod === 'This Month'
-      ? 3
-      : 4;
-  const handleIngoingDashboard = async () => {
-    try {
-      setLoading(true);
-      const response = await getOutInDashboard(isSelected, myPeriod);
-      const data = await response.json();
-      setIngoingDashboard(data.obj);
-      console.log('Outgoing Api resposne', data);
-    } catch (error) {
-      console.log('Outgoing Dashboard Error', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const methods = Ingoingdashboard?.Methods;
-  console.log('Ingoing', methods);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          await Promise.all([
-            handleIngoing(true),
-            handleIngoingDashboard(true),
-          ]);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
-    }, [PaymentMode, selectedPeriod, selectedModule]),
+  const {
+    data: paymentData,
+    isLoading: paymentsLoading,
+    refetch: refetchPayments,
+  } = useIncomingPayments(listParams);
+  const {
+    data: dashboardData,
+    isLoading: dashboardLoading,
+    refetch: refetchDashboard,
+  } = usePaymentDashboard(
+    moduleIdFor(selectedModule),
+    periodIdFor(selectedPeriod),
   );
+  useRefreshOnFocus(refetchPayments);
+  useRefreshOnFocus(refetchDashboard);
 
-  const deleteMutation = useMutation({
+  const refetchAll = useCallback(
+    () => Promise.all([refetchPayments(), refetchDashboard()]),
+    [refetchPayments, refetchDashboard],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refetchAll);
+
+  const payment = paymentData ?? [];
+  const Ingoingdashboard = dashboardData ?? [];
+  const methods = Ingoingdashboard?.Methods;
+  const loading = paymentsLoading || dashboardLoading;
+
+  const deleteMutation = useOptimisticDelete({
     mutationFn: deleteIngoingPayments,
-    onSuccess: () => {
-      handleIngoing();
-      handleIngoingDashboard();
-    },
-    onError: error => {
-      console.log('Delete error:', error);
-    },
+    listKey: queryKeys.incoming(listParams),
+    invalidateKeys: [queryKeys.incomingAll, ['paymentDashboard']],
   });
-  const handleDelete = id => {
-    const previousPayments = payment;
-    setPayment(prev => prev.filter(item => item.Id !== id));
-    deleteMutation.mutate(id, {
-      onError: error => {
-        setPayment(previousPayments);
-        console.log('Delete error:', error);
-      },
-    });
-  };
+  const handleDelete = id => deleteMutation.mutate(id);
   const getPaymentModeIcon = mode => {
     if (mode === 'Cash') {
       return 'account-balance-wallet';
@@ -155,7 +103,7 @@ const IngoingTab = ({ navigation }) => {
     return (Number(amount) || 0).toLocaleString('en-US');
   };
   const formatDate = date => {
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
 
     const monthNames = [
       'Jan',
@@ -196,11 +144,10 @@ const IngoingTab = ({ navigation }) => {
   }
 
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         loading={loading}
-        setLoading={setLoading}
         refreshing={refreshing}
         onRefresh={onRefresh}
         payment={mySearch}
@@ -227,7 +174,6 @@ const IngoingTab = ({ navigation }) => {
         setPaymentMethodId={setPaymentMode}
         methods={methods}
         Ingoingdashboard={Ingoingdashboard}
-        setIngoingDashboard={setIngoingDashboard}
         Page={Page}
       />
     </View>

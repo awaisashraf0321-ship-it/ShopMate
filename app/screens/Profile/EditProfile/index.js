@@ -1,3 +1,4 @@
+import { screenFill } from '../../../theme';
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Design from '../EditProfile/design';
@@ -119,7 +120,7 @@ const EditProfileScreen = ({ navigation, route }) => {
     setShowPhotoModal(false);
   };
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         profileData={profileData}

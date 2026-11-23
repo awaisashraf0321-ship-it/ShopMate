@@ -1,3 +1,4 @@
+import { screenFill } from '../../../theme';
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Design from '../PersonalDetail/design';
@@ -38,7 +39,7 @@ const PersonalDetailScreen = ({ navigation, route }) => {
     handleData();
   }, []);
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         personalDetail={personalDetail}

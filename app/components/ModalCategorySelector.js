@@ -12,7 +12,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../helpers/sizeHelper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import colors1 from '../theme/myColors';
+import { theme } from '../theme';
 
 const ModalCategorySelector = ({
   categories = [],
@@ -34,7 +34,7 @@ const ModalCategorySelector = ({
       ? selectedIcon(selectedCategory.Name)
       : {
           icon: 'category',
-          iconColor: colors1.textSecondary,
+          iconColor: theme.colors.textSecondary,
         };
 
   const handleSelect = id => {
@@ -54,7 +54,7 @@ const ModalCategorySelector = ({
         <Icon
           name={matching.icon}
           size={sizeHelper.calHp(45)}
-          color={colors1.warning}
+          color={theme.colors.warning}
           style={styles.categoryIcon}
         />
 
@@ -68,7 +68,7 @@ const ModalCategorySelector = ({
         <Icon
           name="keyboard-arrow-down"
           size={sizeHelper.calHp(26)}
-          color={colors1.textSecondary}
+          color={theme.colors.textSecondary}
         />
       </TouchableOpacity>
 
@@ -93,7 +93,7 @@ const ModalCategorySelector = ({
                 <Icon
                   name="category"
                   size={sizeHelper.calHp(45)}
-                  color={colors1.primary}
+                  color={theme.colors.primary}
                 />
               </View>
 
@@ -112,7 +112,7 @@ const ModalCategorySelector = ({
                 <Icon
                   name="close"
                   size={sizeHelper.calHp(40)}
-                  color={colors1.textSecondary}
+                  color={theme.colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -131,8 +131,8 @@ const ModalCategorySelector = ({
                     ? selectedIcon(item.Name)
                     : {
                         icon: 'category',
-                        color: colors1.primaryLight,
-                        iconColor: colors1.primary,
+                        color: theme.colors.primarySoft,
+                        iconColor: theme.colors.primary,
                       };
 
                 return (
@@ -149,7 +149,7 @@ const ModalCategorySelector = ({
                         styles.categoryIconBox,
                         {
                           backgroundColor:
-                            itemStyle.color || colors1.primaryLight,
+                            itemStyle.color || theme.colors.primarySoft,
                         },
                       ]}
                     >
@@ -171,7 +171,11 @@ const ModalCategorySelector = ({
                       <Icon
                         name={isSelected ? 'check' : 'chevron-right'}
                         size={sizeHelper.calHp()}
-                        color={isSelected ? colors1.white : colors1.textMuted}
+                        color={
+                          isSelected
+                            ? theme.colors.onPrimary
+                            : theme.colors.textMuted
+                        }
                       />
                     </View>
                   </TouchableOpacity>
@@ -195,17 +199,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: sizeHelper.calHp(33),
     fontWeight: '700',
-    color: colors1.text,
+    color: theme.colors.textPrimary,
     marginBottom: sizeHelper.calHp(38),
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    fontFamily: theme.fontFamily.extraBold,
   },
 
   inputWrapper: {
     width: '100%',
     minHeight: sizeHelper.calHp(130),
     borderRadius: sizeHelper.calHp(35),
-    borderWidth: 0,
-    backgroundColor: colors1.accentLight || '#FFF3D6',
+    borderWidth: 1,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
     paddingHorizontal: sizeHelper.calWp(33),
     flexDirection: 'row',
     alignItems: 'center',
@@ -219,12 +224,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: sizeHelper.calHp(30),
     fontWeight: '600',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-SemiBold',
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fontFamily.semiBold,
   },
 
   placeholder: {
-    color: colors1.textSecondary,
+    color: theme.colors.textSecondary,
     fontWeight: '400',
   },
 
@@ -234,16 +239,20 @@ const styles = StyleSheet.create({
   },
 
   myOverlayStyle: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: theme.colors.overlay,
   },
 
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
 
   bottomSheet: {
     height: '70%',
-    backgroundColor: colors1.white,
+    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: sizeHelper.calHp(50),
     borderTopRightRadius: sizeHelper.calHp(50),
     paddingHorizontal: sizeHelper.calWp(38),
@@ -254,7 +263,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(110),
     height: sizeHelper.calHp(12),
     borderRadius: sizeHelper.calHp(20),
-    backgroundColor: colors1.border,
+    backgroundColor: theme.colors.border,
     alignSelf: 'center',
     marginBottom: sizeHelper.calHp(50),
   },
@@ -269,7 +278,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(130),
     height: sizeHelper.calHp(100),
     borderRadius: sizeHelper.calHp(100),
-    backgroundColor: colors1.primaryLight,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -282,22 +291,22 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: sizeHelper.calHp(40),
     fontWeight: '800',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fontFamily.extraBold,
   },
 
   subtitle: {
     fontSize: sizeHelper.calHp(27),
-    color: colors1.textSecondary,
+    color: theme.colors.textSecondary,
     marginTop: sizeHelper.calHp(8),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
   },
 
   closeButton: {
     width: sizeHelper.calHp(96),
     height: sizeHelper.calHp(96),
     borderRadius: sizeHelper.calHp(50),
-    backgroundColor: colors1.surface,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -309,18 +318,18 @@ const styles = StyleSheet.create({
   categoryRow: {
     minHeight: sizeHelper.calHp(130),
     borderWidth: 1,
-    borderColor: colors1.border,
+    borderColor: theme.colors.border,
     borderRadius: sizeHelper.calHp(35),
     paddingHorizontal: sizeHelper.calWp(30),
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: sizeHelper.calHp(25),
-    backgroundColor: colors1.white,
+    backgroundColor: theme.colors.surface,
   },
 
   selectedRow: {
-    backgroundColor: colors1.primaryLight,
-    borderColor: colors1.primary,
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.primary,
   },
 
   categoryIconBox: {
@@ -335,8 +344,8 @@ const styles = StyleSheet.create({
   categoryName: {
     flex: 1,
     fontSize: sizeHelper.calHp(32),
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-Regular',
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fontFamily.regular,
   },
   checkContainer: {
     height: sizeHelper.calWp(63),
@@ -346,6 +355,6 @@ const styles = StyleSheet.create({
     borderRadius: sizeHelper.calHp(50),
   },
   selectedCheck: {
-    backgroundColor: colors1.primary,
+    backgroundColor: theme.colors.primary,
   },
 });

@@ -1,103 +1,61 @@
 import { StyleSheet } from 'react-native';
-import colors1 from '../../../theme/myColors';
-import sizeHelper from '../../../helpers/sizeHelper';
+import { theme } from '../../../theme';
+
+const { colors, spacing, radius } = theme;
+const AVATAR = 112;
+const ROW_ICON = 40;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFAF5',
+    flex: 1,
+    backgroundColor: colors.background,
   },
-
   scrollContent: {
-    paddingHorizontal: sizeHelper.calWp(35),
-    paddingBottom: sizeHelper.calHp(900),
+    padding: spacing.lg,
+    paddingBottom: spacing.xxxl,
   },
-
-  // Profile
   profileSection: {
     alignItems: 'center',
-    marginTop: sizeHelper.calHp(35),
-    marginBottom: sizeHelper.calHp(45),
+    marginVertical: spacing.lg,
   },
-
   avatar: {
-    width: sizeHelper.calWp(415),
-    height: sizeHelper.calHp(330),
-    borderRadius: sizeHelper.calHp(300),
-    backgroundColor: '#FFE5AD',
+    width: AVATAR,
+    height: AVATAR,
+    borderRadius: AVATAR / 2,
+    backgroundColor: colors.primarySoft,
+    borderWidth: 4,
+    borderColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 4,
-    borderColor: colors1.white,
     overflow: 'hidden',
   },
-
   profileImage: {
-    width: sizeHelper.calHp(320),
-    height: sizeHelper.calHp(320),
-    borderRadius: sizeHelper.calHp(300),
-    // resizeMode: 'center',
+    width: '100%',
+    height: '100%',
   },
-
-  profileText: {
-    color: colors1.text,
-    fontSize: sizeHelper.calHp(35),
-    fontWeight: '700',
-    marginTop: sizeHelper.calHp(25),
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+  name: {
+    marginTop: spacing.md,
   },
-
-  // Detail Cards
-  detailCard: {
-    backgroundColor: colors1.white,
-    borderRadius: sizeHelper.calHp(50),
-    borderWidth: 1,
-    borderColor: '#F0EAE4',
-    paddingHorizontal: sizeHelper.calWp(33),
-    paddingVertical: sizeHelper.calHp(15),
-    marginBottom: sizeHelper.calHp(35),
-    elevation: 2,
-  },
-
-  detailItem: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: sizeHelper.calHp(30),
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0EAE4',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
-
-  detailIcon: {
-    width: sizeHelper.calWp(130),
-    height: sizeHelper.calHp(100),
-    borderRadius: sizeHelper.calHp(60),
-    backgroundColor: '#FFE8C9',
+  rowDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  rowIcon: {
+    width: ROW_ICON,
+    height: ROW_ICON,
+    borderRadius: radius.md,
+    backgroundColor: colors.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: sizeHelper.calWp(30),
   },
-
-  detailContent: {
-    flex: 1,
-  },
-
-  detailLabel: {
-    color: colors1.textSecondary,
-    fontSize: sizeHelper.calHp(30),
-    marginBottom: sizeHelper.calHp(8),
-    fontFamily: 'PlusJakartaSans-Regular',
-    fontWeight: '500',
-  },
-
-  detailValue: {
-    color: '#000000be',
-    fontSize: sizeHelper.calHp(37),
-    fontWeight: '700',
-    fontFamily: 'PlusJakartaSans-Regular',
-  },
-
-  lastItem: {
-    borderBottomWidth: 0,
-  },
+  rowContent: { flex: 1 },
 });
 
 export default styles;

@@ -12,13 +12,12 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import colors1 from '../theme/myColors';
 import ModalCategorySelector from '../components/ModalCategorySelector';
 import ModalDatePicker from '../components/ModalDatePicker';
 import ModalBudgetAmountInput from '../components/ModalBudgetAmountInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+import { theme, categoryStyle } from '../theme';
 
 const EditExpenseModal = ({
   visible,
@@ -46,109 +45,7 @@ const EditExpenseModal = ({
   onUpdate,
   loading,
 }) => {
-  const getCategoryStyle = Category => {
-    if (Category === 'Bill Expense') {
-      return {
-        icon: 'receipt-long',
-        color: '#FCE8E8',
-        iconColor: colors.dot,
-      };
-    }
-
-    if (Category === 'Education & Learning') {
-      return {
-        icon: 'school',
-        color: '#EDE7F6',
-        iconColor: '#7E57C2',
-      };
-    }
-
-    if (Category === 'Entertainment & Leisure') {
-      return {
-        icon: 'movie',
-        color: '#FCE4EC',
-        iconColor: '#D81B60',
-      };
-    }
-
-    if (Category === 'Family & Personal Care') {
-      return {
-        icon: 'people',
-        color: '#E0F2F1',
-        iconColor: '#00897B',
-      };
-    }
-
-    if (Category === 'Food & Groceries') {
-      return {
-        icon: 'restaurant',
-        color: '#FFF3E0',
-        iconColor: '#EF6C00',
-      };
-    }
-
-    if (Category === 'Health & Medical') {
-      return {
-        icon: 'medical-services',
-        color: '#FCE8E8',
-        iconColor: '#E53935',
-      };
-    }
-
-    if (Category === 'Home Expense') {
-      return {
-        icon: 'home',
-        color: '#ECF5D9',
-        iconColor: colors.categoryTravel,
-      };
-    }
-
-    if (Category === 'Mobile & Internet') {
-      return {
-        icon: 'phone-iphone',
-        color: '#E3F2FD',
-        iconColor: '#1976D2',
-      };
-    }
-
-    if (Category === 'Other') {
-      return {
-        icon: 'category',
-        color: '#ECEFF1',
-        iconColor: '#546E7A',
-      };
-    }
-
-    if (Category === 'Saving & Investments') {
-      return {
-        icon: 'savings',
-        color: '#E8F5E9',
-        iconColor: '#388E3C',
-      };
-    }
-
-    if (Category === 'Shopping & Clothing') {
-      return {
-        icon: 'shopping-bag',
-        color: '#F3E5F5',
-        iconColor: '#8E24AA',
-      };
-    }
-
-    if (Category === 'Transportation') {
-      return {
-        icon: 'directions-car',
-        color: '#E8F0FE',
-        iconColor: '#3F51B5',
-      };
-    }
-
-    return {
-      icon: 'apps',
-      color: '#E8F0FE',
-      iconColor: colors.categoryClothing,
-    };
-  };
+  const getCategoryStyle = categoryStyle;
 
   return (
     <Modal
@@ -177,7 +74,7 @@ const EditExpenseModal = ({
                     <Icon
                       name="edit"
                       size={sizeHelper.calHp(50)}
-                      color={colors1.primary}
+                      color={theme.colors.primary}
                     />
                   </View>
 
@@ -194,7 +91,7 @@ const EditExpenseModal = ({
                   <Icon
                     name="close"
                     size={sizeHelper.calHp(60)}
-                    color={colors1.textSecondary}
+                    color={theme.colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -281,7 +178,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(26, 24, 24, 0.25)',
+    backgroundColor: theme.colors.overlay,
   },
 
   safeArea: {
@@ -290,11 +187,11 @@ const styles = StyleSheet.create({
   },
 
   backdrop: {
-    backgroundColor: 'rgba(23,21,47,0.45)',
+    backgroundColor: theme.colors.overlay,
   },
 
   modalContainer: {
-    backgroundColor: colors1.white,
+    backgroundColor: theme.colors.surface,
     borderTopLeftRadius: sizeHelper.calHp(60),
     borderTopRightRadius: sizeHelper.calHp(60),
     paddingHorizontal: sizeHelper.calWp(45),
@@ -307,7 +204,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calWp(130),
     height: sizeHelper.calHp(12),
     borderRadius: sizeHelper.calHp(30),
-    backgroundColor: colors1.border,
+    backgroundColor: theme.colors.border,
     alignSelf: 'center',
     marginBottom: sizeHelper.calHp(40),
   },
@@ -329,7 +226,7 @@ const styles = StyleSheet.create({
     width: sizeHelper.calHp(110),
     height: sizeHelper.calHp(110),
     borderRadius: sizeHelper.calHp(50),
-    backgroundColor: colors1.primaryLight,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: sizeHelper.calWp(28),
@@ -342,20 +239,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: sizeHelper.calHp(45),
     fontWeight: '800',
-    color: colors1.text,
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fontFamily.extraBold,
   },
 
   subtitle: {
     fontSize: sizeHelper.calHp(28),
-    color: colors1.textSecondary,
+    color: theme.colors.textSecondary,
     marginTop: sizeHelper.calHp(15),
-    fontFamily: 'PlusJakartaSans-Regular',
+    fontFamily: theme.fontFamily.regular,
   },
 
   divider: {
     height: 1,
-    backgroundColor: colors1.border,
+    backgroundColor: theme.colors.border,
     marginBottom: sizeHelper.calHp(44),
   },
 
@@ -371,9 +268,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: sizeHelper.calHp(31),
     fontWeight: '700',
-    color: colors1.text,
+    color: theme.colors.textPrimary,
     marginBottom: sizeHelper.calHp(35),
-    fontFamily: 'PlusJakartaSans-ExtraBold',
+    fontFamily: theme.fontFamily.extraBold,
   },
 
   buttonRow: {
@@ -387,15 +284,15 @@ const styles = StyleSheet.create({
     flex: 1,
     height: sizeHelper.calHp(130),
     borderWidth: 1,
-    borderColor: colors1.border,
+    borderColor: theme.colors.border,
     borderRadius: sizeHelper.calHp(37),
-    backgroundColor: colors1.surface,
+    backgroundColor: theme.colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   cancelText: {
-    color: colors1.text,
+    color: theme.colors.textPrimary,
     fontSize: sizeHelper.calHp(33),
     fontWeight: '700',
   },
@@ -404,13 +301,13 @@ const styles = StyleSheet.create({
     flex: 1.3,
     height: sizeHelper.calHp(130),
     borderRadius: sizeHelper.calHp(30),
-    backgroundColor: colors1.accent,
+    backgroundColor: theme.colors.warning,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   updateText: {
-    color: colors1.text,
+    color: theme.colors.textPrimary,
     fontSize: sizeHelper.calHp(33),
     fontWeight: '700',
   },

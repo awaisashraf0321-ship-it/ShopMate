@@ -1,86 +1,72 @@
-import React from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
-
+import React, { useState } from 'react';
+import { StyleSheet, View, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../theme/colors';
-import sizeHelper from '../helpers/sizeHelper';
+import { theme } from '../theme';
+import { FormField } from '../ui';
 
+const { colors, spacing, radius, sizes, typography } = theme;
+
+/** Multi-line note field with an optional "Note" label. */
 const NoteInput = ({
   onFocus,
   onBlur,
   note,
   setNote,
-  placeholder = 'e.g.invoice#1042,PartialPayment ',
+  placeholder = 'e.g. invoice #1042, partial payment',
   style,
   myNote = true,
 }) => {
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={styles.container}>
-      {myNote && <Text style={styles.label}>Note</Text>}
-
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View style={[styles.inputWrapper, style]}>
-          <TextInput
-            style={styles.input}
-            value={note}
-            onChangeText={setNote}
-            placeholder={placeholder}
-            placeholderTextColor={colors.textSecondary}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-            onFocus={onFocus}
-            onBlur={onBlur}
-          />
-
-          <Icon
-            name="edit"
-            size={sizeHelper.calHp(36)}
-            color={colors.textSecondary}
-            style={styles.pencil}
-          />
-        </View>
+    <FormField label={myNote ? 'Note' : undefined}>
+      <View style={[styles.box, focused && styles.boxFocused, style]}>
+        <TextInput
+          style={styles.input}
+          value={note}
+          onChangeText={setNote}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          multiline
+          numberOfLines={3}
+          textAlignVertical="top"
+          accessibilityLabel="Note"
+          onFocus={e => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={e => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+        />
+        <Icon name="edit" size={sizes.icon.sm + 2} color={colors.textMuted} />
       </View>
-    </View>
+    </FormField>
   );
 };
 
 export default NoteInput;
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: sizeHelper.calWp(40),
-  },
-
-  label: {
-    fontSize: sizeHelper.calHp(30),
-    fontWeight: '500',
-    color: colors.textPrimary,
-    marginBottom: sizeHelper.calHp(20),
-  },
-
-  inputWrapper: {
-    width: '100%',
-    borderRadius: sizeHelper.calHp(35),
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.borderColor,
-    paddingHorizontal: sizeHelper.calWp(30),
-    paddingVertical: sizeHelper.calHp(25),
+  box: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-
+  boxFocused: {
+    borderColor: colors.primary,
+  },
   input: {
-    minHeight: sizeHelper.calHp(120),
+    flex: 1,
+    minHeight: 64,
     padding: 0,
-    width: '90%',
-    marginRight: sizeHelper.calWp(15),
-    fontSize: sizeHelper.calHp(27),
+    ...typography.body,
     color: colors.textPrimary,
-    textAlignVertical: 'top',
-  },
-
-  pencil: {
-    marginTop: sizeHelper.calHp(5),
   },
 });

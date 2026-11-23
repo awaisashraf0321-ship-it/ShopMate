@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+import { theme } from '../theme';
 
 const ModalBudgetAmountInput = ({
   expenseAmount,
@@ -15,14 +15,14 @@ const ModalBudgetAmountInput = ({
       {/* <Text style={styles.title}>Expense Amount</Text> */}
 
       <View style={styles.inputWrapper}>
-        <Text style={styles.currency}>Rs.</Text>
+        <Text style={styles.currency}>Rs</Text>
 
         <TextInput
           style={styles.input}
           value={String(expenseAmount ?? '')}
           onChangeText={Changed}
           placeholder="Enter Amount"
-          placeholderTextColor="#999999"
+          placeholderTextColor={theme.colors.textMuted}
           keyboardType="decimal-pad"
           onFocus={onFocus}
           onBlur={onBlur}
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: sizeHelper.calHp(19),
     fontWeight: '700',
-    color: '#171717',
+    color: theme.colors.textPrimary,
     marginBottom: sizeHelper.calHp(9),
   },
 
@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
     width: '100%',
     minHeight: sizeHelper.calHp(130),
     borderWidth: 1.5,
-    borderColor: '#D1CDD0',
+    borderColor: theme.colors.border,
     borderRadius: sizeHelper.calHp(30),
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: sizeHelper.calWp(16),
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   currency: {
     fontSize: sizeHelper.calHp(35),
     fontWeight: '600',
-    color: '#777780',
+    color: theme.colors.textMuted,
     marginRight: sizeHelper.calWp(15),
   },
 
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: sizeHelper.calHp(30),
     fontWeight: '700',
-    color: '#171717',
+    color: theme.colors.textPrimary,
     paddingVertical: sizeHelper.calHp(8),
   },
 });

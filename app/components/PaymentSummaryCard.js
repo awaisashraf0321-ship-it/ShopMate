@@ -1,318 +1,200 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { theme } from '../theme';
+import { AppText, Card } from '../ui';
 
-import sizeHelper from '../helpers/sizeHelper';
-import colors from '../theme/colors';
+const { colors, spacing, radius, sizes } = theme;
+const methodColor = id => colors.paymentMethod[id] ?? colors.onPrimaryMuted;
 
+/**
+ * Purple summary card at the top of the list tabs: period total, payment
+ * count, period picker, a split bar and per-method totals.
+ *
+ * paymentType / paymentPercentage pick which API fields hold the amounts:
+ * 'Outgoing' | 'Ingoing' | 'Self' | 'Business'.
+ */
 const PaymentSummaryCard = ({
   totalAmount,
   totalTransactions,
   formatAmount,
-
   methods,
   setVisible,
   selectedPeriod,
   paymentType,
   paymentPercentage,
-
   paymentText,
 }) => {
-  const getAmount = id => {
-    const item = methods?.find(item => item.PaymentMethodId === id);
-    const percentage =
-      paymentPercentage === 'Outgoing'
+  const percentageOf = item =>
+    Number(
+      (paymentPercentage === 'Outgoing'
         ? item?.OutgoingPercentage
         : paymentPercentage === 'Ingoing'
         ? item?.IncomingPercentage
-        : paymentPercentage === 'Self'
-        ? item?.Percentage
-        : item?.Percentage;
-    return Number(percentage ?? 0);
-  };
+        : item?.Percentage) ?? 0,
+    );
 
-  const cashPercentage = getAmount(1);
-  const bankPercentage = getAmount(2);
-  const creditPercentage = getAmount(3);
+  const amountOf = item =>
+    paymentType === 'Outgoing'
+      ? item?.OutgoingAmount
+      : paymentType === 'Self' || paymentType === 'Business'
+      ? item?.Amount
+      : item?.IncomingAmount;
+
+  const sorted = [...(methods ?? [])].sort(
+    (a, b) => a.PaymentMethodId - b.PaymentMethodId,
+  );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        {/* --- HEADER SECTION --- */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <Text style={styles.title} numberOfLines={1}>
-              {paymentText}
-            </Text>
-
-            <Text
-              style={styles.totalAmount}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.65}
-            >
-              Rs {formatAmount(totalAmount)}
-            </Text>
-
-            <Text style={styles.subtitle}>{totalTransactions} payments</Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => setVisible(true)}
-            style={styles.periodButton}
+    <Card tone="primary" padding="xl" style={styles.card}>
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <AppText variant="label" color="onPrimaryMuted" numberOfLines={1}>
+            {paymentText}
+          </AppText>
+          <AppText
+            variant="display"
+            color="onPrimary"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.65}
+            style={styles.total}
           >
-            <Text style={styles.periodText} numberOfLines={1}>
-              {selectedPeriod}
-            </Text>
-            <Icon
-              style={styles.chevron}
-              name="keyboard-arrow-down"
-              size={sizeHelper.calHp(30)}
-              color={colors.summaryText || '#FFFFFF'}
-            />
-          </TouchableOpacity>
+            Rs {formatAmount(totalAmount)}
+          </AppText>
+          <AppText variant="caption" color="onPrimaryMuted">
+            {totalTransactions} payments
+          </AppText>
         </View>
 
-        {/* --- PROGRESS BAR SECTION --- */}
-        <View style={styles.progressContainer}>
-          <View
-            style={[
-              styles.progressSegment,
-              styles.cashSegment,
-              { flex: cashPercentage },
-            ]}
+        <Pressable
+          onPress={() => setVisible(true)}
+          style={({ pressed }) => [
+            styles.periodButton,
+            pressed && styles.pressed,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`Period: ${selectedPeriod}. Change period`}
+        >
+          <AppText variant="label" color="onPrimary" numberOfLines={1}>
+            {selectedPeriod}
+          </AppText>
+          <Icon
+            name="keyboard-arrow-down"
+            size={sizes.icon.md}
+            color={colors.onPrimary}
           />
-          <View
-            style={[
-              styles.progressSegment,
-              styles.bankSegment,
-              { flex: bankPercentage },
-            ]}
-          />
-          <View
-            style={[
-              styles.progressSegment,
-              styles.creditSegment,
-              { flex: creditPercentage },
-            ]}
-          />
-        </View>
-
-        {/* --- BOTTOM CATEGORIES --- */}
-        <View style={styles.paymentMethods}>
-          {methods?.map(item => {
-            const amount =
-              paymentType === 'Outgoing'
-                ? item?.OutgoingAmount
-                : paymentType === 'Self'
-                ? item?.Amount
-                : paymentType === 'Business'
-                ? item?.Amount
-                : item?.IncomingAmount;
-
-            return (
-              <View style={styles.methodItem} key={item.PaymentMethodId}>
-                <View style={styles.methodLabel}>
-                  <View
-                    style={
-                      item.PaymentMethodId === 1
-                        ? styles.cashDot
-                        : item.PaymentMethodId === 2
-                        ? styles.bankDot
-                        : styles.creditDot
-                    }
-                  />
-
-                  <Text style={styles.methodText} numberOfLines={1}>
-                    {item.PaymentMethodName}
-                  </Text>
-                </View>
-
-                <Text style={styles.methodAmount} numberOfLines={1}>
-                  Rs {formatAmount(amount ?? 0)}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
+        </Pressable>
       </View>
-    </View>
+
+      {/* Split bar */}
+      <View style={styles.bar}>
+        {sorted.map(item => (
+          <View
+            key={item.PaymentMethodId}
+            style={[
+              styles.segment,
+              {
+                flex: percentageOf(item),
+                backgroundColor: methodColor(item.PaymentMethodId),
+              },
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Per-method totals */}
+      <View style={styles.methods}>
+        {sorted.map(item => (
+          <View style={styles.method} key={item.PaymentMethodId}>
+            <View style={styles.methodLabel}>
+              <View
+                style={[
+                  styles.dot,
+                  { backgroundColor: methodColor(item.PaymentMethodId) },
+                ]}
+              />
+              <AppText
+                variant="caption"
+                color="onPrimaryMuted"
+                numberOfLines={1}
+              >
+                {item.PaymentMethodName}
+              </AppText>
+            </View>
+            <AppText variant="bodyStrong" color="onPrimary" numberOfLines={1}>
+              Rs {formatAmount(amountOf(item) ?? 0)}
+            </AppText>
+          </View>
+        ))}
+      </View>
+    </Card>
   );
 };
 
 export default PaymentSummaryCard;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: sizeHelper.calHp(40),
-    marginBottom: sizeHelper.calHp(15),
-  },
-
   card: {
-    width: '100%',
-    height: sizeHelper.calHp(450),
-    backgroundColor: colors.summaryBackground,
-    borderRadius: sizeHelper.calHp(44),
-    paddingHorizontal: sizeHelper.calWp(22),
-    paddingVertical: sizeHelper.calHp(22),
-    overflow: 'hidden',
-    justifyContent: 'space-between',
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
-
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-
-  headerContent: {
+  headerText: {
     flex: 1,
     minWidth: 0,
-    paddingRight: sizeHelper.calWp(10),
+    paddingRight: spacing.sm,
   },
-
-  title: {
-    fontFamily: 'PlusJakartaSans-Medium',
-    fontSize: sizeHelper.calHp(30),
-    marginTop: sizeHelper.calHp(15),
-    fontWeight: '600',
-    marginLeft: sizeHelper.calWp(20),
-    color: colors.summaryTextSecondary || '#E5D9FF',
-    marginBottom: sizeHelper.calHp(4),
+  total: {
+    marginVertical: spacing.xxs,
   },
-
-  totalAmount: {
-    fontFamily: 'PlusJakartaSans-ExtraBold',
-    fontSize: sizeHelper.calHp(70),
-    color: colors.summaryText || '#FFFFFF',
-    marginTop: sizeHelper.calHp(2),
-    marginLeft: sizeHelper.calWp(20),
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-
-  subtitle: {
-    fontFamily: 'JhatakaSans-Regular',
-    fontSize: sizeHelper.calHp(31),
-    color: colors.summaryTextSecondary || '#D8CCFF',
-    marginTop: sizeHelper.calHp(6),
-    marginLeft: sizeHelper.calWp(20),
-  },
-
   periodButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: sizeHelper.calHp(70),
-    marginRight: sizeHelper.calWp(20),
-    paddingHorizontal: sizeHelper.calWp(30),
-    borderRadius: sizeHelper.calHp(30),
-    backgroundColor: colors.filterColor,
-    marginTop: sizeHelper.calHp(10),
+    gap: spacing.xxs,
+    minHeight: 34,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+    borderRadius: radius.pill,
+    backgroundColor: colors.onPrimarySurface,
   },
-
-  periodText: {
-    fontFamily: 'PlusJakartaSans-Medium',
-    fontSize: sizeHelper.calHp(24),
-    fontWeight: 'bold',
-    color: colors.summaryText || '#FFFFFF',
-    marginRight: sizeHelper.calWp(4),
-  },
-
-  progressContainer: {
+  pressed: { opacity: 0.75 },
+  bar: {
     flexDirection: 'row',
-    width: '95%',
-    height: sizeHelper.calHp(15),
-    marginTop: sizeHelper.calHp(28),
-    marginBottom: sizeHelper.calHp(24),
-    gap: sizeHelper.calWp(10),
-    marginLeft: sizeHelper.calWp(20),
+    height: 6,
+    gap: spacing.xs,
+    marginTop: spacing.xl,
+    marginBottom: spacing.lg,
+    borderRadius: radius.pill,
     overflow: 'hidden',
+    backgroundColor: colors.onPrimarySurface,
   },
-
-  progressSegment: {
+  segment: {
     height: '100%',
-    borderRadius: sizeHelper.calHp(5),
+    borderRadius: radius.pill,
   },
-
-  bankSegment: {
-    backgroundColor: colors.summaryTrackActive,
-  },
-
-  creditSegment: {
-    backgroundColor: colors.summaryCreditCard1,
-  },
-
-  cashSegment: {
-    backgroundColor: colors.summarycash,
-  },
-
-  paymentMethods: {
+  methods: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: spacing.sm,
   },
-
-  methodItem: {
+  method: {
     flex: 1,
     minWidth: 0,
-    paddingRight: sizeHelper.calWp(5),
   },
-
   methodLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: sizeHelper.calHp(8),
+    gap: spacing.xs + 2,
+    marginBottom: spacing.xxs,
   },
-
-  bankDot: {
-    width: sizeHelper.calWp(18),
-    height: sizeHelper.calHp(18),
-    borderRadius: sizeHelper.calHp(10),
-    backgroundColor: colors.summaryTrackActive,
-    marginLeft: sizeHelper.calWp(22),
-    marginTop: sizeHelper.calHp(10),
-    marginRight: sizeHelper.calWp(6),
-  },
-
-  creditDot: {
-    width: sizeHelper.calWp(18),
-    height: sizeHelper.calHp(18),
-    marginLeft: sizeHelper.calWp(20),
-    borderRadius: sizeHelper.calHp(10),
-    backgroundColor: colors.creditCard,
-    marginRight: sizeHelper.calWp(6),
-  },
-
-  cashDot: {
-    marginLeft: sizeHelper.calWp(20),
-    width: sizeHelper.calWp(18),
-    height: sizeHelper.calHp(18),
-    borderRadius: sizeHelper.calHp(10),
-    backgroundColor: colors.summarycash,
-    marginRight: sizeHelper.calWp(6),
-  },
-
-  methodText: {
-    flex: 1,
-    marginLeft: sizeHelper.calWp(10),
-    fontFamily: 'PlusJakarta-Regular',
-    fontSize: sizeHelper.calHp(26),
-    color: colors.summaryTextSecondary || '#D8CCFF',
-  },
-
-  methodAmount: {
-    fontFamily: 'PlusJakartaSans-Bold',
-    fontSize: sizeHelper.calHp(30),
-    color: colors.summaryText || '#FFFFFF',
-    fontWeight: 'bold',
-    marginTop: sizeHelper.calHp(5),
-    marginLeft: sizeHelper.calWp(25),
-    marginBottom: sizeHelper.calHp(25),
-  },
-
-  chevron: {
-    marginLeft: sizeHelper.calWp(6),
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: radius.pill,
   },
 });

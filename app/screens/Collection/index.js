@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Design from '../Collection/design';
@@ -19,7 +20,7 @@ const CollectionScreen = ({ navigation }) => {
     setAmount(cleanedValue);
   };
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
         amount={amount}

@@ -1,8 +1,8 @@
 import { Image, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import colors from '../theme/colors';
 import sizeHelper from '../helpers/sizeHelper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { theme } from '../theme';
 
 const ImagePhotoOpen = ({ visible, onClose, imageUri, accessToken }) => {
   return (
@@ -40,7 +40,7 @@ export default ImagePhotoOpen;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: colors.dark,
+    backgroundColor: theme.colors.textPrimary,
   },
 
   crossBorder: {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     top: sizeHelper.calHp(130),
     height: sizeHelper.calWp(100),
     width: sizeHelper.calWp(100),
-    backgroundColor: colors.white,
+    backgroundColor: theme.colors.surface,
     borderRadius: sizeHelper.calHp(100),
     zIndex: 1,
   },

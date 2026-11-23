@@ -1,6 +1,6 @@
 import { RefreshControl, StyleSheet, Text, View } from 'react-native';
-import colors from '../../theme/colors';
 import sizeHelper from '../../helpers/sizeHelper';
+import { theme } from '../../theme';
 
 const styles = StyleSheet.create({
   cardContainer: {
@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 
   main: {
     flex: 1,
-    backgroundColor: colors.BackgroundColor,
+    backgroundColor: theme.colors.background,
     marginTop: sizeHelper.calHp(20),
   },
 

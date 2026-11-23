@@ -1,3 +1,4 @@
+import { screenFill } from '../../theme';
 import { StyleSheet, Text, View, Alert, Keyboard } from 'react-native';
 import React from 'react';
 import Design from '../Business Expense/design';
@@ -150,7 +151,7 @@ const BusinessExpenseScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View>
+    <View style={screenFill}>
       <ErrorModal
         visible={showErrorModal2}
         onClose={() => setShowErrorModal2(false)}

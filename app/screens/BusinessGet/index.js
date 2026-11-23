@@ -1,130 +1,78 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useSyncExternalStore } from 'react';
+import { View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
 import Design from '../BusinessGet/design';
-import { useState, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { GetExpenses } from '../../api/ExpenseApi';
-import { useMutation } from '@tanstack/react-query';
-import { Delete, expensesDashboard } from '../../api/ExpenseApi';
+import { Delete } from '../../api/ExpenseApi';
 import { useModule } from '../../components/ModuleContext';
+import {
+  moduleIdFor,
+  periodIdFor,
+  queryKeys,
+  useExpenseDashboard,
+  useExpenses,
+  useOptimisticDelete,
+  usePullToRefresh,
+  useRefreshOnFocus,
+} from '../../hooks/queries';
 
 const BusinessGetScreen = ({ navigation }) => {
-  const [myExpenses1, setMyExpenses1] = useState([]);
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  const [Loading1, setLoading1] = useState(false);
   const [selectedPaymentId2, setSelectedPaymentId2] = useState(null);
   const [deleteModal3, SetDeleteModal3] = useState(false);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('All');
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
   const [visible, setVisible] = useState(false);
-  const [myDashboard, setDashboard] = useState([]);
   const [PaymentMethodId, setPaymentMethodId] = useState(0);
   const [Page, setPage] = useState(1);
   const [PageSize, setPageSize] = useState(10);
 
-  const onRefresh = async () => {
-    try {
-      setRefreshing(true);
-      await fetchExpenses();
-      await handleMyDashboard();
-    } catch (error) {
-      console.log('refreshing error', error);
-    } finally {
-      setRefreshing(false);
-    }
-  };
   const { selectedModule } = useModule();
-  const ExpenseType = selectedModule === 'Self Expense' ? 1 : 2;
-  const fetchExpenses = async () => {
-    try {
-      setLoading1(true);
-      const response = await GetExpenses(
-        ExpenseType,
-        PaymentMethodId,
-        Page,
-        PageSize,
-      );
-      const data = await response.json();
-      console.log('expense api response', data);
-
-      setMyExpenses1(
-        data.obj.data.filter(item => item.Module === 'BusinessExpense'),
-      );
-    } catch (error) {
-      console.log('api error', error);
-    } finally {
-      setLoading1(false);
-    }
+  const moduleId = moduleIdFor(selectedModule);
+  const listParams = {
+    expenseType: moduleId,
+    paymentMethodId: PaymentMethodId,
+    page: Page,
+    pageSize: PageSize,
   };
 
-  const isSelected = selectedModule === 'Self Expendse' ? 1 : 2;
-  const myPeriod =
-    selectedPeriod === 'Today'
-      ? 1
-      : selectedPeriod === 'This Week'
-      ? 2
-      : selectedPeriod === 'This Month'
-      ? 3
-      : 4;
-  const handleMyDashboard = async () => {
-    try {
-      setLoading1(true);
-      const response = await expensesDashboard(isSelected, myPeriod);
-      const data = await response.json();
-      setDashboard(data.obj);
-      console.log('My Business Dashboard', data);
-    } catch (error) {
-      console.log('Dasboard Business Api Error', error);
-    } finally {
-      setLoading1(false);
-    }
-  };
-  const methods = myDashboard?.Methods;
-  console.log(' Business methods', methods);
+  const {
+    data: expensesData,
+    isLoading: expensesLoading,
+    refetch: refetchExpenses,
+  } = useExpenses(listParams);
+  const {
+    data: dashboardData,
+    isLoading: dashboardLoading,
+    refetch: refetchDashboard,
+  } = useExpenseDashboard(moduleId, periodIdFor(selectedPeriod));
+  useRefreshOnFocus(refetchExpenses);
+  useRefreshOnFocus(refetchDashboard);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        setLoading1(true);
-        try {
-          await Promise.all([fetchExpenses(), handleMyDashboard()]);
-        } finally {
-          setLoading1(false);
-        }
-      };
-
-      fetchData();
-    }, [selectedPeriod, PaymentMethodId]),
+  const refetchAll = useCallback(
+    () => Promise.all([refetchExpenses(), refetchDashboard()]),
+    [refetchExpenses, refetchDashboard],
   );
+  const { refreshing, onRefresh } = usePullToRefresh(refetchAll);
 
-  const deleteMutation = useMutation({
+  const myExpenses1 = useMemo(
+    () =>
+      (expensesData ?? []).filter(item => item.Module === 'BusinessExpense'),
+    [expensesData],
+  );
+  const myDashboard = dashboardData ?? [];
+  const methods = myDashboard?.Methods;
+  const Loading1 = expensesLoading || dashboardLoading;
+
+  const deleteMutation = useOptimisticDelete({
     mutationFn: Delete,
-    onSuccess: () => {
-      fetchExpenses();
-      handleMyDashboard();
-    },
-    onError: error => {
-      console.log('Delete error:', error);
-    },
+    listKey: queryKeys.expenses(listParams),
+    invalidateKeys: [queryKeys.expensesAll, ['expenseDashboard']],
   });
-  const handleDelete = id => {
-    const previousExpenses = myExpenses1;
-    setMyExpenses1(prev => prev.filter(item => item.Id !== id));
-    deleteMutation.mutate(id, {
-      onError: error => {
-        setMyExpenses1(previousExpenses);
-        console.log('Delete error:', error);
-      },
-    });
-  };
+  const handleDelete = id => deleteMutation.mutate(id);
   const formatAmount = amount => {
     return Number(amount || 0).toLocaleString('en-US');
   };
   const formatDate = date => {
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
 
     const monthNames = [
       'Jan',
@@ -222,7 +170,6 @@ const BusinessGetScreen = ({ navigation }) => {
         selectedPeriod={selectedPeriod}
         setSelectedPeriod={setSelectedPeriod}
         myDashboard={myDashboard}
-        setDashboard={setDashboard}
         methods={methods}
         PaymentMethodId={PaymentMethodId}
         setPaymentMethodId={setPaymentMethodId}

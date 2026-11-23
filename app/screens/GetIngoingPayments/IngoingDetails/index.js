@@ -1,45 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { GetByIdIngoingPayments } from '../../../api/IngoingPayments';
+import { screenFill } from '../../../theme';
+import { View } from 'react-native';
+import React, { useState } from 'react';
 import Design from '../IngoingDetails/design';
-import { useState, useEffect } from 'react';
 import { deleteIngoingPayments } from '../../../api/IngoingPayments';
+import {
+  useIncomingPaymentById,
+  usePullToRefresh,
+} from '../../../hooks/queries';
+
 const IngoingDetail = ({ route, navigation }) => {
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [getPayments1, setGetPayments1] = useState(null);
   const [deleteModal1, SetDeleteModal1] = useState(false);
   const [selectedPaymentId1, setSelectedPaymentId1] = useState(null);
 
-  const onRefresh = async () => {
-    await handleIngoingGetById(true);
-  };
-  console.log('payment Id', route.params.id);
-  const handleIngoingGetById = async (isRefreshing = false) => {
-    try {
-      if (!isRefreshing) {
-        setLoading(true);
-      }
-      const response = await GetByIdIngoingPayments(route.params.id);
-      const data = await response.json();
-      setGetPayments1(data.obj);
-      console.log('api response', data);
-      if (response.ok) {
-        console.log('data fetched successfully');
-      } else {
-        console.log('data not fetched');
-      }
-    } catch (error) {
-      console.log('api error', error.message);
-    } finally {
-      if (!isRefreshing) {
-        setLoading(false);
-      }
-      setRefreshing(false);
-    }
-  };
-  useEffect(() => {
-    handleIngoingGetById();
-  }, []);
+  const {
+    data: getPayments1 = null,
+    isLoading: loading,
+    refetch,
+  } = useIncomingPaymentById(route.params.id);
+  const { refreshing, onRefresh } = usePullToRefresh(refetch);
 
   const handleDelete = async id => {
     try {
@@ -63,7 +41,7 @@ const IngoingDetail = ({ route, navigation }) => {
     return Number(amount).toLocaleString('en-US');
   };
   const formatDate = date => {
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = String(date).slice(0, 10).split('-');
 
     const monthNames = [
       'Jan',
@@ -83,13 +61,11 @@ const IngoingDetail = ({ route, navigation }) => {
     return `${day}-${monthNames[Number(month) - 1]}-${year}`;
   };
   return (
-    <View>
+    <View style={screenFill}>
       <Design
         navigation={navigation}
-        handleIngoingGetById={handleIngoingGetById}
         getPayments1={getPayments1}
         loading={loading}
-        setLoading={setLoading}
         refreshing={refreshing}
         onRefresh={onRefresh}
         formatDate={formatDate}
@@ -105,5 +81,3 @@ const IngoingDetail = ({ route, navigation }) => {
 };
 
 export default IngoingDetail;
-
-const styles = StyleSheet.create({});

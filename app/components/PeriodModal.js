@@ -4,6 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import sizeHelper from '../helpers/sizeHelper';
+import { theme } from '../theme';
 
 const periods = [
   { id: 'Daily', label: 'Daily', icon: 'calendar-outline' },
@@ -41,7 +42,7 @@ const PeriodModal = ({ visible, onClose, selectedPeriod, onSelect }) => {
               >
                 {isSelected ? (
                   <LinearGradient
-                    colors={['#8A56FF', '#FF6B9E']}
+                    colors={theme.colors.gradient}
                     style={styles.optionSelected}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -49,7 +50,7 @@ const PeriodModal = ({ visible, onClose, selectedPeriod, onSelect }) => {
                     <Icon
                       name={period.icon}
                       size={sizeHelper.calHp(18)}
-                      color="#FFFFFF"
+                      color={theme.colors.onPrimary}
                     />
 
                     <Text style={styles.optionLabelSelected}>
@@ -59,7 +60,7 @@ const PeriodModal = ({ visible, onClose, selectedPeriod, onSelect }) => {
                     <Icon
                       name="checkmark"
                       size={sizeHelper.calHp(18)}
-                      color="#FFFFFF"
+                      color={theme.colors.onPrimary}
                       style={styles.checkIcon}
                     />
                   </LinearGradient>
@@ -68,7 +69,7 @@ const PeriodModal = ({ visible, onClose, selectedPeriod, onSelect }) => {
                     <Icon
                       name={period.icon}
                       size={sizeHelper.calHp(18)}
-                      color="#1A1A1A"
+                      color={theme.colors.textPrimary}
                     />
 
                     <Text style={styles.optionLabel}>{period.label}</Text>
@@ -88,17 +89,17 @@ export default PeriodModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(26, 24, 24, 0.5)',
+    backgroundColor: theme.colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   modalBox: {
     width: '70%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: sizeHelper.calHp(18),
     padding: sizeHelper.calWp(8),
-    shadowColor: '#000',
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
       height: sizeHelper.calHp(8),
@@ -134,14 +135,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: sizeHelper.calHp(14),
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: theme.colors.textPrimary,
   },
 
   optionLabelSelected: {
     flex: 1,
     fontSize: sizeHelper.calHp(14),
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.colors.onPrimary,
   },
 
   checkIcon: {

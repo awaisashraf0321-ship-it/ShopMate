@@ -1,4 +1,3 @@
-import { StyleSheet, Text, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Design from '../../screens/Login/design';
 import { login } from '../../api/AuthApi';
@@ -8,11 +7,6 @@ import Toast from 'react-native-toast-message';
 import { useModule } from '../../components/ModuleContext';
 const LoginScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState(1);
-  const [check, setCheck] = useState(true);
-  const [visible, setVisible] = useState(false);
-  const [visible1, setVisible1] = useState(false);
-  const [visible2, setVisible2] = useState(false);
-  const [moduleDropdown, setModuleDropdown] = useState(false);
 
   const [rememberPassword, setRememberPassword] = useState(false);
   const [username, setUsername] = useState('');
@@ -68,7 +62,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const { selectedModule, setSelectedModule, myModule } = useModule();
+  const { selectedModule, myModule } = useModule();
   const isActive = selectedModule === 'Self Expense' ? 1 : 2;
   const handleSignUp = async values => {
     try {
@@ -117,40 +111,25 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <Design
-      navigation={navigation}
       loading={loading}
-      setLoading={setLoading}
       errorModal={errorModal}
       setErrorModal={setErrorModal}
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
-      check={check}
       handleLogin={handleLogin}
-      setCheck={setCheck}
-      visible={visible}
-      setVisible={setVisible}
       rememberPassword={rememberPassword}
       setRememberPassword={setRememberPassword}
       handleSignUp={handleSignUp}
       loading1={loading1}
-      setLoading1={setLoading1}
       username={username}
-      setUsername={setUsername}
-      visible1={visible1}
-      setVisible1={setVisible1}
-      visible2={visible2}
-      setVisible2={setVisible2}
       signupErrorModal={signupErrorModal}
       setSignupErrorModal={setSignupErrorModal}
       signupErrorMessage={signupErrorMessage}
       setSignupErrorMessage={setSignupErrorMessage}
       selectedModule={selectedModule}
-      setSelectedModule={setSelectedModule}
-      moduleDropdown={moduleDropdown}
       myModule={myModule}
-      setModuleDropdown={setModuleDropdown}
     />
   );
 };

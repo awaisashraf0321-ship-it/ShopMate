@@ -14,10 +14,13 @@ import MainStack from './MianStack';
 
 import OnBoardingScreen from '../screens/onBoarding/index';
 
+import { useModule } from '../components/ModuleContext';
+
 const Stack = createNativeStackNavigator();
 
 const RootStack = () => {
   const [initialScreen, setInitialScreen] = useState(null);
+  const { moduleLoading } = useModule();
 
   useEffect(() => {
     checkApp();
@@ -38,7 +41,9 @@ const RootStack = () => {
     }
   };
 
-  if (!initialScreen) {
+  // Wait for the saved Self/Business module too, so screens never
+  // mount with the default module and then flip.
+  if (!initialScreen || moduleLoading) {
     return <View style={{ flex: 1 }} />;
   }
 
