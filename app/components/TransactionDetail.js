@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Button, Card } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 
@@ -73,7 +74,7 @@ const TransactionDetail = ({
         <View style={styles.badge}>
           <Icon name="check" size={sizes.icon.sm} color={colors.success} />
           <AppText variant="label" color="success">
-            Completed
+            {t('field.completed')}
           </AppText>
         </View>
         <AppText variant="caption" color="onPrimaryMuted" align="center">
@@ -90,7 +91,7 @@ const TransactionDetail = ({
         ))}
         <View style={styles.divider} />
         <AppText variant="caption" color="textSecondary">
-          Description
+          {t('field.description')}
         </AppText>
         <AppText
           variant="body"
@@ -103,7 +104,7 @@ const TransactionDetail = ({
       </Card>
 
       <Button
-        title="Delete"
+        title={t('delete.button')}
         icon="delete-outline"
         variant="dangerOutline"
         onPress={onDelete}

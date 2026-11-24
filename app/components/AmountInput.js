@@ -3,12 +3,13 @@ import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, shadows, sizes, typography } = theme;
 
 /**
  * Large amount entry card at the top of the add/edit forms.
- * `update` shows an "Update" pill that opens the salary modal.
+ * `update` shows an t('common.update') pill that opens the salary modal.
  */
 const AmountInput = ({
   amount,
@@ -18,6 +19,9 @@ const AmountInput = ({
   placeholder,
   currency = 'Rs',
   update = false,
+  autoFocus = false,
+  onFocus,
+  onBlur,
 }) => {
   return (
     <View style={styles.card}>
@@ -38,6 +42,9 @@ const AmountInput = ({
             placeholder={placeholder}
             placeholderTextColor={colors.textMuted}
             keyboardType="numeric"
+            autoFocus={autoFocus}
+            onFocus={onFocus}
+            onBlur={onBlur}
             accessibilityLabel={amountTitle || 'Amount'}
           />
         </View>
@@ -51,7 +58,7 @@ const AmountInput = ({
         >
           <Icon name="edit" size={sizes.icon.sm} color={colors.primary} />
           <AppText variant="label" color="primary">
-            Update
+            {t('common.update')}
           </AppText>
         </Pressable>
       )}

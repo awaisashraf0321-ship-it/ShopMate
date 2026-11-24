@@ -14,6 +14,7 @@ import ExpenseOverview from '../../components/ExpenseOverview';
 import Loader from '../../components/Loader';
 import ErrorModal from '../../components/ErrorModal';
 import styles from '../Dashboard/style';
+import { t } from '../../i18n';
 const Design = ({
   navigation,
   selectedTab,
@@ -41,10 +42,10 @@ const Design = ({
   const filterData = [
     {
       id: 'Today',
-      label: 'Today',
+      label: t('period.today'),
     },
-    { id: 'This Week', label: 'This Week' },
-    { id: 'This Month', label: 'This Month' },
+    { id: 'This Week', label: t('period.thisWeek') },
+    { id: 'This Month', label: t('period.thisMonth') },
   ];
 
   return (
@@ -96,7 +97,7 @@ const Design = ({
             visible={errorModal}
             onClose={() => setErrorModal(false)}
             errorMessage={errorMessage}
-            text="Dashboard Failed!"
+            text={t('home.failed')}
             setErrorMessage={setErrorMessage}
             icon="error-outline"
           />

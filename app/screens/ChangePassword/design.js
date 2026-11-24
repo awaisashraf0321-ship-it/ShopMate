@@ -7,15 +7,16 @@ import LeadgerHeader from '../../components/LeadgerHeader';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import { AppText, Button, Card, TextField } from '../../ui';
 import styles from './style';
+import { t } from '../../i18n';
 
 const validationSchema = Yup.object({
-  currentPassword: Yup.string().required('Current password is required'),
+  currentPassword: Yup.string().required(() => t('password.currentRequired')),
   newPassword: Yup.string()
-    .required('New password is required')
-    .min(6, 'Password must be at least 6 characters'),
+    .required(() => t('password.newRequired'))
+    .min(6, () => t('password.min')),
   confirmNewPassword: Yup.string()
-    .required('Confirm new password is required')
-    .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+    .required(() => t('password.confirmRequired'))
+    .oneOf([Yup.ref('newPassword')], () => t('password.match')),
 });
 
 const fieldError = (touched, errors, name) =>
@@ -28,8 +29,8 @@ const Design = ({ navigation, handlePassword, loading }) => (
       showDropdown={false}
       showBack
       showPlus={false}
-      title="Change Password"
-      subTitle="Update your account password"
+      title={t('password.title')}
+      subTitle={t('password.subtitle')}
       back={() => navigation.goBack()}
     />
     <LeadgerHeader gaping={false} btn={false} navigation={navigation} />
@@ -67,14 +68,14 @@ const Design = ({ navigation, handlePassword, loading }) => (
                 color="textSecondary"
                 style={styles.intro}
               >
-                Your new password must be at least 6 characters.
+                {t('password.rule')}
               </AppText>
               <TextField
                 inset={false}
                 password
-                label="Current password"
+                label={t('password.current')}
                 icon="lock-outline"
-                placeholder="Enter your current password"
+                placeholder={t('password.currentPlaceholder')}
                 value={values.currentPassword}
                 onChangeText={handleChange('currentPassword')}
                 onBlur={handleBlur('currentPassword')}
@@ -83,9 +84,9 @@ const Design = ({ navigation, handlePassword, loading }) => (
               <TextField
                 inset={false}
                 password
-                label="New password"
+                label={t('password.new')}
                 icon="lock-reset"
-                placeholder="Enter a new password"
+                placeholder={t('password.newPlaceholder')}
                 value={values.newPassword}
                 onChangeText={handleChange('newPassword')}
                 onBlur={handleBlur('newPassword')}
@@ -94,9 +95,9 @@ const Design = ({ navigation, handlePassword, loading }) => (
               <TextField
                 inset={false}
                 password
-                label="Confirm new password"
+                label={t('password.confirm')}
                 icon="lock-reset"
-                placeholder="Re-enter the new password"
+                placeholder={t('password.confirmPlaceholder')}
                 value={values.confirmNewPassword}
                 onChangeText={handleChange('confirmNewPassword')}
                 onBlur={handleBlur('confirmNewPassword')}
@@ -104,7 +105,7 @@ const Design = ({ navigation, handlePassword, loading }) => (
               />
             </Card>
             <Button
-              title="Change password"
+              title={t('password.title')}
               icon="check-circle-outline"
               onPress={handleSubmit}
               loading={loading}

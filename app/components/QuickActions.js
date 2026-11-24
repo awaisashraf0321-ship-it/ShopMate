@@ -3,39 +3,52 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useModule } from './ModuleContext';
 import { theme } from '../theme';
+import { GAVE, GOT } from '../helpers/moneyWords';
 import { AppText } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes, shadows } = theme;
 
-const ACTIONS = {
+const getActions = () => ({
   self: {
-    label: 'Add Self Expenses',
+    label: t('home.addSelf'),
     icon: 'account-balance-wallet',
     screen: 'SelfExpense',
   },
   business: {
-    label: 'Business Expense',
+    label: t('home.business'),
     icon: 'business-center',
     screen: 'BusinessExpense',
   },
-  loan: { label: 'Outgoing Payments', icon: 'payments', screen: 'Loan' },
+  loan: {
+    label: GAVE.label,
+    icon: GAVE.icon,
+    screen: 'Loan',
+    color: GAVE.color,
+  },
   incoming: {
-    label: 'Incoming Payments',
-    icon: 'call-received',
+    label: GOT.label,
+    icon: GOT.icon,
     screen: 'InComing',
+    color: GOT.color,
   },
   monthly: {
-    label: 'Monthly Budget',
+    label: t('home.monthly'),
     icon: 'calendar-month',
     screen: 'Monthly',
   },
-  customer: { label: 'Add Customer', icon: 'person', screen: 'AddCustomer' },
-};
+  customer: { label: t('customer.new'), icon: 'person', screen: 'AddCustomer' },
+  customers: {
+    label: t('home.customers'),
+    icon: 'groups',
+    screen: 'Customers',
+  },
+});
 
 // Which four shortcuts each module shows, in order.
 const BY_MODULE = {
   'Self Expense': ['self', 'loan', 'incoming', 'monthly'],
-  'Business Expense': ['business', 'loan', 'incoming', 'customer'],
+  'Business Expense': ['business', 'loan', 'incoming', 'customers'],
 };
 
 /** Four shortcut tiles under the balance card; set depends on the module. */
@@ -46,11 +59,41 @@ const QuickActions = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <AppText variant="title" style={styles.title}>
-        Quick Actions
+        {t('home.quickActions')}
       </AppText>
+      <Pressable
+        onPress={() =>
+          navigation.navigate(
+            selectedModule === 'Self Expense'
+              ? 'SelfExpense'
+              : 'BusinessExpense',
+            { startVoice: true },
+          )
+        }
+        style={({ pressed }) => [styles.voice, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={t('home.voice')}
+      >
+        <View style={styles.voiceIcon}>
+          <Icon name="mic" size={sizes.icon.lg} color={colors.onPrimary} />
+        </View>
+        <View style={styles.voiceText}>
+          <AppText variant="bodyStrong" color="onPrimary">
+            {t('home.voice')}
+          </AppText>
+          <AppText variant="caption" color="onPrimaryMuted" numberOfLines={1}>
+            {t('home.voiceExample')}
+          </AppText>
+        </View>
+        <Icon
+          name="chevron-right"
+          size={sizes.icon.lg}
+          color={colors.onPrimary}
+        />
+      </Pressable>
       <View style={styles.row}>
         {keys.map(key => {
-          const action = ACTIONS[key];
+          const action = getActions()[key];
           return (
             <Pressable
               key={key}
@@ -63,7 +106,7 @@ const QuickActions = ({ navigation }) => {
                 <Icon
                   name={action.icon}
                   size={sizes.icon.lg}
-                  color={colors.primary}
+                  color={colors[action.color] ?? colors.primary}
                 />
               </View>
               <AppText
@@ -107,6 +150,26 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   pressed: { opacity: 0.8 },
+  voice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  voiceIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.onPrimarySurface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  voiceText: { flex: 1, gap: 2 },
   icon: {
     width: 48,
     height: 48,

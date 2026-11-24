@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../helpers/sizeHelper';
 import SearchBar from '../components/SearchBar';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const SentToInput = ({
   search,
@@ -31,7 +32,7 @@ const SentToInput = ({
   cusLength,
   onDelete,
   SetDeleteModal4,
-  placeholder = 'Choose a Customer',
+  placeholder = t('money.chooseCustomer'),
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -114,7 +115,9 @@ const SentToInput = ({
                 onPress={event => event.stopPropagation()}
               >
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Choose Customer</Text>
+                  <Text style={styles.modalTitle}>
+                    {t('money.chooseCustomer')}
+                  </Text>
 
                   <TouchableOpacity
                     style={styles.iconBorder}
@@ -140,7 +143,7 @@ const SentToInput = ({
                       <SearchBar
                         search={search}
                         setSearch={setSearch}
-                        placeholder="Search by name"
+                        placeholder={t('common.searchName')}
                         style1={{
                           backgroundColor: theme.colors.surfaceMuted,
                           width: '100%',
@@ -160,19 +163,28 @@ const SentToInput = ({
                             color={theme.colors.primary}
                           />
 
-                          <Text style={styles.CusText}>Add new Customer</Text>
+                          <Text style={styles.CusText}>
+                            {t('money.addNewCustomer')}
+                          </Text>
                         </TouchableOpacity>
                       </View>
 
                       <View style={styles.cusLen}>
                         <Text style={styles.cusLenText}>
-                          ALL CUSTOMERS .{cusLength}
+                          ALL CUSTOMERS · {cusLength ?? getNames?.length ?? 0}
                         </Text>
+                        {onDelete ? (
+                          <Text style={styles.deleteHint}>
+                            {t('money.deleteHint')}
+                          </Text>
+                        ) : null}
                       </View>
                     </View>
                   }
                   ListEmptyComponent={
-                    <Text style={styles.emptyText}>No customers found</Text>
+                    <Text style={styles.emptyText}>
+                      {t('customer.noneFound')}
+                    </Text>
                   }
                   renderItem={({ item }) => {
                     const name = String(item.Name || 'Unknown').toUpperCase();
@@ -210,6 +222,15 @@ const SentToInput = ({
                             sentTo === item.Name && styles.selected,
                           ]}
                           onPress={() => handleSelect(item)}
+                          // Deleting is a long press, so a quick tap while
+                          // choosing someone can never delete them.
+                          onLongPress={
+                            onDelete ? () => onDelete(item) : undefined
+                          }
+                          delayLongPress={600}
+                          accessibilityHint={
+                            onDelete ? 'Press and hold to delete' : undefined
+                          }
                         >
                           <View
                             style={[
@@ -226,13 +247,6 @@ const SentToInput = ({
                           </View>
 
                           <Text style={styles.optionText}>{item.Name}</Text>
-                          <TouchableOpacity onPress={() => onDelete(item)}>
-                            <Icon
-                              name="delete"
-                              size={sizeHelper.calHp(60)}
-                              color="red"
-                            />
-                          </TouchableOpacity>
                           {sentTo === item.Name && (
                             <View style={styles.tickBorder}>
                               <Icon
@@ -327,6 +341,12 @@ const styles = StyleSheet.create({
 
   placeholder: {
     color: theme.colors.textMuted,
+  },
+
+  deleteHint: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+    marginTop: theme.spacing.xs,
   },
 
   overlay: {

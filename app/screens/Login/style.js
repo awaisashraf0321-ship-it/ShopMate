@@ -70,6 +70,25 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
 
+  phoneChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+  },
+  forgot: { alignSelf: 'center' },
+  statusLine: {
+    minHeight: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.xl,
+  },
+
   remember: {
     flexDirection: 'row',
     alignItems: 'center',

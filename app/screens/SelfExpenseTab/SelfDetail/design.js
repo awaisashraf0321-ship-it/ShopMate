@@ -1,5 +1,6 @@
 import { Text, View, RefreshControl } from 'react-native';
 import React from 'react';
+import { deleteExpensePrompt } from '../../../helpers/moneyWords';
 import styles from '../SelfDetail/style';
 import LeadgerHeader from '../../../components/LeadgerHeader';
 import Loader from '../../../components/Loader';
@@ -9,6 +10,7 @@ import sizeHelper from '../../../helpers/sizeHelper';
 import ConfirmModal from '../../../components/ConfirmModal';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
 import { categoryStyle } from '../../../theme';
+import { t } from '../../../i18n';
 const Design = ({
   Get,
   navigation,
@@ -36,9 +38,9 @@ const Design = ({
         showPlus={false}
       />
       <LeadgerHeader
-        title={'Self Expense Details'}
-        subTitle={'View and manage Self Expense information'}
-        btnText={'Save'}
+        title={t('expense.selfDetails')}
+        subTitle={t('expense.detailsSubtitle')}
+        btnText={t('common.save')}
         btn={false}
         plus={false}
         navigation={navigation}
@@ -75,10 +77,9 @@ const Design = ({
           visible={deleteModal3}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          title={deleteExpensePrompt().title}
+          deleteText={t('delete.button')}
+          subTitle1={deleteExpensePrompt().subTitle1}
           onClose={() => SetDeleteModal3(false)}
           onOk={() => {
             handleDelete(selectedPaymentId3);

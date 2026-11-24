@@ -14,7 +14,7 @@ const SavePayment = ({
   loading = false,
   disabled = false,
   compact = false,
-  title = 'Save Payment',
+  title = 'Save',
 }) => {
   return (
     <View style={compact ? styles.compact : styles.container}>

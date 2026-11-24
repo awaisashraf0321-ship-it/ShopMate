@@ -4,6 +4,9 @@ import React from 'react';
 import Design from './design';
 import { useState } from 'react';
 import { IngoingPayments } from '../../api/IngoingPayments';
+import Toast from 'react-native-toast-message';
+import { GOT, missingPaymentField } from '../../helpers/moneyWords';
+import { friendlyError, serverMessage } from '../../helpers/session';
 import ErrorModal from '../../components/ErrorModal';
 import { useModule } from '../../components/ModuleContext';
 import { GetLookups } from '../../api/IngoingPayments';
@@ -14,11 +17,15 @@ import { CustomerDelete } from '../../api/CustomerApi';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-const InComingScreen = ({ navigation }) => {
+import { t } from '../../i18n';
+const InComingScreen = ({ navigation, route }) => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [sentTo, setSentTo] = useState('');
-  const [paymentMode, setPaymentMode] = useState(null);
+  // Opened from a customer's page: that customer is already chosen.
+  const fromCustomer = route?.params?.customerId != null;
+  const [sentTo, setSentTo] = useState(route?.params?.customerName ?? '');
+  // Most payments are cash, so start there.
+  const [paymentMode, setPaymentMode] = useState(1);
   const [note, setNote] = useState('');
   const [showDate, setShowDate] = useState(false);
   const [showTime, setShowTime] = useState(false);
@@ -27,7 +34,9 @@ const InComingScreen = ({ navigation }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [activeModal, setActiveModal] = useState(false);
-  const [selectedCustomerId1, setSelectedCustomerId1] = useState(null);
+  const [selectedCustomerId1, setSelectedCustomerId1] = useState(
+    route?.params?.customerId ?? null,
+  );
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [imageUri2, setImageUri2] = useState(null);
   const [base64Image2, setBase64Image2] = useState(null);
@@ -40,9 +49,9 @@ const InComingScreen = ({ navigation }) => {
   const { selectedModule } = useModule();
   const moduleId = selectedModule === 'Self Expense' ? 1 : 2;
   const handleIncomingPayments = async () => {
-    if (!amount || !sentTo || !paymentMode) {
-      setErrorMessage('Please fill all inputs');
-      setShowErrorModal(true);
+    const missing = missingPaymentField({ amount, party: sentTo, words: GOT });
+    if (missing) {
+      Toast.show({ type: 'error', text1: missing });
       return;
     }
     try {
@@ -61,15 +70,34 @@ const InComingScreen = ({ navigation }) => {
       const data = await response.json();
       console.log('IngoingPayments response', data);
       if (response.ok && data.Status === 201) {
-        console.log('Incoming payments sucessfully added');
-        navigation.navigate('MainTabs', {
-          screen: 'DashboardTab',
+        Toast.show({
+          type: 'success',
+          text1: GOT.saved({
+            amount: Number(amount).toLocaleString(),
+            name: sentTo,
+          }),
         });
+        if (fromCustomer) {
+          navigation.goBack();
+        } else {
+          navigation.navigate('MainTabs', {
+            screen: 'DashboardTab',
+          });
+        }
       } else {
-        console.log('Incoming payments sucessfully added');
+        Toast.show({
+          type: 'error',
+          text1: t('money.notSaved'),
+          text2: serverMessage(data) || t('common.tryAgain'),
+        });
       }
     } catch (error) {
       console.log('Ingoing Payment Error:', error.message);
+      Toast.show({
+        type: 'error',
+        text1: t('money.notSaved'),
+        text2: friendlyError(error),
+      });
     } finally {
       setLoading(false);
     }
@@ -188,7 +216,7 @@ const InComingScreen = ({ navigation }) => {
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}
-        text={'Ingoing Payments Failed!'}
+        text={t('money.notSaved')}
         errorMessage={errorMessage}
       />
       <Design

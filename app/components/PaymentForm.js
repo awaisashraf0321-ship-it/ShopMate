@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,8 +16,12 @@ import PaymentMethod from './PaymentMethod';
 import SavePayment from './SavePayment';
 import SentToInput from './SentToInput';
 import { theme } from '../theme';
+import { AppText } from '../ui';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Pressable } from 'react-native';
+import { t } from '../i18n';
 
-const { colors, spacing } = theme;
+const { colors, spacing, sizes } = theme;
 
 /**
  * Shared layout for the payment forms (New Outgoing Payment, Incoming
@@ -47,10 +51,13 @@ export default function PaymentForm({
   setNote,
   onFieldFocus,
   onSave,
-  saveTitle = 'Save Payment',
+  saveTitle = t('common.save'),
   children,
 }) {
   const focus = value => onFieldFocus?.(value);
+  // The note is optional: show a small "Add a note" link until it's wanted.
+  const [noteOpen, setNoteOpen] = useState(Boolean(note));
+  const showNote = noteOpen || Boolean(note);
 
   return (
     <View style={styles.screen}>
@@ -84,6 +91,7 @@ export default function PaymentForm({
             amountTitle={amountTitle}
             placeholder="0"
             handleAmountChange={handleAmountChange}
+            autoFocus
             onFocus={() => focus(true)}
             onBlur={() => focus(false)}
           />
@@ -102,20 +110,38 @@ export default function PaymentForm({
             <PaymentMethod amount={amount} {...payment} />
           </View>
 
-          <View style={styles.section}>
-            <NoteInput
-              note={note}
-              setNote={setNote}
-              onFocus={() => {
-                focus(true);
-                setTimeout(
-                  () => scrollRef?.current?.scrollToEnd({ animated: true }),
-                  150,
-                );
-              }}
-              onBlur={() => focus(false)}
-            />
-          </View>
+          {!showNote ? (
+            <Pressable
+              onPress={() => setNoteOpen(true)}
+              style={({ pressed }) => [
+                styles.addNote,
+                pressed && styles.pressed,
+              ]}
+              accessibilityRole="button"
+              hitSlop={8}
+            >
+              <Icon name="add" size={sizes.icon.md} color={colors.primary} />
+              <AppText variant="bodyStrong" color="primary">
+                {t('money.addNote')}
+              </AppText>
+            </Pressable>
+          ) : (
+            <View style={styles.section}>
+              <NoteInput
+                autoFocus={noteOpen && !note}
+                note={note}
+                setNote={setNote}
+                onFocus={() => {
+                  focus(true);
+                  setTimeout(
+                    () => scrollRef?.current?.scrollToEnd({ animated: true }),
+                    150,
+                  );
+                }}
+                onBlur={() => focus(false)}
+              />
+            </View>
+          )}
         </ScrollView>
 
         <View style={styles.footer}>
@@ -140,6 +166,16 @@ const styles = StyleSheet.create({
   section: {
     marginTop: spacing.lg,
   },
+  addNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  pressed: { opacity: 0.7 },
   footer: {
     backgroundColor: colors.background,
     borderTopWidth: StyleSheet.hairlineWidth,

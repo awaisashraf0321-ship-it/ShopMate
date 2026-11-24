@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, SegmentedControl } from '../ui';
-import { MODULE_OPTIONS, useModule } from './ModuleContext';
+import { MODULE_OPTIONS, useModule, useSwitchModule } from './ModuleContext';
 
 const AVATAR = 44;
 
@@ -15,7 +15,8 @@ const AVATAR = 44;
  */
 const Header = ({ navigation, title, subTitle, initial }) => {
   const insets = useSafeAreaInsets();
-  const { selectedModule, myModule } = useModule();
+  const { selectedModule } = useModule();
+  const switchModule = useSwitchModule();
 
   return (
     <View
@@ -40,9 +41,7 @@ const Header = ({ navigation, title, subTitle, initial }) => {
         <SegmentedControl
           options={MODULE_OPTIONS}
           value={selectedModule}
-          onChange={value => {
-            if (value !== selectedModule) myModule(value);
-          }}
+          onChange={switchModule}
           size="sm"
         />
 

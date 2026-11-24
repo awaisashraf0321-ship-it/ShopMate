@@ -1,5 +1,7 @@
 import { View } from 'react-native';
 import React from 'react';
+import Toast from 'react-native-toast-message';
+import { friendlyError, serverMessage } from '../../helpers/session';
 import Design from '../Montly Budget/design';
 import { useState, useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,6 +15,7 @@ import {
   usePullToRefresh,
   useRefreshOnFocus,
 } from '../../hooks/queries';
+import { t } from '../../i18n';
 const MonthlyBudgetScreen = ({ navigation }) => {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
@@ -40,7 +43,7 @@ const MonthlyBudgetScreen = ({ navigation }) => {
   const handleMonthly = async () => {
     try {
       if (!category || !expenseAmount) {
-        setErrorMessage('Please select category and enter expense amount.');
+        setErrorMessage(t('budget.chooseAndType'));
         setShowErrorModal(true);
         return;
       }
@@ -63,10 +66,22 @@ const MonthlyBudgetScreen = ({ navigation }) => {
       const data = await response.json();
       console.log('Monthly Api Budget response', data);
       if (response.ok) {
+        Toast.show({ type: 'success', text1: t('expense.saved') });
         await Promise.all([refetch(), refetchSummary()]);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: t('expense.notSaved'),
+          text2: serverMessage(data) || t('common.tryAgain'),
+        });
       }
     } catch (error) {
       console.log('get api error', error);
+      Toast.show({
+        type: 'error',
+        text1: t('expense.notSaved'),
+        text2: friendlyError(error),
+      });
     } finally {
       setLoader(false);
     }
@@ -166,9 +181,21 @@ const MonthlyBudgetScreen = ({ navigation }) => {
         await queryClient.invalidateQueries({
           queryKey: ['monthlyBudgetSummary'],
         });
+        Toast.show({ type: 'success', text1: t('common.changesSaved') });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: t('common.changesNotSaved'),
+          text2: serverMessage(data) || t('common.tryAgain'),
+        });
       }
     } catch (error) {
       console.log('Update API Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: t('common.changesNotSaved'),
+        text2: friendlyError(error),
+      });
     } finally {
       setLoader(false);
     }
@@ -216,7 +243,7 @@ const MonthlyBudgetScreen = ({ navigation }) => {
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}
-        text={'Monthly Budget Failed!'}
+        text={t('common.couldNotSave')}
         errorMessage={errorMessage}
       />
       <Design

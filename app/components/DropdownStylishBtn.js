@@ -3,9 +3,10 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { MODULE_OPTIONS, useModule } from './ModuleContext';
+import { MODULE_OPTIONS, useModule, useSwitchModule } from './ModuleContext';
 import { theme } from '../theme';
 import { AppText, SegmentedControl } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, shadows, sizes } = theme;
 
@@ -25,12 +26,15 @@ const DropdownStylishBtn = ({
   showBack = false,
   showPlus = false,
   onPlusPress,
+  // Optional round icon button on the right, e.g. { icon: 'mic', label: t('home.addByVoice'), onPress }
+  rightAction,
   back,
   title,
   subTitle,
   Margin = true,
 }) => {
-  const { selectedModule, myModule } = useModule();
+  const { selectedModule } = useModule();
+  const switchModule = useSwitchModule();
   const insets = useSafeAreaInsets();
   const showSwitch = showDropdown && !title;
 
@@ -69,9 +73,7 @@ const DropdownStylishBtn = ({
             <SegmentedControl
               options={MODULE_OPTIONS}
               value={selectedModule}
-              onChange={value => {
-                if (value !== selectedModule) myModule(value);
-              }}
+              onChange={switchModule}
               size="sm"
             />
           </View>
@@ -106,6 +108,23 @@ const DropdownStylishBtn = ({
             accessibilityLabel="Add new"
           >
             <Icon name="add" size={sizes.icon.lg} color={colors.onPrimary} />
+          </Pressable>
+        ) : rightAction ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.plusButton,
+              pressed && styles.pressed,
+            ]}
+            onPress={rightAction.onPress}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={rightAction.label}
+          >
+            <Icon
+              name={rightAction.icon}
+              size={sizes.icon.lg}
+              color={colors.onPrimary}
+            />
           </Pressable>
         ) : showBack && showSwitch ? (
           // keeps the switch centred when there's a back button but no "+"

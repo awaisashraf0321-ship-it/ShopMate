@@ -4,6 +4,9 @@ import React from 'react';
 import Design from './design';
 import { useState, useRef } from 'react';
 import { OutgoingPayment } from '../../api/OutgoingPaymentsApi';
+import Toast from 'react-native-toast-message';
+import { GAVE, missingPaymentField } from '../../helpers/moneyWords';
+import { friendlyError, serverMessage } from '../../helpers/session';
 import ErrorModal from '../../components/ErrorModal';
 import { Screen } from 'react-native-screens';
 import { useModule } from '../../components/ModuleContext';
@@ -13,12 +16,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomerDelete } from '../../api/CustomerApi';
 import { useEffect } from 'react';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { t } from '../../i18n';
 
-const LoanScreen = ({ navigation }) => {
+const LoanScreen = ({ navigation, route }) => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [sentTo, setSentTo] = useState('');
-  const [paymentMode, setPaymentMode] = useState(null);
+  // Opened from a customer's page: that customer is already chosen.
+  const fromCustomer = route?.params?.customerId != null;
+  const [sentTo, setSentTo] = useState(route?.params?.customerName ?? '');
+  // Most payments are cash, so start there.
+  const [paymentMode, setPaymentMode] = useState(1);
   const [note, setNote] = useState('');
   const [showDate, setShowDate] = useState(false);
   const [showTime, setShowTime] = useState(false);
@@ -26,7 +33,9 @@ const LoanScreen = ({ navigation }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [Loading, setLoading] = useState(false);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(
+    route?.params?.customerId ?? null,
+  );
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -41,9 +50,13 @@ const LoanScreen = ({ navigation }) => {
   const moduleId = selectedModule === 'Self Expense' ? 1 : 2;
   const handleSave = async () => {
     try {
-      if (!amount || !sentTo || !paymentMode) {
-        setErrorMessage('Please fill all inputs');
-        setShowErrorModal(true);
+      const missing = missingPaymentField({
+        amount,
+        party: sentTo,
+        words: GAVE,
+      });
+      if (missing) {
+        Toast.show({ type: 'error', text1: missing });
         return;
       }
 
@@ -66,15 +79,34 @@ const LoanScreen = ({ navigation }) => {
       console.log('Outgoing Payment Response:', data);
 
       if (response.ok) {
-        console.log('Outgoing Payment Created Successfully');
-        navigation.navigate('MainTabs', {
-          screen: 'DashboardTab',
+        Toast.show({
+          type: 'success',
+          text1: GAVE.saved({
+            amount: Number(amount).toLocaleString(),
+            name: sentTo,
+          }),
         });
+        if (fromCustomer) {
+          navigation.goBack();
+        } else {
+          navigation.navigate('MainTabs', {
+            screen: 'DashboardTab',
+          });
+        }
       } else {
-        console.log('Outgoing Payment Failed:', data);
+        Toast.show({
+          type: 'error',
+          text1: t('money.notSaved'),
+          text2: serverMessage(data) || t('common.tryAgain'),
+        });
       }
     } catch (error) {
       console.log('Outgoing Payment Error:', error.message);
+      Toast.show({
+        type: 'error',
+        text1: t('money.notSaved'),
+        text2: friendlyError(error),
+      });
     } finally {
       setLoading(false);
     }
@@ -208,7 +240,7 @@ const LoanScreen = ({ navigation }) => {
       <ErrorModal
         visible={showErrorModal}
         onClose={() => setShowErrorModal(false)}
-        text={'Outgoing Payments Failed!'}
+        text={t('money.notSaved')}
         errorMessage={errorMessage}
       />
       <Design

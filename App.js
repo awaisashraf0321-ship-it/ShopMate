@@ -8,9 +8,32 @@ import { LoaderHost } from './app/components/Loader';
 import RootStack from './app/navigation/RootStack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ModuleProvider } from './app/components/ModuleContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { ThemeProvider } from './app/theme';
-const queryClient = new QueryClient();
+import { LanguageProvider, t } from './app/i18n';
+// When loading data fails because the phone is offline, say so once,
+// instead of leaving empty screens with no explanation.
+let lastOfflineToast = 0;
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: error => {
+      const offline =
+        error?.message === 'NO_INTERNET' ||
+        /network request failed/i.test(error?.message ?? '');
+      if (!offline || Date.now() - lastOfflineToast < 10000) return;
+      lastOfflineToast = Date.now();
+      Toast.show({
+        type: 'error',
+        text1: t('common.noInternetTitle'),
+        text2: t('common.noInternetPull'),
+      });
+    },
+  }),
+});
 const toastConfig = {
   success: props => <CustomToast {...props} />,
   error: props => <CustomToast {...props} tone="error" />,
@@ -27,11 +50,13 @@ function App() {
               barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             />
 
-            <NavigationContainer>
-              <ModuleProvider>
-                <RootStack />
-              </ModuleProvider>
-            </NavigationContainer>
+            <LanguageProvider>
+              <NavigationContainer>
+                <ModuleProvider>
+                  <RootStack />
+                </ModuleProvider>
+              </NavigationContainer>
+            </LanguageProvider>
 
             {/* Full-screen spinner driven by <Loader visible /> in screens */}
             <LoaderHost />

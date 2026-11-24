@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Button } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, shadows } = theme;
 
@@ -70,7 +71,7 @@ const ConfirmModal = ({
 
           <View style={styles.row}>
             <Button
-              title="Cancel"
+              title={t('common.cancel')}
               variant="secondary"
               onPress={onClose}
               style={styles.flex}

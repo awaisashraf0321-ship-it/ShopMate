@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import sizeHelper from '../helpers/sizeHelper';
 import { theme } from '../theme';
+import { periodLabel, t } from '../i18n';
 
 const PeriodFilterModal = ({
   visible,
@@ -44,7 +45,7 @@ const PeriodFilterModal = ({
                 size={sizeHelper.calHp(34)}
                 color={theme.colors.textMuted}
               />
-              <Text style={styles.headerTitle}>Select Period</Text>
+              <Text style={styles.headerTitle}>{t('period.select')}</Text>
             </View>
 
             <TouchableOpacity
@@ -90,7 +91,7 @@ const PeriodFilterModal = ({
 
                     <View style={styles.optionTextContainer}>
                       <Text style={styles.selectedOptionTitle}>
-                        {item.title}
+                        {periodLabel(item.title)}
                       </Text>
                     </View>
 
@@ -113,7 +114,9 @@ const PeriodFilterModal = ({
                     </View>
 
                     <View style={styles.optionTextContainer}>
-                      <Text style={styles.optionTitle}>{item.title}</Text>
+                      <Text style={styles.optionTitle}>
+                        {periodLabel(item.title)}
+                      </Text>
                     </View>
 
                     <View style={styles.radioCircle} />

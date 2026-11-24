@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Swipeable } from 'react-native-gesture-handler';
 import { theme } from '../theme';
 import { AppText } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 
@@ -79,7 +80,7 @@ const PaymentCard = ({
       {editBtn && (
         <SwipeAction
           icon="edit"
-          label="Edit"
+          label={t('common.edit')}
           color={colors.warning}
           disabled={editDisabled}
           onPress={() => {
@@ -91,7 +92,7 @@ const PaymentCard = ({
       )}
       <SwipeAction
         icon="delete-outline"
-        label="Delete"
+        label={t('delete.button')}
         color={colors.danger}
         onPress={onDelete}
       />

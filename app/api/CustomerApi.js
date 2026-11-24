@@ -19,3 +19,11 @@ export const CustomerDelete = async id => {
   console.log('delete Customer resposne', data);
   return data;
 };
+
+export const getCustomerById = async id => {
+  const response = await apiFetch(
+    API_END_POINTS.CUSTOMER_GET_BY_ID.replace('{id}', id),
+    { method: 'GET' },
+  );
+  return response;
+};

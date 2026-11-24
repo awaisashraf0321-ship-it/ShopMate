@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -17,73 +18,226 @@ import { Formik } from 'formik';
 
 import style from './style';
 import ErrorModal from '../../components/ErrorModal';
+import LanguageChips from '../../components/LanguageChips';
 import { useTheme } from '../../theme';
-import { AppText, Button, SegmentedControl, TextField } from '../../ui';
+import {
+  AppText,
+  Button,
+  NumberPad,
+  PhoneDisplay,
+  PinDots,
+  TextField,
+} from '../../ui';
+import { formatPhone, PIN_LENGTH } from '../../helpers/phoneAccount';
+import { t } from '../../i18n';
 
-const loginSchema = Yup.object({
-  username: Yup.string().required('Username is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+const passwordSchema = Yup.object({
+  username: Yup.string().required(() => t('login.usernameRequired')),
+  password: Yup.string().required(() => t('login.passwordRequired')),
 });
-
-const signUpSchema = Yup.object({
-  userName: Yup.string()
-    .matches(/^\S*$/, 'Username must not contain spaces')
-    .required('Name is required'),
-  email: Yup.string()
-    .email('Please enter a valid email')
-    .required('Email is required'),
-  phoneNumber: Yup.string()
-    .matches(/^03[0-9]{9}$/, 'Enter a valid phone number')
-    .required('Phone number is required'),
-  salary: Yup.string().required('Please Enter Your Budget Salary'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .matches(/[A-Z]/, 'Password must contain at least 1 uppercase letter')
-    .required('Password is required'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Passwords must match')
-    .required('Confirm Password is required'),
-});
-
-const TABS = [
-  { value: 1, label: 'Log in' },
-  { value: 2, label: 'Sign up' },
-];
-
-const MODULES = [
-  { value: 'Self Expense', label: 'Personal' },
-  { value: 'Business Expense', label: 'Business' },
-];
 
 /** Shows a Formik error only once the field has been touched. */
 const fieldError = (touched, errors, name) =>
   touched[name] && errors[name] ? errors[name] : undefined;
 
-const Design = ({
-  activeTab,
-  setActiveTab,
+const PhoneLogin = ({
+  phoneStep,
+  phone,
+  phoneError,
+  phoneValid,
+  pin,
+  pinError,
+  wrongCount,
+  loading,
+  onDigit,
+  onBackspace,
+  onPhoneNext,
+  onChangeNumber,
+  onForgotPin,
+}) => {
+  const { colors, spacing, sizes } = useTheme();
+
+  if (phoneStep === 'number') {
+    return (
+      <>
+        <AppText variant="title" align="center">
+          {t('phone.title')}
+        </AppText>
+        <PhoneDisplay
+          phone={phone}
+          error={phoneError}
+          style={{ marginTop: spacing.lg }}
+        />
+        <NumberPad
+          onDigit={onDigit}
+          onBackspace={onBackspace}
+          style={{ marginTop: spacing.xl }}
+        />
+        <Button
+          title={t('common.next')}
+          icon="arrow-forward"
+          size="lg"
+          disabled={!phoneValid}
+          onPress={onPhoneNext}
+          style={{ marginTop: spacing.lg }}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Pressable
+        onPress={onChangeNumber}
+        disabled={loading}
+        accessibilityRole="button"
+        accessibilityLabel={`Number ${formatPhone(
+          phone,
+        )}. Tap to change number`}
+        style={[
+          style.phoneChip,
+          { backgroundColor: colors.surfaceMuted, gap: spacing.sm },
+        ]}
+      >
+        <Icon
+          name="phone-iphone"
+          size={sizes.icon.md}
+          color={colors.textSecondary}
+        />
+        <AppText variant="bodyStrong">{formatPhone(phone)}</AppText>
+        <AppText variant="label" color="primary">
+          {t('common.change')}
+        </AppText>
+      </Pressable>
+
+      <AppText
+        variant="title"
+        align="center"
+        style={{ marginTop: spacing.lg, marginBottom: spacing.lg }}
+      >
+        {t('pin.type')}
+      </AppText>
+      <PinDots length={PIN_LENGTH} filled={pin.length} errorKey={wrongCount} />
+
+      <View style={[style.statusLine, { marginTop: spacing.md }]}>
+        {loading ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : pinError ? (
+          <AppText variant="bodyStrong" color="danger" align="center">
+            {pinError}
+          </AppText>
+        ) : null}
+      </View>
+
+      <NumberPad
+        onDigit={onDigit}
+        onBackspace={onBackspace}
+        disabled={loading}
+        style={{ marginTop: spacing.md }}
+      />
+
+      <Pressable
+        onPress={onForgotPin}
+        disabled={loading}
+        accessibilityRole="button"
+        hitSlop={8}
+        style={[style.forgot, { marginTop: spacing.lg }]}
+      >
+        <AppText variant="bodyStrong" color="primary">
+          {t('pin.forgot')}
+        </AppText>
+      </Pressable>
+    </>
+  );
+};
+
+const PasswordLogin = ({
+  username,
   rememberPassword,
   setRememberPassword,
-  handleLogin,
-  errorModal,
-  setErrorModal,
-  errorMessage,
-  setErrorMessage,
+  handlePasswordLogin,
   loading,
-  loading1,
-  username,
-  signupErrorModal,
-  setSignupErrorModal,
-  signupErrorMessage,
-  setSignupErrorMessage,
-  handleSignUp,
-  selectedModule,
-  myModule,
 }) => {
   const { colors, spacing } = useTheme();
-  const isLogin = activeTab === 1;
+  return (
+    <Formik
+      enableReinitialize
+      initialValues={{ username, password: '' }}
+      validationSchema={passwordSchema}
+      onSubmit={handlePasswordLogin}
+      validateOnBlur={false}
+      validateOnChange={false}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+      }) => (
+        <>
+          <TextField
+            inset={false}
+            label={t('login.username')}
+            icon="person-outline"
+            placeholder={t('login.username')}
+            value={values.username}
+            onChangeText={handleChange('username')}
+            onBlur={handleBlur('username')}
+            error={fieldError(touched, errors, 'username')}
+          />
+          <TextField
+            inset={false}
+            password
+            label={t('login.password')}
+            icon="lock-outline"
+            placeholder={t('login.password')}
+            value={values.password}
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            error={fieldError(touched, errors, 'password')}
+          />
+          <Pressable
+            onPress={() => setRememberPassword(!rememberPassword)}
+            style={[style.remember, { gap: spacing.sm }]}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rememberPassword }}
+            hitSlop={8}
+          >
+            <Icon
+              name={rememberPassword ? 'check-box' : 'check-box-outline-blank'}
+              size={22}
+              color={rememberPassword ? colors.primary : colors.textMuted}
+            />
+            <AppText variant="body">{t('login.remember')}</AppText>
+          </Pressable>
+          <Button
+            title={t('login.button')}
+            size="lg"
+            onPress={handleSubmit}
+            loading={loading}
+            style={{ marginTop: spacing.xl }}
+          />
+        </>
+      )}
+    </Formik>
+  );
+};
+
+const Design = props => {
+  const {
+    mode,
+    setMode,
+    onCreateAccount,
+    loading,
+    errorModal,
+    setErrorModal,
+    errorMessage,
+    setErrorMessage,
+  } = props;
+  const { colors, spacing } = useTheme();
+  const isPhone = mode === 'phone';
 
   return (
     <View style={[style.root, { backgroundColor: colors.background }]}>
@@ -120,219 +274,45 @@ const Design = ({
                   />
                 </View>
               </View>
-              <AppText variant="display" color="onPrimary" style={style.center}>
-                {isLogin ? 'Welcome back' : 'Create account'}
+              <AppText variant="h1" color="onPrimary" style={style.center}>
+                {t('login.welcome')}
               </AppText>
               <AppText
                 variant="body"
                 color="onPrimaryMuted"
                 style={[style.center, { marginTop: spacing.xs }]}
               >
-                {isLogin
-                  ? 'Log in to manage your expenses and business.'
-                  : 'Track personal and business spending in one place.'}
+                {t('login.subtitle')}
               </AppText>
+              <LanguageChips onDark style={{ marginTop: spacing.lg }} />
             </SafeAreaView>
           </View>
 
           {/* Form sheet, pulled up over the header */}
           <View style={[style.sheet, { backgroundColor: colors.surface }]}>
-            <SegmentedControl
-              options={TABS}
-              value={activeTab}
-              onChange={setActiveTab}
-              style={{ marginBottom: spacing.xl }}
+            {isPhone ? <PhoneLogin {...props} /> : <PasswordLogin {...props} />}
+          </View>
+
+          {/* New users + other way to log in */}
+          <View style={[style.footer, { gap: spacing.md }]}>
+            <AppText variant="body" color="textSecondary" align="center">
+              {t('login.new')}
+            </AppText>
+            <Button
+              title={t('login.createAccount')}
+              icon="person-add-alt"
+              variant="secondary"
+              size="lg"
+              disabled={loading}
+              onPress={onCreateAccount}
             />
-
-            {isLogin ? (
-              <Formik
-                enableReinitialize
-                initialValues={{ username, password: '' }}
-                validationSchema={loginSchema}
-                onSubmit={handleLogin}
-                validateOnBlur={false}
-                validateOnChange={false}
-              >
-                {({
-                  values,
-                  errors,
-                  touched,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                }) => (
-                  <>
-                    <TextField
-                      inset={false}
-                      label="Username"
-                      icon="person-outline"
-                      placeholder="Enter your username"
-                      value={values.username}
-                      onChangeText={handleChange('username')}
-                      onBlur={handleBlur('username')}
-                      error={fieldError(touched, errors, 'username')}
-                    />
-                    <TextField
-                      inset={false}
-                      password
-                      label="Password"
-                      icon="lock-outline"
-                      placeholder="Enter your password"
-                      value={values.password}
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
-                      error={fieldError(touched, errors, 'password')}
-                    />
-
-                    <Pressable
-                      onPress={() => setRememberPassword(!rememberPassword)}
-                      style={[style.remember, { gap: spacing.sm }]}
-                      accessibilityRole="checkbox"
-                      accessibilityState={{ checked: rememberPassword }}
-                      hitSlop={8}
-                    >
-                      <Icon
-                        name={
-                          rememberPassword
-                            ? 'check-box'
-                            : 'check-box-outline-blank'
-                        }
-                        size={22}
-                        color={
-                          rememberPassword ? colors.primary : colors.textMuted
-                        }
-                      />
-                      <AppText variant="body">Remember me</AppText>
-                    </Pressable>
-
-                    <Button
-                      title="Log in"
-                      variant="primary"
-                      size="lg"
-                      onPress={handleSubmit}
-                      loading={loading}
-                      style={{ marginTop: spacing.xl }}
-                    />
-                  </>
-                )}
-              </Formik>
-            ) : (
-              <Formik
-                initialValues={{
-                  userName: '',
-                  email: '',
-                  phoneNumber: '',
-                  salary: '',
-                  password: '',
-                  confirmPassword: '',
-                }}
-                validationSchema={signUpSchema}
-                onSubmit={handleSignUp}
-                validateOnBlur={false}
-                validateOnChange={false}
-              >
-                {({
-                  values,
-                  errors,
-                  touched,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                }) => (
-                  <>
-                    <TextField
-                      inset={false}
-                      label="Username"
-                      icon="person-outline"
-                      placeholder="No spaces, e.g. ali_traders"
-                      value={values.userName}
-                      onChangeText={handleChange('userName')}
-                      onBlur={handleBlur('userName')}
-                      error={fieldError(touched, errors, 'userName')}
-                    />
-                    <TextField
-                      inset={false}
-                      label="Email"
-                      icon="mail-outline"
-                      placeholder="you@example.com"
-                      keyboardType="email-address"
-                      value={values.email}
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
-                      error={fieldError(touched, errors, 'email')}
-                    />
-                    <TextField
-                      inset={false}
-                      label="Phone number"
-                      icon="phone-iphone"
-                      placeholder="03XXXXXXXXX"
-                      keyboardType="phone-pad"
-                      maxLength={11}
-                      value={values.phoneNumber}
-                      onChangeText={handleChange('phoneNumber')}
-                      onBlur={handleBlur('phoneNumber')}
-                      error={fieldError(touched, errors, 'phoneNumber')}
-                    />
-                    <TextField
-                      inset={false}
-                      label="Monthly salary / budget"
-                      icon="account-balance-wallet"
-                      placeholder="e.g. 80000"
-                      keyboardType="number-pad"
-                      value={values.salary}
-                      onChangeText={handleChange('salary')}
-                      onBlur={handleBlur('salary')}
-                      error={fieldError(touched, errors, 'salary')}
-                    />
-
-                    <AppText
-                      variant="label"
-                      style={{ marginBottom: spacing.sm }}
-                    >
-                      What will you track?
-                    </AppText>
-                    <SegmentedControl
-                      options={MODULES}
-                      value={selectedModule}
-                      onChange={value => myModule(value)}
-                      style={{ marginBottom: spacing.lg }}
-                    />
-
-                    <TextField
-                      inset={false}
-                      password
-                      label="Password"
-                      icon="lock-outline"
-                      placeholder="At least 6 characters, 1 capital"
-                      value={values.password}
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
-                      error={fieldError(touched, errors, 'password')}
-                    />
-                    <TextField
-                      inset={false}
-                      password
-                      label="Confirm password"
-                      icon="lock-outline"
-                      placeholder="Re-enter your password"
-                      value={values.confirmPassword}
-                      onChangeText={handleChange('confirmPassword')}
-                      onBlur={handleBlur('confirmPassword')}
-                      error={fieldError(touched, errors, 'confirmPassword')}
-                    />
-
-                    <Button
-                      title="Create account"
-                      variant="primary"
-                      size="lg"
-                      onPress={handleSubmit}
-                      loading={loading1}
-                      style={{ marginTop: spacing.md }}
-                    />
-                  </>
-                )}
-              </Formik>
-            )}
+            <Button
+              title={isPhone ? t('login.withPassword') : t('login.withPhone')}
+              variant="ghost"
+              size="sm"
+              disabled={loading}
+              onPress={() => setMode(isPhone ? 'password' : 'phone')}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -341,16 +321,8 @@ const Design = ({
         visible={errorModal}
         onClose={() => setErrorModal(false)}
         errorMessage={errorMessage}
-        text="Login Failed!"
+        text={t('login.failed')}
         setErrorMessage={setErrorMessage}
-        icon="error-outline"
-      />
-      <ErrorModal
-        visible={signupErrorModal}
-        onClose={() => setSignupErrorModal(false)}
-        errorMessage={signupErrorMessage}
-        text="Sign Up Failed!"
-        setErrorMessage={setSignupErrorMessage}
         icon="error-outline"
       />
     </View>

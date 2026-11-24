@@ -1,5 +1,6 @@
 import { View, ScrollView, Text, RefreshControl } from 'react-native';
 import React from 'react';
+import { deleteExpensePrompt } from '../../helpers/moneyWords';
 import LeadgerHeader from '../../components/LeadgerHeader';
 import PaymentCard from '../../components/PaymentCard';
 import Loader from '../../components/Loader';
@@ -13,6 +14,7 @@ import Filter from '../../components/Filter';
 import FilterModal from '../../components/FilterModal';
 import { EmptyState } from '../../ui';
 import { theme, categoryStyle } from '../../theme';
+import { t } from '../../i18n';
 
 const Design = ({
   navigation,
@@ -45,10 +47,10 @@ const Design = ({
   console.log('myExpenses:', myExpenses);
   const getCategoryStyle = categoryStyle;
   const filtering = [
-    { id: 'All', label: 'All', PaymentMethodId: 0 },
-    { id: 'Cash', label: 'Cash', PaymentMethodId: 1 },
-    { id: 'Bank Transfer', label: 'Bank', PaymentMethodId: 2 },
-    { id: 'Credit Card', label: 'Credit', PaymentMethodId: 3 },
+    { id: 'All', label: t('period.all'), PaymentMethodId: 0 },
+    { id: 'Cash', label: t('money.cash'), PaymentMethodId: 1 },
+    { id: 'Bank Transfer', label: t('money.bank'), PaymentMethodId: 2 },
+    { id: 'Credit Card', label: t('money.card'), PaymentMethodId: 3 },
   ];
   const periodOptions = [
     { id: 1, title: 'Today', icon: 'today' },
@@ -72,8 +74,8 @@ const Design = ({
         onPlusPress={() => navigation.navigate('SelfExpense')}
       />
       <LeadgerHeader
-        title={'Self Expense'}
-        subTitle="Manage your personal expenses"
+        title={t('expense.self')}
+        subTitle={t('expense.selfSubtitle')}
         btn={false}
         navigation={navigation}
         plus={true}
@@ -91,7 +93,7 @@ const Design = ({
         <PaymentSummaryCard
           totalAmount={dashboard.TotalExpense}
           totalTransactions={dashboard.PaymentCount}
-          paymentText="Total Self Expense"
+          paymentText={t('expense.selfTotal')}
           formatAmount={formatAmount}
           methods={methods}
           visible={visible}
@@ -112,7 +114,7 @@ const Design = ({
         <SearchBar
           search={search}
           setSearch={setSearch}
-          placeholder="Search payee or reference"
+          placeholder={t('common.searchName')}
           onFocus={() =>
             setTimeout(() => {
               scrollRef?.current.scrollToEnd({
@@ -131,8 +133,8 @@ const Design = ({
 
         {groupedPayments.length === 0 && !Loading ? (
           <EmptyState
-            title="No Self Expense Available"
-            message="You haven't added any outgoing payments yet. Tap the plus icon above to create one."
+            title={t('expense.selfEmpty')}
+            message={t('expense.emptyMessage')}
           />
         ) : (
           groupedPayments?.map(group => (
@@ -180,10 +182,9 @@ const Design = ({
           visible={deleteModal3}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          title={deleteExpensePrompt().title}
+          deleteText={t('delete.button')}
+          subTitle1={deleteExpensePrompt().subTitle1}
           onClose={() => SetDeleteModal3(false)}
           onOk={() => {
             handleDelete(selectedPaymentId2);

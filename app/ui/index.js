@@ -10,3 +10,6 @@ export { default as FormField } from './FormField';
 export { default as AmountText, formatAmount, formatMoney } from './AmountText';
 export { default as TextField } from './TextField';
 export { default as SegmentedControl } from './SegmentedControl';
+export { default as NumberPad } from './NumberPad';
+export { default as PinDots } from './PinDots';
+export { default as PhoneDisplay } from './PhoneDisplay';

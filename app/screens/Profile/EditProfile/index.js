@@ -7,6 +7,13 @@ import { useState, useEffect } from 'react';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { profileImage } from '../../../api/Profile';
+import Toast from 'react-native-toast-message';
+import { friendlyError, serverMessage } from '../../../helpers/session';
+import {
+  isPlaceholderEmail,
+  placeholderEmail,
+} from '../../../helpers/phoneAccount';
+import { t } from '../../../i18n';
 
 const EditProfileScreen = ({ navigation, route }) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -30,7 +37,12 @@ const EditProfileScreen = ({ navigation, route }) => {
       setLoading(true);
       const myData = {
         fullName: value.userName,
-        email: value.email,
+        // The API needs an email: keep the account's placeholder if left empty.
+        email:
+          value.email?.trim() ||
+          (isPlaceholderEmail(profileData?.Email)
+            ? profileData.Email
+            : placeholderEmail(value.phoneNumber)),
         phoneNumber: value.phoneNumber,
         image: base64Image,
         removeImage: removeImage,
@@ -38,17 +50,28 @@ const EditProfileScreen = ({ navigation, route }) => {
 
       const response = await profileImage(userId?.UserId, myData);
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       console.log('UPDATE RESPONSE:', response.status);
 
       console.log('Update Profile Response:', data);
       if (response.ok) {
         setImageVersion(prev => prev + 1);
-        console.log('Updated Image URL:', data?.obj?.ImageUrl);
+        Toast.show({ type: 'success', text1: t('profile.saved') });
         navigation.goBack();
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: t('profile.notSaved'),
+          text2: serverMessage(data) || t('common.tryAgain'),
+        });
       }
     } catch (error) {
       console.log('Update Profile Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: t('profile.notSaved'),
+        text2: friendlyError(error),
+      });
     } finally {
       setLoading(false);
     }

@@ -14,6 +14,8 @@ import MainStack from './MianStack';
 
 import OnBoardingScreen from '../screens/onBoarding/index';
 
+import ForgotPinScreen from '../screens/ForgotPin/index';
+
 import { useModule } from '../components/ModuleContext';
 
 const Stack = createNativeStackNavigator();
@@ -62,6 +64,12 @@ const RootStack = () => {
       <Stack.Screen name="Auth" component={AuthStack} />
 
       <Stack.Screen name="Main" component={MainStack} />
+
+      <Stack.Screen
+        name="ForgotPin"
+        component={ForgotPinScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
     </Stack.Navigator>
   );
 };

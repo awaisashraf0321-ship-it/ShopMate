@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 import sizeHelper from '../helpers/sizeHelper';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const BudgetAmountInput = ({
   expenseAmount,
@@ -12,7 +13,7 @@ const BudgetAmountInput = ({
 }) => {
   return (
     <View style={[styles.container, compact && styles.compactContainer]}>
-      {!compact && <Text style={styles.title}>Enter Amount</Text>}
+      {!compact && <Text style={styles.title}>{t('field.enterAmount')}</Text>}
 
       <View
         style={[styles.inputWrapper, compact && styles.compactInputWrapper]}

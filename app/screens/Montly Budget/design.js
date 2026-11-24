@@ -9,6 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import React from 'react';
+import { deleteExpensePrompt } from '../../helpers/moneyWords';
 import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import AmountInput from '../../components/AmountInput';
 import CategorySelector from '../../components/CategorySelector';
@@ -26,6 +27,7 @@ import UpdateSalaryModal from '../../components/UpdateSalaryModal';
 import { EmptyState } from '../../ui';
 import BudgetOverviewCard from '../../components/BudgetOverviewCard';
 import { theme, categoryStyle } from '../../theme';
+import { t } from '../../i18n';
 
 const Design = ({
   navigation,
@@ -87,8 +89,8 @@ const Design = ({
           showDropdown={false}
           showBack={true}
           showPlus={false}
-          title="Monthly Budget"
-          subTitle=" Manage your monthly expenses"
+          title={t('budget.title')}
+          subTitle={t('budget.subtitle')}
           showIcon={true}
           back={() => navigation.goBack()}
         />
@@ -142,7 +144,7 @@ const Design = ({
             amount={amount}
             setAmount={setAmount}
             amountTitle={' Enter Salary'}
-            placeholder={'Enter Salary'}
+            placeholder={t('budget.enterSalary')}
             update={true}
             setSalaryModalVisible={setSalaryModalVisible}
             currency="Rs"
@@ -159,11 +161,15 @@ const Design = ({
                   />
                 </View>
 
-                <Text style={styles.expenseFormTitle}>Add Monthly Expense</Text>
+                <Text style={styles.expenseFormTitle}>
+                  {t('budget.addExpense')}
+                </Text>
               </View>
 
               <View style={styles.expenseFieldBlock}>
-                <Text style={styles.expenseFieldLabel}>Category</Text>
+                <Text style={styles.expenseFieldLabel}>
+                  {t('expense.category')}
+                </Text>
 
                 <CategorySelector
                   categories={categories || []}
@@ -174,13 +180,15 @@ const Design = ({
                   visible={visible}
                   setVisible={setVisible}
                   compact={true}
-                  title="Select Category"
+                  title={t('category.select')}
                 />
               </View>
 
               <View style={styles.expenseFieldsRow}>
                 <View style={styles.expenseField}>
-                  <Text style={styles.expenseFieldLabel}>Amount</Text>
+                  <Text style={styles.expenseFieldLabel}>
+                    {t('expense.amount')}
+                  </Text>
 
                   <BudgetAmountInput
                     expenseAmount={expenseAmount}
@@ -191,7 +199,9 @@ const Design = ({
                 </View>
 
                 <View style={styles.expenseField}>
-                  <Text style={styles.expenseFieldLabel}>Date</Text>
+                  <Text style={styles.expenseFieldLabel}>
+                    {t('field.date')}
+                  </Text>
 
                   <DatePicker
                     date={date}
@@ -210,17 +220,17 @@ const Design = ({
                 amount={amount}
                 onPress={handleMonthly}
                 compact={true}
-                title="Save Expense"
+                title={t('expense.save')}
               />
             </View>
 
             <View style={styles.expensesCon}>
-              <Text style={styles.expenseText}>Expense History</Text>
+              <Text style={styles.expenseText}>{t('budget.history')}</Text>
               <View style={styles.paymentCon}>
                 {getMonthlyBudget?.length === 0 ? (
                   <EmptyState
-                    title="No Monthly Expenses Added Yet"
-                    message="You haven't added any monthly expenses yet. Start adding expenses to track your spending and manage your monthly budget more effectively."
+                    title={t('budget.empty')}
+                    message={t('budget.emptyMessage')}
                   />
                 ) : (
                   getMonthlyBudget?.map(item => (
@@ -260,10 +270,9 @@ const Design = ({
                   visible={budgetDeleteModal}
                   icon="delete"
                   tone="danger"
-                  title="Are You Sure?"
-                  deleteText="Delete"
-                  subTitle1="This payment will be permanently deleted."
-                  subTitle2="Do you want to continue?"
+                  title={deleteExpensePrompt().title}
+                  deleteText={t('delete.button')}
+                  subTitle1={deleteExpensePrompt().subTitle1}
                   onClose={() => setBudgetdeleteModal(false)}
                   onOk={() => {
                     deleteBudget.mutate(selectedPaymentId2);

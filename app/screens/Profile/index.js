@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import Design from './design';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getLoginMethod } from '../../helpers/session';
 import { useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Logout } from '../../api/AuthApi';
@@ -14,6 +15,11 @@ const ProfileScreen = ({ navigation }) => {
   const [loader] = useState(false);
   const [imageVersion, setImageVersion] = useState(0);
   const queryClient = useQueryClient();
+  // PIN accounts change their PIN; others change their password.
+  const [isPinAccount, setIsPinAccount] = useState(false);
+  useEffect(() => {
+    getLoginMethod().then(method => setIsPinAccount(method === 'pin'));
+  }, []);
 
   // useEffect(() => {
   //   const galleryImageSave = async () => {
@@ -67,6 +73,7 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.root}>
       <Design
+        isPinAccount={isPinAccount}
         logoutModal={logoutModal}
         setLogoutModal={setLogoutModal}
         imageUri={imageUri}

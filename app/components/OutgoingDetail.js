@@ -1,5 +1,7 @@
 import React from 'react';
 import TransactionDetail from './TransactionDetail';
+import { GAVE, GOT } from '../helpers/moneyWords';
+import { t } from '../i18n';
 
 /**
  * Detail view for an outgoing OR incoming payment.
@@ -24,15 +26,18 @@ const OutgoingDetails = ({
   return (
     <TransactionDetail
       icon={incoming ? 'south-west' : 'north-east'}
-      title={`${incoming ? 'Received from' : 'Paid to'} ${sentTo || '-'}`}
+      title={`${(incoming ? GOT : GAVE).detailPrefix} ${sentTo || '-'}`}
       amount={formatAmount ? formatAmount(amount) : String(amount ?? '0')}
       direction={incoming ? 'in' : 'out'}
       date={formatDate ? formatDate(reciptDate) : reciptDate}
       method={paymentMode}
-      rows={[
-        { label: 'Account', value: module },
-        { label: 'Reference', value: reciptNo || id, icon: 'tag' },
-      ]}
+      // Only show a receipt number when there is one; the internal id and
+      // the Personal/Business account mean nothing to the user.
+      rows={
+        reciptNo
+          ? [{ label: t('field.receiptNo'), value: reciptNo, icon: 'tag' }]
+          : []
+      }
       description={Description}
       onDelete={onPress}
     />

@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../helpers/sizeHelper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const ModalCategorySelector = ({
   categories = [],
@@ -98,11 +99,9 @@ const ModalCategorySelector = ({
               </View>
 
               <View style={styles.headerText}>
-                <Text style={styles.modalTitle}>Select Category</Text>
+                <Text style={styles.modalTitle}>{t('category.select')}</Text>
 
-                <Text style={styles.subtitle}>
-                  Choose a category for your expense
-                </Text>
+                <Text style={styles.subtitle}>{t('category.choose')}</Text>
               </View>
 
               <TouchableOpacity

@@ -1,4 +1,6 @@
 // One typeface (Plus Jakarta Sans), one scale.
+// The smallest sizes (label, caption, overline) are a step larger than usual
+// on purpose: many ShopMate users have weaker eyesight or older phones.
 //
 // Sizes are fixed points, not screen-height ratios, so text keeps the same
 // size on every phone and still respects the user's accessibility text size.
@@ -11,7 +13,6 @@ export const fontFamily = {
   semiBold: 'PlusJakartaSans-SemiBold',
   bold: 'PlusJakartaSans-Bold',
   extraBold: 'PlusJakartaSans-ExtraBold',
-  extraBoldItalic: 'PlusJakartaSans-ExtraBoldItalic',
 };
 
 export const typography = {
@@ -22,12 +23,12 @@ export const typography = {
   subtitle: { fontFamily: fontFamily.semiBold, fontSize: 16, lineHeight: 22 },
   body: { fontFamily: fontFamily.regular, fontSize: 15, lineHeight: 22 },
   bodyStrong: { fontFamily: fontFamily.semiBold, fontSize: 15, lineHeight: 22 },
-  label: { fontFamily: fontFamily.semiBold, fontSize: 14, lineHeight: 18 },
-  caption: { fontFamily: fontFamily.regular, fontSize: 13, lineHeight: 18 },
+  label: { fontFamily: fontFamily.semiBold, fontSize: 15, lineHeight: 20 },
+  caption: { fontFamily: fontFamily.regular, fontSize: 14, lineHeight: 20 },
   overline: {
     fontFamily: fontFamily.bold,
-    fontSize: 11,
-    lineHeight: 14,
+    fontSize: 12,
+    lineHeight: 16,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },

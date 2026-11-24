@@ -9,6 +9,7 @@ import {
   useRefreshOnFocus,
   useSpendingGraph,
 } from '../../hooks/queries';
+import { t } from '../../i18n';
 
 const DashboardScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState(1);
@@ -27,7 +28,9 @@ const DashboardScreen = ({ navigation }) => {
   const { data: profile } = useProfile();
   const fullName = profile?.details?.FullName || profile?.user?.FullName || '';
   const firstName = fullName.trim().split(/\s+/)[0];
-  const welcome = firstName ? `Hi, ${firstName}` : 'Hi there';
+  const welcome = firstName
+    ? t('home.hi', { name: firstName })
+    : t('home.hiThere');
   const initial = firstName ? firstName[0].toUpperCase() : '';
 
   const formatDate1 = date => {
@@ -106,7 +109,7 @@ const DashboardScreen = ({ navigation }) => {
   // Same message the screen showed before when the summary failed to load.
   useEffect(() => {
     if (summaryError) {
-      setErrorMessage('No internet Connection');
+      setErrorMessage(t('common.noInternetTitle'));
       setErrorModal(true);
     }
   }, [summaryError]);
@@ -121,9 +124,9 @@ const DashboardScreen = ({ navigation }) => {
   const hours = currentDate.getHours();
 
   let greeting = '';
-  if (hours >= 5 && hours < 12) greeting = 'Good Morning';
-  else if (hours >= 12 && hours < 17) greeting = 'Good Afternoon';
-  else greeting = 'Good Evening';
+  if (hours >= 5 && hours < 12) greeting = t('home.greetMorning');
+  else if (hours >= 12 && hours < 17) greeting = t('home.greetAfternoon');
+  else greeting = t('home.greetEvening');
 
   const date = currentDate.toLocaleDateString('en-GB', {
     day: 'numeric',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { deleteExpensePrompt } from '../../../helpers/moneyWords';
 import {
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import Loader from '../../../components/Loader';
 import styles from '../MonthlyMain/style';
 import ConfirmModal from '../../../components/ConfirmModal';
 import { theme, categoryStyle } from '../../../theme';
+import { t } from '../../../i18n';
 const Design = ({
   navigation,
   handleMonthlyGetById,
@@ -42,8 +44,8 @@ const Design = ({
         showDropdown={false}
         showBack={true}
         showPlus={false}
-        title="Expense Detail"
-        subTitle=" Manage your  expenses details"
+        title={t('expense.detail')}
+        subTitle={t('expense.detailsSubtitle')}
         showIcon={true}
         back={() => navigation.goBack()}
       />
@@ -94,7 +96,7 @@ const Design = ({
         {/* Expense Information */}
         <View style={styles.detailsCard}>
           <View style={styles.sectionHeading}>
-            <Text style={styles.sectionTitle}>Expense Information</Text>
+            <Text style={styles.sectionTitle}>{t('expense.information')}</Text>
           </View>
 
           {/* Date */}
@@ -111,7 +113,7 @@ const Design = ({
                 color={theme.colors.warning}
               />
             </View>
-            <Text style={styles.detailLabel}>Date</Text>
+            <Text style={styles.detailLabel}>{t('field.date')}</Text>
             <Text style={styles.detailValue}>
               {formatDate(idResponse?.Date)}
             </Text>
@@ -127,7 +129,7 @@ const Design = ({
             >
               <Icon name="sell" size={23} color={theme.colors.success} />
             </View>
-            <Text style={styles.detailLabel}>Category</Text>
+            <Text style={styles.detailLabel}>{t('expense.category')}</Text>
             <Text style={styles.detailValue}>
               {idResponse?.ExpenseCategory}
             </Text>
@@ -143,7 +145,7 @@ const Design = ({
             >
               <Icon name="payments" size={23} color={theme.colors.warning} />
             </View>
-            <Text style={styles.detailLabel}>Amount</Text>
+            <Text style={styles.detailLabel}>{t('expense.amount')}</Text>
             <Text style={styles.detailValue}>
               Rs {formatAmount(idResponse?.Amount)}
             </Text>
@@ -164,16 +166,15 @@ const Design = ({
             size={sizeHelper.calHp(60)}
             color={theme.colors.danger}
           />
-          <Text style={styles.deleteButtonText}>Delete Expense</Text>
+          <Text style={styles.deleteButtonText}>{t('expense.delete')}</Text>
         </TouchableOpacity>
         <ConfirmModal
           visible={deleteModal2}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          title={deleteExpensePrompt().title}
+          deleteText={t('delete.button')}
+          subTitle1={deleteExpensePrompt().subTitle1}
           onClose={() => SetDeleteModal2(false)}
           onOk={() => {
             handleDelete.mutate(selectedPaymentId2);

@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Button } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, shadows } = theme;
 
@@ -38,7 +39,7 @@ const ErrorModal = ({ visible, text, onClose, errorMessage }) => {
             </AppText>
           ) : null}
           <AppText variant="caption" color="textMuted" style={styles.hint}>
-            Please try again.
+            {t('common.tryAgain')}
           </AppText>
 
           <Button title="OK" onPress={onClose} style={styles.button} />

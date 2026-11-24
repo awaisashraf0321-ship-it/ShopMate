@@ -14,6 +14,7 @@ export const API_END_POINTS = {
   INGOING_PAYMENTS_GET_BY_ID: '/api/IncomingPayments/getById/{id}',
   CUSTOMER_POST: '/api/Customer/post',
   CUSTOMER_DELETE: '/api/Customer/delete/{id}',
+  CUSTOMER_GET_BY_ID: '/api/Customer/getById/{id}',
   POST_EXPENSES: '/api/Expenses/post',
   LOOKUP_EXPENSE_CATEGORIES: '/api/Lookup/ExpenseCategories/Module/{moduleId}',
   GET_EXPENSES_ALL: '/api/Expenses/All',

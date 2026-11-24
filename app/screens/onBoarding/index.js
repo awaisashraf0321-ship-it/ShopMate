@@ -2,25 +2,21 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import Design from './design';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { t } from '../../i18n';
 
-const SLIDES = [
+// Keep these short and true: only promise what the app does today.
+const getSlides = () => [
   {
     key: 1,
-    title: 'Complete Financial Management',
-    text: 'Track your income, expenses, and manage your business all in one place.',
+    title: t('onboarding.khataTitle'),
+    text: t('onboarding.khataText'),
     img: require('../../assets/image/first (2).jpeg'),
   },
   {
     key: 2,
-    title: 'Manage Your Expenses',
-    text: 'Easily add and track your personal expenses with simple categories and notes.',
+    title: t('onboarding.spendTitle'),
+    text: t('onboarding.spendText'),
     img: require('../../assets/image/page2 (2).jpeg'),
-  },
-  {
-    key: 3,
-    title: 'Manage Your Employees',
-    text: 'Add employee details, manage salaries, and keep your team organized with ease.',
-    img: require('../../assets/image/page3 (2).jpeg'),
   },
 ];
 
@@ -35,7 +31,7 @@ const OnBoardingScreen = () => {
     navigation.replace('Splash');
   };
 
-  return <Design SLIDES={SLIDES} onDone={handleDone} />;
+  return <Design SLIDES={getSlides()} onDone={handleDone} />;
 };
 
 export default OnBoardingScreen;

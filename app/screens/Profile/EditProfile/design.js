@@ -18,17 +18,20 @@ import ImagePhotoOpen from '../../../components/ImagePhotoOpen';
 import Loader from '../../../components/Loader';
 import { useTheme } from '../../../theme';
 import { Button, Card, TextField } from '../../../ui';
+import { isPlaceholderEmail } from '../../../helpers/phoneAccount';
+import { t } from '../../../i18n';
 
 const API_BASE = 'https://api.app.shopmate.squarecod.com';
 
 const editScheme = Yup.object({
-  userName: Yup.string().required('Name is required'),
+  userName: Yup.string().required(() => t('profile.nameRequired')),
+  // Optional: phone + PIN accounts have no email.
   email: Yup.string()
-    .email('Please enter a valid email')
-    .required('Email is required'),
+    .trim()
+    .email(() => t('profile.emailInvalid')),
   phoneNumber: Yup.string()
-    .matches(/^03[0-9]{9}$/, 'Enter a valid phone number')
-    .required('Phone number is required'),
+    .matches(/^03[0-9]{9}$/, () => t('profile.phoneInvalid'))
+    .required(() => t('profile.phoneRequired')),
 });
 
 const fieldError = (touched, errors, name) =>
@@ -78,8 +81,8 @@ const Design = ({
         showDropdown={false}
         showBack
         showPlus={false}
-        title="Edit Profile"
-        subTitle="Update your personal information"
+        title={t('profile.edit')}
+        subTitle={t('profile.editSub')}
         back={() => navigation.goBack()}
       />
       <ScrollView
@@ -110,7 +113,7 @@ const Design = ({
               style={styles.cameraButton}
               onPress={() => setShowPhotoModal(true)}
               accessibilityRole="button"
-              accessibilityLabel="Change photo"
+              accessibilityLabel={t('photo.change')}
               hitSlop={8}
             >
               <Icon
@@ -121,7 +124,7 @@ const Design = ({
             </Pressable>
           </View>
           <Button
-            title="Change photo"
+            title={t('photo.change')}
             icon="image"
             variant="ghost"
             size="sm"
@@ -134,7 +137,9 @@ const Design = ({
         <Formik
           initialValues={{
             userName: profileData?.FullName || '',
-            email: profileData?.Email || '',
+            email: isPlaceholderEmail(profileData?.Email)
+              ? ''
+              : profileData?.Email || '',
             phoneNumber: profileData?.PhoneNumber || '',
           }}
           validationSchema={editScheme}
@@ -155,9 +160,9 @@ const Design = ({
               <Card padding="lg">
                 <TextField
                   inset={false}
-                  label="Full name"
+                  label={t('profile.fullName')}
                   icon="person-outline"
-                  placeholder="Enter full name"
+                  placeholder={t('profile.enterName')}
                   autoCapitalize="words"
                   value={values.userName}
                   onChangeText={handleChange('userName')}
@@ -166,7 +171,7 @@ const Design = ({
                 />
                 <TextField
                   inset={false}
-                  label="Email address"
+                  label={t('profile.emailOptional')}
                   icon="mail-outline"
                   placeholder="you@example.com"
                   keyboardType="email-address"
@@ -178,7 +183,7 @@ const Design = ({
                 />
                 <TextField
                   inset={false}
-                  label="Phone number"
+                  label={t('customer.phone')}
                   icon="phone-iphone"
                   placeholder="03XXXXXXXXX"
                   keyboardType="phone-pad"
@@ -190,7 +195,7 @@ const Design = ({
                 />
               </Card>
               <Button
-                title="Save changes"
+                title={t('common.saveChanges')}
                 icon="check-circle-outline"
                 onPress={handleSubmit}
                 style={styles.save}

@@ -1,8 +1,10 @@
 import React from 'react';
 import PaymentForm from '../../components/PaymentForm';
 import ConfirmModal from '../../components/ConfirmModal';
+import { GOT } from '../../helpers/moneyWords';
+import { t } from '../../i18n';
 
-/** New Incoming Payment: money received from a customer. */
+/** "You got": money someone gave the user. */
 const Design = ({
   date,
   setDate,
@@ -44,16 +46,16 @@ const Design = ({
 }) => (
   <PaymentForm
     navigation={navigation}
-    title="New Payment"
-    subTitle="Money you've received"
+    title={GOT.formTitle}
+    subTitle={GOT.formSubtitle}
     loading={Loading}
     scrollRef={scrollRef}
     amount={amount}
     setAmount={setAmount}
     handleAmountChange={handleAmountChange}
-    amountTitle="Amount received"
+    amountTitle={GOT.amountTitle}
     party={{
-      text: 'Received from',
+      text: GOT.partyLabel,
       sentTo,
       setSentTo,
       visible: activeModal,
@@ -89,10 +91,9 @@ const Design = ({
       visible={deleteModal4}
       icon="delete"
       tone="danger"
-      title="Delete this customer?"
-      deleteText="Delete"
-      subTitle1="This customer will be permanently deleted."
-      subTitle2="Do you want to continue?"
+      title={t('customer.deleteTitle')}
+      deleteText={t('delete.button')}
+      subTitle1={t('customer.deleteText')}
       onClose={() => SetDeleteModal4(false)}
       onOk={() => {
         deleteCustomer.mutate(selectedPaymentId3);

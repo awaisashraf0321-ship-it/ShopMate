@@ -1,5 +1,10 @@
 import React, { use } from 'react';
 import {
+  GAVE,
+  deletePaymentPrompt,
+  findPayment,
+} from '../../helpers/moneyWords';
+import {
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -17,9 +22,9 @@ import FilterModal from '../../components/FilterModal';
 
 import sizeHelper from '../../helpers/sizeHelper';
 import Filter from '../../components/Filter';
-import { useModule } from '../../components/ModuleContext';
 import { EmptyState } from '../../ui';
 import { theme } from '../../theme';
+import { t } from '../../i18n';
 
 const Design = ({
   navigation,
@@ -50,10 +55,10 @@ const Design = ({
   setPaymentMethodId,
 }) => {
   const filtering = [
-    { id: 'All', label: 'All', PaymentMethodId: 0 },
-    { id: 'Cash', label: 'Cash', PaymentMethodId: 1 },
-    { id: 'Bank Transfer', label: 'Bank', PaymentMethodId: 2 },
-    { id: 'Credit Card', label: 'Credit', PaymentMethodId: 3 },
+    { id: 'All', label: t('period.all'), PaymentMethodId: 0 },
+    { id: 'Cash', label: t('money.cash'), PaymentMethodId: 1 },
+    { id: 'Bank Transfer', label: t('money.bank'), PaymentMethodId: 2 },
+    { id: 'Credit Card', label: t('money.card'), PaymentMethodId: 3 },
   ];
   const periodOptions = [
     { id: 1, title: 'Today', icon: 'today' },
@@ -65,7 +70,6 @@ const Design = ({
       icon: 'apps',
     },
   ];
-  const { selectedModule } = useModule();
   return (
     <View style={styles.main}>
       <DropdownStylishBtn
@@ -79,12 +83,8 @@ const Design = ({
       />
 
       <LeadgerHeader
-        title={
-          selectedModule === 'Self Expense'
-            ? 'Sending Payments'
-            : 'Outgoing Payments'
-        }
-        subTitle="Money you've paid out from this account"
+        title={GAVE.label}
+        subTitle={GAVE.listSubtitle}
         btn={false}
         navigation={navigation}
         plus={true}
@@ -102,7 +102,7 @@ const Design = ({
           totalAmount={outgoingdashboard.TotalOutgoing}
           totalTransactions={outgoingdashboard.OutgoingCount}
           methods={methods}
-          paymentText="Total sent"
+          paymentText={GAVE.total}
           paymentType="Outgoing"
           paymentPercentage="Outgoing"
           formatAmount={formatAmount}
@@ -115,7 +115,7 @@ const Design = ({
         <SearchBar
           search={search}
           setSearch={setSearch}
-          placeholder="Search payee or reference"
+          placeholder={t('common.searchName')}
         />
         <FilterModal
           visible={visible}
@@ -133,10 +133,7 @@ const Design = ({
         />
 
         {payment.length === 0 && !loading ? (
-          <EmptyState
-            title="No Outgoing Payments Available"
-            message="You haven't recorded any outgoing payments yet. Tap the plus icon above to create one."
-          />
+          <EmptyState title={GAVE.emptyTitle} message={GAVE.emptyMessage} />
         ) : (
           groupedPayments.map(group => (
             <View key={group.date} style={styles.dateGroup}>
@@ -184,10 +181,11 @@ const Design = ({
           visible={deleteModal}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          {...deletePaymentPrompt(
+            GAVE,
+            findPayment(groupedPayments, selectedPaymentId),
+          )}
+          deleteText={t('delete.button')}
           onClose={() => SetDeleteModal(false)}
           onOk={() => {
             handleDelete(selectedPaymentId);

@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import sizeHelper from '../helpers/sizeHelper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
   return (
@@ -28,7 +29,7 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
             <View
               style={{ flexDirection: 'row', justifyContent: 'space-between' }}
             >
-              <Text style={styles.title}>Update Photo</Text>
+              <Text style={styles.title}>{t('photo.update')}</Text>
               <TouchableOpacity
                 onPress={onDelete}
                 accessibilityRole="button"
@@ -52,7 +53,7 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
                 />
               </View>
 
-              <Text style={styles.optionText}>Camera</Text>
+              <Text style={styles.optionText}>{t('photo.camera')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.option} onPress={onGallery}>
@@ -64,11 +65,11 @@ const PhotoModal = ({ visible, onClose, onCamera, onGallery, onDelete }) => {
                 />
               </View>
 
-              <Text style={styles.optionText}>Gallery</Text>
+              <Text style={styles.optionText}>{t('photo.gallery')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.cancel} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

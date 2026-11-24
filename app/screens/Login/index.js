@@ -1,135 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import Design from '../../screens/Login/design';
-import { login } from '../../api/AuthApi';
-import { postSignUp } from '../../api/AuthApi';
+import React, { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from 'react-native-toast-message';
-import { useModule } from '../../components/ModuleContext';
-const LoginScreen = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState(1);
 
-  const [rememberPassword, setRememberPassword] = useState(false);
+import Design from './design';
+import {
+  PHONE_LENGTH,
+  PIN_LENGTH,
+  isValidPhone,
+  normalizePhone,
+  phoneProblem,
+} from '../../helpers/phoneAccount';
+import {
+  friendlyError,
+  getRememberedPhone,
+  goToApp,
+  logIn,
+  logInWithPhone,
+  setLoginMethod,
+} from '../../helpers/session';
+import { t } from '../../i18n';
+
+const LoginScreen = ({ navigation, route }) => {
+  // 'phone' = mobile number + PIN (default); 'password' = old username login
+  const [mode, setMode] = useState('phone');
+  const [phoneStep, setPhoneStep] = useState('number'); // 'number' | 'pin'
+  const [phone, setPhone] = useState('');
+  const [pin, setPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [wrongCount, setWrongCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  // Old username + password login
   const [username, setUsername] = useState('');
+  const [rememberPassword, setRememberPassword] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [signupErrorModal, setSignupErrorModal] = useState(false);
-  const [signupErrorMessage, setSignupErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loading1, setLoading1] = useState(false);
+
+  const timer = useRef(null);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  // Start at the PIN when we know the number: from sign-up, or last login.
+  const paramPhone = route?.params?.phone;
   useEffect(() => {
-    const loadSavedUsername = async () => {
-      const savedUsername = await AsyncStorage.getItem('rememberedUsername');
-      if (savedUsername) {
-        setUsername(savedUsername);
-        setRememberPassword(true);
+    const load = async () => {
+      const known = normalizePhone(paramPhone || (await getRememberedPhone()));
+      if (isValidPhone(known)) {
+        setPhone(known);
+        setPin('');
+        setPinError('');
+        setPhoneStep('pin');
+        setMode('phone');
       }
     };
-    loadSavedUsername();
+    load();
+  }, [paramPhone]);
+
+  useEffect(() => {
+    AsyncStorage.getItem('rememberedUsername')
+      .then(saved => {
+        if (saved) {
+          setUsername(saved);
+          setRememberPassword(true);
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  const handleLogin = async value => {
+  const submitPin = async value => {
+    setLoading(true);
+    setPinError('');
     try {
-      setLoading(true);
-      console.log('loading true');
-      const fields = {
-        username: value.username,
-        password: value.password,
-      };
-      const response = await login(fields);
-      const data = await response.json();
-
-      if (response.ok && data.Status === 200) {
-        await AsyncStorage.setItem('accessToken', data.obj.Accesstoken);
-        await AsyncStorage.setItem('refreshToken', data.obj.Refreshtoken);
-        if (rememberPassword) {
-          await AsyncStorage.setItem('rememberedUsername', value.username);
-        } else {
-          await AsyncStorage.removeItem('rememberedUsername');
-        }
-
-        navigation.navigate('Main');
-      } else {
-        setErrorModal(true);
-        setErrorMessage(data.Message || 'Invalid username or password.');
+      const result = await logInWithPhone({ phone, pin: value });
+      if (result.ok) {
+        goToApp(navigation);
+        return;
       }
-    } catch (error) {
-      console.log(error.Message);
-      setErrorModal(true);
-      setErrorMessage('Something Went Wrong');
+      setWrongCount(c => c + 1);
+      setPinError(t('pin.wrong'));
+    } catch (e) {
+      setPinError(friendlyError(e));
     } finally {
+      setPin('');
       setLoading(false);
-      console.log('loading false');
     }
   };
 
-  const { selectedModule, myModule } = useModule();
-  const isActive = selectedModule === 'Self Expense' ? 1 : 2;
-  const handleSignUp = async values => {
+  const onDigit = digit => {
+    if (loading) return;
+    if (phoneStep === 'number') {
+      setPhone(p => {
+        if (!p && digit === '3') return '03';
+        return p.length < PHONE_LENGTH ? p + digit : p;
+      });
+      return;
+    }
+    if (pin.length >= PIN_LENGTH) return;
+    const next = pin + digit;
+    setPin(next);
+    setPinError('');
+    if (next.length === PIN_LENGTH) {
+      timer.current = setTimeout(() => submitPin(next), 150);
+    }
+  };
+
+  const onBackspace = clearAll => {
+    const cut = v => (clearAll ? '' : v.slice(0, -1));
+    if (phoneStep === 'number') setPhone(cut);
+    else setPin(cut);
+  };
+
+  const onPhoneNext = () => {
+    if (isValidPhone(phone)) {
+      setPin('');
+      setPinError('');
+      setPhoneStep('pin');
+    }
+  };
+
+  const onChangeNumber = () => {
+    setPin('');
+    setPinError('');
+    setPhoneStep('number');
+  };
+
+  const onForgotPin = () => navigation.navigate('ForgotPin', { phone });
+
+  const onCreateAccount = () =>
+    navigation.navigate('SignUp', {
+      phone: isValidPhone(phone) ? phone : undefined,
+    });
+
+  const handlePasswordLogin = async values => {
+    setLoading(true);
     try {
-      setLoading1(true);
-      const fields = {
-        userName: values.userName,
-        email: values.email,
-        moduleId: isActive,
-        phoneNumber: values.phoneNumber,
-        salary: Number(values.salary),
+      const result = await logIn({
+        username: values.username.trim(),
         password: values.password,
-        confirmPassword: values.confirmPassword,
-      };
-      setSignupErrorModal(false);
-      setSignupErrorMessage('');
-
-      const response = await postSignUp(fields);
-
-      const data = await response.json();
-      console.log('api response', data);
-
-      console.log('Signup status:', response.status);
-      console.log('Signup response:', data);
-
-      if (response.ok && (data.Status === 201 || data.Status === 200)) {
-        Toast.show({
-          type: 'success',
-          text1: data.Message || 'Account Created Successfully',
-        });
-
-        setActiveTab(1);
+      });
+      if (result.ok) {
+        await setLoginMethod('password');
+        if (rememberPassword) {
+          await AsyncStorage.setItem(
+            'rememberedUsername',
+            values.username.trim(),
+          );
+        } else {
+          await AsyncStorage.removeItem('rememberedUsername');
+        }
+        goToApp(navigation);
       } else {
-        setSignupErrorMessage(data.Message || data.message || 'SignUp Failed');
-
-        setSignupErrorModal(true);
+        setErrorMessage(result.message || t('login.wrongPassword'));
+        setErrorModal(true);
       }
-    } catch (error) {
-      console.log('Signup error:', error.message);
-
-      setSignupErrorMessage('Something Went Wrong');
-      setSignupErrorModal(true);
+    } catch (e) {
+      setErrorMessage(friendlyError(e));
+      setErrorModal(true);
     } finally {
-      setLoading1(false);
+      setLoading(false);
     }
   };
 
   return (
     <Design
+      mode={mode}
+      setMode={setMode}
+      phoneStep={phoneStep}
+      phone={phone}
+      phoneError={phoneProblem(phone)}
+      phoneValid={isValidPhone(phone)}
+      pin={pin}
+      pinError={pinError}
+      wrongCount={wrongCount}
       loading={loading}
+      onDigit={onDigit}
+      onBackspace={onBackspace}
+      onPhoneNext={onPhoneNext}
+      onChangeNumber={onChangeNumber}
+      onForgotPin={onForgotPin}
+      onCreateAccount={onCreateAccount}
+      username={username}
+      rememberPassword={rememberPassword}
+      setRememberPassword={setRememberPassword}
+      handlePasswordLogin={handlePasswordLogin}
       errorModal={errorModal}
       setErrorModal={setErrorModal}
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-      handleLogin={handleLogin}
-      rememberPassword={rememberPassword}
-      setRememberPassword={setRememberPassword}
-      handleSignUp={handleSignUp}
-      loading1={loading1}
-      username={username}
-      signupErrorModal={signupErrorModal}
-      setSignupErrorModal={setSignupErrorModal}
-      signupErrorMessage={signupErrorMessage}
-      setSignupErrorMessage={setSignupErrorMessage}
-      selectedModule={selectedModule}
-      myModule={myModule}
     />
   );
 };

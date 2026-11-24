@@ -6,6 +6,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './style';
 import { theme } from '../../theme';
 import { AppText } from '../../ui';
+import LanguageChips from '../../components/LanguageChips';
+import { t } from '../../i18n';
 
 const Design = ({ SLIDES, onDone }) => {
   const renderItem = item => {
@@ -50,7 +52,7 @@ const Design = ({ SLIDES, onDone }) => {
   const renderSkipButton = () => {
     return (
       <AppText variant="label" color="textSecondary" style={styles.skipText}>
-        Skip
+        {t('onboarding.skip')}
       </AppText>
     );
   };
@@ -59,7 +61,7 @@ const Design = ({ SLIDES, onDone }) => {
     return (
       <View style={styles.doneButton}>
         <AppText variant="bodyStrong" color="onPrimary">
-          Get started
+          {t('onboarding.start')}
         </AppText>
         <Icon
           name={'arrow-forward'}
@@ -77,6 +79,8 @@ const Design = ({ SLIDES, onDone }) => {
         edges={['top', 'right', 'bottom', 'left']}
       >
         <StatusBar barStyle="dark-content" />
+        {/* Pick a language before reading anything else */}
+        <LanguageChips style={{ marginTop: theme.spacing.md }} />
 
         <View style={styles.sliderContainer}>
           <AppIntroSlider

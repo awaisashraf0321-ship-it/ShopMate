@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../theme';
 import { AppText, FormField } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes, shadows } = theme;
 
@@ -107,9 +108,9 @@ const CategorySelector = ({
               />
             </View>
             <View style={styles.flex}>
-              <AppText variant="title">Select Category</AppText>
+              <AppText variant="title">{t('category.select')}</AppText>
               <AppText variant="caption" color="textSecondary">
-                Choose the category for your expense
+                {t('category.choose')}
               </AppText>
             </View>
             <Pressable
@@ -139,7 +140,7 @@ const CategorySelector = ({
                 align="center"
                 style={styles.empty}
               >
-                No category found
+                {t('category.none')}
               </AppText>
             }
             renderItem={({ item }) => {

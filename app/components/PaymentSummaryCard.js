@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Card } from '../ui';
+import { periodLabel, t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 const methodColor = id => colors.paymentMethod[id] ?? colors.onPrimaryMuted;
@@ -63,7 +64,7 @@ const PaymentSummaryCard = ({
             Rs {formatAmount(totalAmount)}
           </AppText>
           <AppText variant="caption" color="onPrimaryMuted">
-            {totalTransactions} payments
+            {t('summary.payments', { n: totalTransactions })}
           </AppText>
         </View>
 
@@ -77,7 +78,7 @@ const PaymentSummaryCard = ({
           accessibilityLabel={`Period: ${selectedPeriod}. Change period`}
         >
           <AppText variant="label" color="onPrimary" numberOfLines={1}>
-            {selectedPeriod}
+            {periodLabel(selectedPeriod)}
           </AppText>
           <Icon
             name="keyboard-arrow-down"

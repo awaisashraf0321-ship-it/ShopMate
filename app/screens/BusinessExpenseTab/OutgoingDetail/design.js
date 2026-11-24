@@ -9,9 +9,11 @@ import OutgoingDetails from '../../../components/OutgoingDetail';
 import LeadgerHeader from '../../../components/LeadgerHeader';
 import sizeHelper from '../../../helpers/sizeHelper';
 import React from 'react';
+import { GAVE, deletePaymentPrompt } from '../../../helpers/moneyWords';
 import ConfirmModal from '../../../components/ConfirmModal';
 import Loader from '../../../components/Loader';
 import DropdownStylishBtn from '../../../components/DropdownStylishBtn';
+import { t } from '../../../i18n';
 
 const Design = ({
   navigation,
@@ -38,9 +40,9 @@ const Design = ({
         back={() => navigation.goBack()}
       />
       <LeadgerHeader
-        title={'Outgoing Details'}
-        subTitle={'View and manage payment information'}
-        btnText={'Save'}
+        title={GAVE.detailTitle}
+        subTitle={t('payment.detailsSubtitle')}
+        btnText={t('common.save')}
         btn={false}
         plus={false}
         navigation={navigation}
@@ -77,10 +79,8 @@ const Design = ({
           visible={deleteModal2}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          {...deletePaymentPrompt(GAVE, getPayments)}
+          deleteText={t('delete.button')}
           onClose={() => SetDeleteModal2(false)}
           onOk={() => {
             handleDelete(selectedPaymentId2);

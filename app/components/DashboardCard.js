@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { theme } from '../theme';
 import { AppText, Card, formatMoney } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 
@@ -93,7 +94,7 @@ const DashboardCard = ({
       </View>
 
       <AppText variant="label" color="onPrimaryMuted">
-        Net Balance
+        {t('home.balance')}
       </AppText>
       <AppText
         variant="display"
@@ -118,12 +119,14 @@ const DashboardCard = ({
       <View style={styles.summaryRow}>
         <Summary
           icon="arrow-down-outline"
-          label="Money in"
+          // Everything that came in or went out (payments and expenses),
+          // so not "You got / You gave", which are only money between people.
+          label={t('home.cameIn')}
           value={`Rs ${formatAmount(MoneyIn)}`}
         />
         <Summary
           icon="arrow-up-outline"
-          label="Money out"
+          label={t('home.wentOut')}
           value={`Rs ${formatAmount(MoneyOut)}`}
         />
       </View>

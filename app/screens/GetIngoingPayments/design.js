@@ -6,6 +6,11 @@ import {
   Text,
 } from 'react-native';
 import React from 'react';
+import {
+  GOT,
+  deletePaymentPrompt,
+  findPayment,
+} from '../../helpers/moneyWords';
 import LeadgerHeader from '../../components/LeadgerHeader';
 import styles from './style';
 import sizeHelper from '../../helpers/sizeHelper';
@@ -17,8 +22,8 @@ import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import SearchBar from '../../components/SearchBar';
 import Filter from '../../components/Filter';
 import FilterModal from '../../components/FilterModal';
-import { useModule } from '../../components/ModuleContext';
 import { EmptyState } from '../../ui';
+import { t } from '../../i18n';
 
 const Design = ({
   navigation,
@@ -51,10 +56,10 @@ const Design = ({
   setPaymentMethodId,
 }) => {
   const filtering = [
-    { id: 'All', label: 'All', PaymentMethodId: 0 },
-    { id: 'Cash', label: 'Cash', PaymentMethodId: 1 },
-    { id: 'Bank Transfer', label: 'Bank', PaymentMethodId: 2 },
-    { id: 'Credit Card', label: 'Credit', PaymentMethodId: 3 },
+    { id: 'All', label: t('period.all'), PaymentMethodId: 0 },
+    { id: 'Cash', label: t('money.cash'), PaymentMethodId: 1 },
+    { id: 'Bank Transfer', label: t('money.bank'), PaymentMethodId: 2 },
+    { id: 'Credit Card', label: t('money.card'), PaymentMethodId: 3 },
   ];
   const periodOptions = [
     { id: 1, title: 'Today', icon: 'today' },
@@ -66,7 +71,6 @@ const Design = ({
       icon: 'apps',
     },
   ];
-  const { selectedModule } = useModule();
   return (
     <View style={styles.main}>
       <DropdownStylishBtn
@@ -80,12 +84,8 @@ const Design = ({
       />
 
       <LeadgerHeader
-        title={
-          selectedModule === 'Self Expense'
-            ? 'Receiving Payments'
-            : 'Incoming Payments'
-        }
-        subTitle={'Manage your received payments'}
+        title={GOT.label}
+        subTitle={GOT.listSubtitle}
         btn={false}
         navigation={navigation}
         plus={true}
@@ -103,7 +103,7 @@ const Design = ({
           totalAmount={Ingoingdashboard.TotalIncoming}
           totalTransactions={Ingoingdashboard.IncomingCount}
           methods={methods}
-          paymentText="Total received"
+          paymentText={GOT.total}
           paymentType="Ingoing"
           paymentPercentage="Ingoing"
           formatAmount={formatAmount}
@@ -117,7 +117,7 @@ const Design = ({
           <SearchBar
             search={search}
             setSearch={setSearch}
-            placeholder="Search payee or reference"
+            placeholder={t('common.searchName')}
           />
           <FilterModal
             visible={visible}
@@ -135,10 +135,7 @@ const Design = ({
           />
         </View>
         {payment.length === 0 && !loading ? (
-          <EmptyState
-            title="No Incoming Payments Available"
-            message="You haven't recorded any received payments yet. Tap the plus icon above to create one."
-          />
+          <EmptyState title={GOT.emptyTitle} message={GOT.emptyMessage} />
         ) : (
           groupedPayments.map((group, index) => (
             <View key={group.date || index} style={styles.dateGroup}>
@@ -189,10 +186,11 @@ const Design = ({
           visible={deleteModal}
           icon="delete"
           tone="danger"
-          title="Are You Sure?"
-          deleteText="Delete"
-          subTitle1="This payment will be permanently deleted."
-          subTitle2="Do you want to continue?"
+          {...deletePaymentPrompt(
+            GOT,
+            findPayment(groupedPayments, selectedPaymentId),
+          )}
+          deleteText={t('delete.button')}
           onClose={() => SetDeleteModal(false)}
           onOk={() => {
             handleDelete(selectedPaymentId);

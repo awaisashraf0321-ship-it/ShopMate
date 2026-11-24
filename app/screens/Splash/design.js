@@ -4,6 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import styles from './style';
 import { useTheme } from '../../theme';
 import { AppText } from '../../ui';
+import { t } from '../../i18n';
 
 /** Brand splash shown while the stored login token is checked. */
 const Design = () => {
@@ -37,7 +38,7 @@ const Design = () => {
         color="onPrimaryMuted"
         style={{ marginTop: spacing.xs }}
       >
-        Expenses and business, in one place
+        {t('splash.tagline')}
       </AppText>
       <ActivityIndicator
         color={colors.onPrimary}

@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sizeHelper from '../helpers/sizeHelper';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
   return (
@@ -52,9 +53,9 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                     </View>
 
                     <View style={styles.headerText}>
-                      <Text style={styles.title}>Update Salary</Text>
+                      <Text style={styles.title}>{t('salary.update')}</Text>
                       <Text style={styles.subtitle}>
-                        Set your monthly salary budget.
+                        {t('salary.subtitle')}
                       </Text>
                     </View>
                   </View>
@@ -71,7 +72,7 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                 <View style={styles.divider} />
 
                 {/* Salary Amount */}
-                <Text style={styles.label}>Monthly Salary</Text>
+                <Text style={styles.label}>{t('salary.monthly')}</Text>
 
                 <View style={styles.inputWrapper}>
                   <Text style={styles.currency}>Rs</Text>
@@ -80,7 +81,7 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                     style={styles.input}
                     value={String(salary ?? '')}
                     onChangeText={setSalary}
-                    placeholder="Enter monthly salary"
+                    placeholder={t('salary.enter')}
                     placeholderTextColor={theme.colors.textMuted}
                     keyboardType="numeric"
                   />
@@ -94,9 +95,7 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                     color={theme.colors.primary}
                   />
 
-                  <Text style={styles.infoText}>
-                    Your salary will be used to manage your monthly budget.
-                  </Text>
+                  <Text style={styles.infoText}>{t('salary.note')}</Text>
                 </View>
 
                 {/* Buttons */}
@@ -106,7 +105,7 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                     onPress={onClose}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.cancelText}>Cancel</Text>
+                    <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -114,7 +113,9 @@ const UpdateSalaryModal = ({ visible, onClose, salary, setSalary }) => {
                     onPress={onClose}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.saveText}>Save Changes</Text>
+                    <Text style={styles.saveText}>
+                      {t('common.saveChanges')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>

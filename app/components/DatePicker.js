@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, FormField } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes, shadows } = theme;
 
@@ -81,7 +82,7 @@ const DatePicker = ({
     <>
       <PickerRow
         icon="calendar-today"
-        label="Date"
+        label={t('field.date')}
         value={formatDate(date)}
         compact={compact}
         onPress={() => setShowDate(true)}
@@ -90,7 +91,7 @@ const DatePicker = ({
         <View style={styles.timeRow}>
           <PickerRow
             icon="access-time"
-            label="Time"
+            label={t('field.time')}
             value={formatTime(date)}
             onPress={() => setShowTime(true)}
           />
@@ -129,7 +130,7 @@ const DatePicker = ({
     return <View style={styles.compactContainer}>{rows}</View>;
   }
   return (
-    <FormField label="Date" style={styles.field}>
+    <FormField label={t('field.date')} style={styles.field}>
       {rows}
     </FormField>
   );

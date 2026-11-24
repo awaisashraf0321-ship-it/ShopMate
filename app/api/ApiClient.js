@@ -69,7 +69,8 @@ export const apiFetch = async (endpoint, options = {}) => {
     return response;
   } catch (error) {
     if (
-      error.message?.includes('Network Request Failed') ||
+      // React Native says "Network request failed" (lowercase r).
+      /network request failed/i.test(error.message ?? '') ||
       error.message?.includes('Failed to fetch')
     ) {
       throw new Error('NO_INTERNET');

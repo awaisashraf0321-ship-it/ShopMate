@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 import sizeHelper from '../helpers/sizeHelper';
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const ModalBudgetAmountInput = ({
   expenseAmount,
@@ -12,7 +13,7 @@ const ModalBudgetAmountInput = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Expense Amount</Text> */}
+      {/* <Text style={styles.title}>{t('expense.editAmount')}</Text> */}
 
       <View style={styles.inputWrapper}>
         <Text style={styles.currency}>Rs</Text>
@@ -21,7 +22,7 @@ const ModalBudgetAmountInput = ({
           style={styles.input}
           value={String(expenseAmount ?? '')}
           onChangeText={Changed}
-          placeholder="Enter Amount"
+          placeholder={t('field.enterAmount')}
           placeholderTextColor={theme.colors.textMuted}
           keyboardType="decimal-pad"
           onFocus={onFocus}

@@ -20,6 +20,9 @@ import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import Loader from '../../components/Loader';
 import { Button } from '../../ui';
 import { theme } from '../../theme';
+import { isPlaceholderEmail } from '../../helpers/phoneAccount';
+import LanguageChips from '../../components/LanguageChips';
+import { t } from '../../i18n';
 
 const Design = ({
   photoOpenModal,
@@ -39,6 +42,7 @@ const Design = ({
   loading,
   profileRecord,
   profileRecordGet,
+  isPinAccount,
   accessToken,
   imageVersion,
   setImageVersion,
@@ -50,8 +54,8 @@ const Design = ({
         showDropdown={false}
         showBack={true}
         showPlus={false}
-        title="My Profile"
-        subTitle=" Manage your personal information"
+        title={t('profile.title')}
+        subTitle={t('profile.subtitle')}
         back={() => navigation.goBack()}
       />
       <LeadgerHeader gaping={false} btn={false} navigation={navigation} />
@@ -127,16 +131,19 @@ const Design = ({
                   {profileRecordGet?.FullName}
                 </Text>
 
-                <View style={styles.infoRow}>
-                  <Icon
-                    name="email"
-                    size={sizeHelper.calHp(22)}
-                    color={theme.colors.onPrimary}
-                  />
-                  <Text style={styles.infoText} numberOfLines={1}>
-                    {profileRecordGet?.Email}
-                  </Text>
-                </View>
+                {profileRecordGet?.Email &&
+                !isPlaceholderEmail(profileRecordGet.Email) ? (
+                  <View style={styles.infoRow}>
+                    <Icon
+                      name="email"
+                      size={sizeHelper.calHp(22)}
+                      color={theme.colors.onPrimary}
+                    />
+                    <Text style={styles.infoText} numberOfLines={1}>
+                      {profileRecordGet?.Email}
+                    </Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.infoRow}>
                   <Icon
@@ -167,7 +174,7 @@ const Design = ({
                   size={sizeHelper.calHp(20)}
                   color={theme.colors.onPrimary}
                 />
-                <Text style={styles.editButtonText}>Edit</Text>
+                <Text style={styles.editButtonText}>{t('common.edit')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -184,7 +191,9 @@ const Design = ({
                 <Text style={styles.accountTitle}>
                   {profileRecordGet?.Roles?.[0]}
                 </Text>
-                <Text style={styles.accountSubTitle}>Account Type</Text>
+                <Text style={styles.accountSubTitle}>
+                  {t('profile.accountType')}
+                </Text>
               </View>
 
               <View style={styles.accountDivider} />
@@ -197,7 +206,7 @@ const Design = ({
                     color={theme.colors.accent}
                   />
                 </View>
-                <Text style={styles.accountTitle}>Since</Text>
+                <Text style={styles.accountTitle}>{t('profile.since')}</Text>
                 <Text style={styles.accountSubTitle}>
                   {profileRecordGet?.MemberSinceLabel}
                 </Text>
@@ -216,14 +225,26 @@ const Design = ({
                 <Text style={styles.accountTitle}>
                   {profileRecordGet?.AccountStatus}
                 </Text>
-                <Text style={styles.accountSubTitle}>Account Status</Text>
+                <Text style={styles.accountSubTitle}>
+                  {t('profile.status')}
+                </Text>
               </View>
             </View>
           </View>
 
+          {/* ================= LANGUAGE ================= */}
+          <Text style={styles.sectionHeading}>
+            {t('language.title').toUpperCase()}
+          </Text>
+          <View
+            style={[styles.sectionCard, { paddingVertical: theme.spacing.md }]}
+          >
+            <LanguageChips />
+          </View>
+
           {/* ================= ACCOUNT SECTION ================= */}
 
-          <Text style={styles.sectionHeading}>ACCOUNT</Text>
+          <Text style={styles.sectionHeading}>{t('profile.account')}</Text>
           <View style={styles.sectionCard}>
             <TouchableOpacity
               style={[styles.row, styles.rowDivider]}
@@ -245,8 +266,10 @@ const Design = ({
               </View>
 
               <View style={styles.rowContent}>
-                <Text style={styles.rowText}>Personal details</Text>
-                <Text style={styles.rowSubText}>Name, email and phone</Text>
+                <Text style={styles.rowText}>{t('profile.personal')}</Text>
+                <Text style={styles.rowSubText}>
+                  {t('profile.personalSub')}
+                </Text>
               </View>
 
               <Icon
@@ -257,7 +280,11 @@ const Design = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('ChangePassword')}
+              onPress={() =>
+                isPinAccount
+                  ? navigation.navigate('ChangePin')
+                  : navigation.navigate('ChangePassword')
+              }
               style={styles.row}
               activeOpacity={0.8}
             >
@@ -270,8 +297,12 @@ const Design = ({
               </View>
 
               <View style={styles.rowContent}>
-                <Text style={styles.rowText}>Change password</Text>
-                <Text style={styles.rowSubText}>Keep your account secure</Text>
+                <Text style={styles.rowText}>
+                  {isPinAccount
+                    ? t('profile.changePin')
+                    : t('profile.changePassword')}
+                </Text>
+                <Text style={styles.rowSubText}>{t('profile.secure')}</Text>
               </View>
 
               <Icon
@@ -300,9 +331,9 @@ const Design = ({
               </View>
 
               <View style={styles.rowContent}>
-                <Text style={styles.rowText}>Notifications</Text>
+                <Text style={styles.rowText}>{t('profile.notifications')}</Text>
                 <Text style={styles.rowSubText}>
-                  Payment alerts and reminders
+                  {t('profile.notificationsSub')}
                 </Text>
               </View>
 
@@ -328,8 +359,8 @@ const Design = ({
               </View>
 
               <View style={styles.rowContent}>
-                <Text style={styles.rowText}>Language</Text>
-                <Text style={styles.rowSubText}>App display language</Text>
+                <Text style={styles.rowText}>{t('language.title')}</Text>
+                <Text style={styles.rowSubText}>{t('profile.languageSub')}</Text>
               </View>
 
               <Icon
@@ -341,7 +372,7 @@ const Design = ({
           {/* </View> */}
 
           <Button
-            title="Logout"
+            title={t('profile.logout')}
             icon="logout"
             variant="dangerOutline"
             size="lg"
@@ -353,10 +384,9 @@ const Design = ({
             visible={logoutModal}
             loader={loader}
             icon="logout"
-            title={'Are You Sure?'}
-            deleteText="Logout"
-            subTitle1={'you will be logged out from your account.'}
-            subTitle2={'Do you want to continue?'}
+            title={t('profile.logoutTitle')}
+            deleteText={t('profile.logout')}
+            subTitle1={t('profile.logoutText')}
             onClose={() => setLogoutModal(false)}
             onOk={() => handleLogout()}
           />

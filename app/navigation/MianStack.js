@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GAVE, GOT } from '../helpers/moneyWords';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -20,6 +21,9 @@ import IngoingTab from '../screens/GetIngoingPayments/index';
 import LoanScreen from '../screens/Loan/index';
 import CollectionScreen from '../screens/Collection/index';
 import ChangePasswordScreen from '../screens/ChangePassword/index';
+import ChangePinScreen from '../screens/ChangePin/index';
+import CustomersScreen from '../screens/Customers/index';
+import CustomerDetailScreen from '../screens/CustomerDetail/index';
 import StyleGuideScreen from '../screens/StyleGuide/index';
 import MonthlyBudgetScreen from '../screens/Montly Budget';
 import BusinessExpenseScreen from '../screens/Business Expense';
@@ -30,6 +34,7 @@ import EditProfileScreen from '../screens/Profile/EditProfile/index';
 import PersonalDetailScreen from '../screens/Profile/PersonalDetail/index';
 
 import { theme } from '../theme';
+import { t } from '../i18n';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -198,32 +203,32 @@ const MainTabs = () => {
     {
       name: 'DashboardTab',
       component: DashboardScreen,
-      label: 'Home',
+      label: t('tabs.home'),
       icon: 'home-filled',
     },
     {
       name: 'SelfExpensesTab',
       component: SelfExpensesModuleTab,
-      label: 'Expenses',
+      label: t('tabs.expenses'),
       icon: 'inventory-2',
     },
     {
       name: 'BusinessExpensesTab',
       component: BusinessExpensesModuleTab,
-      label: 'Expenses',
+      label: t('tabs.expenses'),
       icon: 'account-balance',
     },
     {
       name: 'OutgoingPaymentsTab',
       component: OutgoingPaymentsWrapper,
-      label: 'Sent',
-      icon: 'payments',
+      label: GAVE.label,
+      icon: GAVE.icon,
     },
     {
       name: 'IngoingTab',
       component: IngoingScreenWrapper,
-      label: 'Received',
-      icon: 'input',
+      label: GOT.label,
+      icon: GOT.icon,
     },
   ];
 
@@ -416,6 +421,12 @@ const MainStack = () => {
           <Stack.Screen
             name="ChangePassword"
             component={ChangePasswordScreen}
+          />
+          <Stack.Screen name="ChangePin" component={ChangePinScreen} />
+          <Stack.Screen name="Customers" component={CustomersScreen} />
+          <Stack.Screen
+            name="CustomerDetail"
+            component={CustomerDetailScreen}
           />
           {__DEV__ && (
             <Stack.Screen name="StyleGuide" component={StyleGuideScreen} />

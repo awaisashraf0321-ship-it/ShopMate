@@ -33,26 +33,23 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSContactsUsageDescription</key>
+	<string>ShopMate shows your phone contacts so you can add a customer with one tap. Your contacts are not uploaded.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ShopMate uses the microphone so you can add expenses by speaking.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>ShopMate turns what you say into an expense you can check before saving.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>PlusJakartaSans-Bold.ttf</string>
-		<string>PlusJakartaSans-BoldItalic.ttf</string>
 		<string>PlusJakartaSans-ExtraBold.ttf</string>
-		<string>PlusJakartaSans-ExtraBoldItalic.ttf</string>
-		<string>PlusJakartaSans-ExtraLight.ttf</string>
-		<string>PlusJakartaSans-ExtraLightItalic.ttf</string>
-		<string>PlusJakartaSans-Italic.ttf</string>
-		<string>PlusJakartaSans-Light.ttf</string>
-		<string>PlusJakartaSans-LightItalic.ttf</string>
 		<string>PlusJakartaSans-Medium.ttf</string>
-		<string>PlusJakartaSans-MediumItalic.ttf</string>
 		<string>PlusJakartaSans-Regular.ttf</string>
 		<string>PlusJakartaSans-SemiBold.ttf</string>
-		<string>PlusJakartaSans-SemiBoldItalic.ttf</string>
 		<string>MaterialIcons.ttf</string>
 		<string>Ionicons.ttf</string>
 	</array>

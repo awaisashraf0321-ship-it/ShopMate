@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Card } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 
@@ -46,30 +47,30 @@ const BudgetOverviewCard = ({ summary, formatAmount }) => {
 
   return (
     <Card padding="lg" style={styles.card}>
-      <AppText variant="title">Monthly Budget Overview</AppText>
+      <AppText variant="title">{t('budget.overview')}</AppText>
 
       <View style={styles.grid}>
         <Stat
           icon="account-balance-wallet"
-          label="Monthly Budget"
+          label={t('budget.title')}
           value={rs(summary?.MonthlySalary)}
           tone="info"
         />
         <Stat
           icon="shopping-cart"
-          label="Total Expenses"
+          label={t('budget.totalExpenses')}
           value={rs(summary?.TotalAllocatedBudget)}
           tone="warning"
         />
         <Stat
           icon="check-circle"
-          label="Remaining"
+          label={t('budget.remaining')}
           value={rs(summary?.RemainingBudget)}
           tone="success"
         />
         <Stat
           icon="warning"
-          label="Over Budget"
+          label={t('budget.over')}
           value={rs(summary?.OverBudget)}
           tone="danger"
           highlight={over}
@@ -77,7 +78,7 @@ const BudgetOverviewCard = ({ summary, formatAmount }) => {
       </View>
 
       <View style={styles.usedHeader}>
-        <AppText variant="label">Budget Used</AppText>
+        <AppText variant="label">{t('budget.used')}</AppText>
         <AppText variant="label" color={barTone}>
           {Number.isFinite(percentage) ? percentage : 0}%
         </AppText>

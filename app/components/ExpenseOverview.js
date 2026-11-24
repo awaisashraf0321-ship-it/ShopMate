@@ -3,11 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Card, SegmentedControl } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius } = theme;
 const CHART_HEIGHT = 120;
 
-/** Dashboard "Total Spending" card with a period switch and bar chart. */
+/** Dashboard t('overview.total') card with a period switch and bar chart. */
 const ExpenseOverview = ({
   selectedTab,
   setSelectedTab,
@@ -23,10 +24,10 @@ const ExpenseOverview = ({
   const labelEvery = Math.max(1, Math.ceil(buckets.length / 6));
   const max = Math.max(...buckets.map(b => Number(b.Amount) || 0), 1);
   const hasSpending = buckets.some(b => Number(b.Amount) > 0);
-  const periodText = {
-    Today: 'today',
-    'This Week': 'this week',
-    'This Month': 'this month',
+  const noSpendingKey = {
+    Today: 'overview.noToday',
+    'This Week': 'overview.noWeek',
+    'This Month': 'overview.noMonth',
   };
   const total = formatAmount
     ? formatAmount(totalSpending ?? 0)
@@ -34,7 +35,7 @@ const ExpenseOverview = ({
 
   return (
     <Card padding="lg" style={styles.card}>
-      <AppText variant="title">Total Spending</AppText>
+      <AppText variant="title">{t('overview.total')}</AppText>
       <AppText variant="h1" style={styles.total}>
         Rs {total}
       </AppText>
@@ -58,10 +59,10 @@ const ExpenseOverview = ({
             />
           </View>
           <AppText variant="bodyStrong" align="center">
-            No spending {periodText[Period] ?? 'in this period'}
+            {t(noSpendingKey[Period] ?? 'overview.noPeriod')}
           </AppText>
           <AppText variant="caption" color="textSecondary" align="center">
-            Expenses you add will show up here as a chart.
+            {t('overview.empty')}
           </AppText>
         </View>
       ) : buckets.length > 0 ? (

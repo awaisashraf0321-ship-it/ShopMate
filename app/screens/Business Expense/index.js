@@ -1,6 +1,10 @@
+import VoiceSheet from '../../voice/VoiceSheet';
 import { screenFill } from '../../theme';
-import { StyleSheet, Text, View, Alert, Keyboard } from 'react-native';
+import { StyleSheet, Text, View, Keyboard } from 'react-native';
 import React from 'react';
+import Toast from 'react-native-toast-message';
+import { friendlyError } from '../../helpers/session';
+import { missingExpenseField } from '../../helpers/moneyWords';
 import Design from '../Business Expense/design';
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -12,7 +16,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import { useRef, useEffect } from 'react';
-const BusinessExpenseScreen = ({ navigation }) => {
+import { t } from '../../i18n';
+const BusinessExpenseScreen = ({ navigation, route }) => {
+  // Voice input: the mic in the header opens the panel; the Dashboard mic
+  // opens this screen with { startVoice: true }.
+  const [voiceOpen, setVoiceOpen] = useState(
+    Boolean(route?.params?.startVoice),
+  );
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [date, setDate] = useState(new Date());
@@ -21,7 +31,8 @@ const BusinessExpenseScreen = ({ navigation }) => {
   const [showTime, setShowTime] = useState(false);
   const [open, setOpen] = useState(false);
   const [expenseType, setExpenseType] = useState('');
-  const [paymentMode, setPaymentMode] = useState(null);
+  // Most expenses are paid in cash, so start there.
+  const [paymentMode, setPaymentMode] = useState(1);
   const [activeExpenseTab, setActiveExpenseTab] = useState(1);
   const [showErrorModal2, setShowErrorModal2] = useState(false);
   const [errorMessage2, setErrorMessage2] = useState('');
@@ -35,25 +46,32 @@ const BusinessExpenseScreen = ({ navigation }) => {
   const businessMutation = useMutation({
     mutationFn: ExpensesPost,
     onSuccess: response => {
-      if (response.Status) {
-        navigation.navigate('MainTabs', {
-          screen: 'Dashboard',
-        });
+      if (response?.Status === 200 || response?.Status === 201) {
+        Toast.show({ type: 'success', text1: t('expense.saved') });
+        navigation.goBack();
       } else {
-        Alert.alert('Error', response?.Message || 'Failed to add expense');
+        Toast.show({
+          type: 'error',
+          text1: t('expense.notSaved'),
+          text2: response?.Message || 'Please try again.',
+        });
       }
     },
     onError: error => {
-      console.log('Add Self Expense Error:', error);
-      Alert.alert('Error', 'Something went wrong while saving expense');
+      console.log('Add Expense Error:', error);
+      Toast.show({
+        type: 'error',
+        text1: t('expense.notSaved'),
+        text2: friendlyError(error),
+      });
     },
   });
   const { isPending } = businessMutation;
 
   const handleExpense = () => {
-    if (!amount || !category || !paymentMode) {
-      setErrorMessage2('Please fill all inputs');
-      setShowErrorModal2(true);
+    const missing = missingExpenseField({ amount, category });
+    if (missing) {
+      Toast.show({ type: 'error', text1: missing });
       return;
     }
     const payload = {
@@ -150,16 +168,27 @@ const BusinessExpenseScreen = ({ navigation }) => {
     return () => KeyboardHide.remove();
   }, []);
 
+  const applyVoice = draft => {
+    setVoiceOpen(false);
+    if (!draft) return;
+    if (draft.amount != null) setAmount(String(Math.round(draft.amount)));
+    if (draft.categoryId != null) setCategory(draft.categoryId);
+    if (draft.paymentMode != null) setPaymentMode(draft.paymentMode);
+    if (draft.date) setDate(draft.date);
+    if (draft.note) setNote(draft.note);
+  };
+
   return (
     <View style={screenFill}>
       <ErrorModal
         visible={showErrorModal2}
         onClose={() => setShowErrorModal2(false)}
-        text={'Bsuiness Expenses Failed!'}
+        text={t('common.couldNotSave')}
         errorMessage={errorMessage2}
       />
       <Loader visible={isPending} />
       <Design
+        onVoicePress={() => setVoiceOpen(true)}
         paymentMode={paymentMode}
         setPaymentMode={setPaymentMode}
         open={open}
@@ -197,6 +226,12 @@ const BusinessExpenseScreen = ({ navigation }) => {
         imageRemove={imageRemove}
         isDescriptionFocused={isDescriptionFocused}
         setDescriptionFoucused={setDescriptionFoucused}
+      />
+      <VoiceSheet
+        visible={voiceOpen}
+        categories={categories || []}
+        onClose={() => setVoiceOpen(false)}
+        onApply={applyVoice}
       />
     </View>
   );

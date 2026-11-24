@@ -11,12 +11,13 @@ import DropdownStylishBtn from '../../components/DropdownStylishBtn';
 import SavePayment from '../../components/SavePayment';
 import { categoryStyle } from '../../theme';
 import styles from './style';
+import { t } from '../../i18n';
 
 /**
  * Add Expense form, shared by the personal (SelfExpense) and business
  * (Business Expense) screens; only the header text differs.
  * Header row (back + title), then the fields in the order people fill
- * them: amount, category, date, payment method, note. "Save Expense"
+ * them: amount, category, date, payment method, note. t('expense.save')
  * stays pinned at the bottom.
  */
 const Design = ({
@@ -52,6 +53,7 @@ const Design = ({
   setDescriptionFoucused,
   title = 'Add Expense',
   subTitle = 'Personal expense',
+  onVoicePress,
 }) => (
   <View style={styles.screen}>
     <DropdownStylishBtn
@@ -63,6 +65,11 @@ const Design = ({
       title={title}
       subTitle={subTitle}
       back={() => navigation.goBack()}
+      rightAction={
+        onVoicePress
+          ? { icon: 'mic', label: t('home.voice'), onPress: onVoicePress }
+          : undefined
+      }
     />
     <Loader visible={loading} />
 
@@ -81,7 +88,7 @@ const Design = ({
           amount={amount}
           setAmount={setAmount}
           currency="Rs"
-          amountTitle="Amount"
+          amountTitle={t('expense.amount')}
           placeholder="0"
           handleAmountChange={handleAmountChange}
           onFocus={() => setDescriptionFoucused(true)}
@@ -97,7 +104,7 @@ const Design = ({
             visible={visible}
             setVisible={setVisible}
             amount={amount}
-            title="Category"
+            title={t('expense.category')}
           />
         </View>
 
@@ -149,7 +156,7 @@ const Design = ({
         <SavePayment
           amount={amount}
           onPress={handleExpense}
-          title="Save Expense"
+          title={t('expense.save')}
         />
       </View>
     </KeyboardAvoidingView>

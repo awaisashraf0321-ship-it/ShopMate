@@ -15,6 +15,7 @@ const NoteInput = ({
   placeholder = 'e.g. invoice #1042, partial payment',
   style,
   myNote = true,
+  autoFocus = false,
 }) => {
   const [focused, setFocused] = useState(false);
   return (
@@ -27,6 +28,7 @@ const NoteInput = ({
           placeholder={placeholder}
           placeholderTextColor={colors.textMuted}
           multiline
+          autoFocus={autoFocus}
           numberOfLines={3}
           textAlignVertical="top"
           accessibilityLabel="Note"

@@ -8,6 +8,7 @@ import Loader from '../../../components/Loader';
 import ImagePhotoOpen from '../../../components/ImagePhotoOpen';
 import { useTheme } from '../../../theme';
 import { AppText, Card } from '../../../ui';
+import { t } from '../../../i18n';
 
 const API_BASE = 'https://api.app.shopmate.squarecod.com';
 
@@ -50,8 +51,8 @@ const Design = ({
         showDropdown={false}
         showBack
         showPlus={false}
-        title="Personal Details"
-        subTitle="View your personal information"
+        title={t('profile.details')}
+        subTitle={t('profile.detailsSub')}
         back={() => navigation.goBack()}
       />
       <Loader visible={loading} />
@@ -86,17 +87,17 @@ const Design = ({
         <Card padding="none">
           <DetailRow
             icon="person-outline"
-            label="Full name"
+            label={t('profile.fullName')}
             value={personalDetail?.FullName}
           />
           <DetailRow
             icon="mail-outline"
-            label="Email address"
+            label={t('profile.email')}
             value={personalDetail?.Email}
           />
           <DetailRow
             icon="phone-iphone"
-            label="Phone number"
+            label={t('customer.phone')}
             value={personalDetail?.PhoneNumber}
             last
           />

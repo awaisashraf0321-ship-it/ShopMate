@@ -3,17 +3,37 @@ import { StyleSheet, View, Pressable, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../theme';
 import { AppText, Button, FormField } from '../ui';
+import { t } from '../i18n';
 
 const { colors, spacing, radius, sizes } = theme;
 
 const METHODS = [
-  { label: 'Cash', value: 1, icon: 'payments' },
-  { label: 'Bank', value: 2, icon: 'account-balance' },
-  { label: 'Credit', value: 3, icon: 'credit-card' },
+  {
+    get label() {
+      return t('money.cash');
+    },
+    value: 1,
+    icon: 'payments',
+  },
+  {
+    get label() {
+      return t('money.bank');
+    },
+    value: 2,
+    icon: 'account-balance',
+  },
+  // "Card", not "Credit": shopkeepers read "credit" as udhaar.
+  {
+    get label() {
+      return t('money.card');
+    },
+    value: 3,
+    icon: 'credit-card',
+  },
 ];
 
 /**
- * Payment-method picker (Cash / Bank, plus Credit on Loan & InComing).
+ * Payment-method picker (Cash / Bank, plus Card on Loan & InComing).
  * With `condition`, choosing Bank shows a receipt upload area.
  */
 const PaymentMethod = ({
@@ -32,7 +52,7 @@ const PaymentMethod = ({
       : METHODS.filter(method => method.value !== 3);
 
   return (
-    <FormField label="Payment Method">
+    <FormField label={t('money.paymentMethod')}>
       <View style={styles.options} accessibilityRole="radiogroup">
         {methods.map(method => {
           const selected = paymentMode === method.value;
@@ -85,9 +105,9 @@ const PaymentMethod = ({
               />
             </View>
             <View style={styles.flex}>
-              <AppText variant="bodyStrong">Upload Bank Receipt</AppText>
+              <AppText variant="bodyStrong">{t('receipt.upload')}</AppText>
               <AppText variant="caption" color="textSecondary">
-                Upload your payment proof
+                {t('receipt.proof')}
               </AppText>
             </View>
           </View>
@@ -122,17 +142,17 @@ const PaymentMethod = ({
                 color={colors.accent}
               />
               <AppText variant="bodyStrong" style={styles.emptyTitle}>
-                No Receipt Selected
+                {t('receipt.none')}
               </AppText>
               <AppText variant="caption" color="textSecondary" align="center">
-                Choose an image from gallery or camera
+                {t('receipt.choose')}
               </AppText>
             </View>
           )}
 
           <View style={styles.uploadButtons}>
             <Button
-              title="Gallery"
+              title={t('photo.gallery')}
               icon="photo-library"
               variant="secondary"
               size="sm"
@@ -140,7 +160,7 @@ const PaymentMethod = ({
               style={styles.flex}
             />
             <Button
-              title="Camera"
+              title={t('photo.camera')}
               icon="camera-alt"
               size="sm"
               onPress={openCamera}

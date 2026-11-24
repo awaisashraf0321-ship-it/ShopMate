@@ -18,6 +18,7 @@ import ModalBudgetAmountInput from '../components/ModalBudgetAmountInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import sizeHelper from '../helpers/sizeHelper';
 import { theme, categoryStyle } from '../theme';
+import { t } from '../i18n';
 
 const EditExpenseModal = ({
   visible,
@@ -79,10 +80,10 @@ const EditExpenseModal = ({
                   </View>
 
                   <View style={styles.headerText}>
-                    <Text style={styles.title}>Edit Expense</Text>
+                    <Text style={styles.title}>{t('expense.edit')}</Text>
 
                     <Text style={styles.subtitle}>
-                      Update your monthly budget.
+                      {t('expense.editSubtitle')}
                     </Text>
                   </View>
                 </View>
@@ -106,7 +107,7 @@ const EditExpenseModal = ({
               >
                 {/* Category */}
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Expense Category</Text>
+                  <Text style={styles.label}>{t('expense.editCategory')}</Text>
 
                   <ModalCategorySelector
                     categories={categories || []}
@@ -116,13 +117,13 @@ const EditExpenseModal = ({
                     myOverlay={true}
                     visible={categoryVisible}
                     setVisible={setCategoryVisible}
-                    title="Select Category"
+                    title={t('category.select')}
                   />
                 </View>
 
                 {/* Amount */}
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Expense Amount</Text>
+                  <Text style={styles.label}>{t('expense.editAmount')}</Text>
 
                   <ModalBudgetAmountInput
                     expenseAmount={expenseAmount}
@@ -132,7 +133,7 @@ const EditExpenseModal = ({
 
                 {/* Date */}
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Expense Date</Text>
+                  <Text style={styles.label}>{t('expense.editDate')}</Text>
 
                   <ModalDatePicker
                     date={date}
@@ -149,7 +150,7 @@ const EditExpenseModal = ({
                     onPress={onClose}
                     disabled={loading}
                   >
-                    <Text style={styles.cancelText}>Cancel</Text>
+                    <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity

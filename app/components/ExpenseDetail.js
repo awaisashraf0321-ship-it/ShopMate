@@ -1,5 +1,6 @@
 import React from 'react';
 import TransactionDetail from './TransactionDetail';
+import { t } from '../i18n';
 
 /** Detail view for a Self / Business expense. */
 const ExpenseDetail = ({
@@ -26,9 +27,9 @@ const ExpenseDetail = ({
       date={formatDate ? formatDate(Date) : Date}
       method={paymentMethod}
       rows={[
-        { label: 'Expense Type', value: Expensetype, icon: 'category' },
+        { label: t('expense.type'), value: Expensetype, icon: 'category' },
         {
-          label: 'Category',
+          label: t('expense.category'),
           value: expenseCategory,
           icon: category?.icon || 'label',
         },
