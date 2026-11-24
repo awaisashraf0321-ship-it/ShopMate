@@ -23,6 +23,19 @@ target 'shopMate' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Ship only the icon fonts the app uses. RNVectorIcons' podspec copies all
+  # ~18 icon fonts (~4.4 MB); keep this list in sync with UIAppFonts and
+  # android/app/build.gradle (project.ext.vectoricons).
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      next unless pod.name == 'RNVectorIcons'
+      pod.root_spec.attributes_hash['resources'] = [
+        'Fonts/MaterialIcons.ttf',
+        'Fonts/Ionicons.ttf',
+      ]
+    end
+  end
+
   post_install do |installer|
     react_native_post_install(
       installer,

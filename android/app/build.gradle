@@ -85,6 +85,18 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    // One APK per CPU type instead of one APK carrying all four (~72 MB).
+    // Phones only need the ARM builds; x86/x86_64 are for emulators.
+    // (For Google Play, upload the .aab from `bundleRelease`, which does this
+    // automatically.)
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            universalApk false
+        }
+    }
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -117,4 +129,9 @@ dependencies {
         implementation jscFlavor
     }
 }
+// Bundle only the icon fonts the app uses (MaterialIcons, Ionicons) instead
+// of all ~18 sets (~3.8 MB).
+project.ext.vectoricons = [
+    iconFontNames: [ 'MaterialIcons.ttf', 'Ionicons.ttf' ]
+]
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
